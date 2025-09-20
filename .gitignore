@@ -12,6 +12,7 @@
 .buildlog/
 .history
 .svn/
+assets/.env
 
 # IntelliJ related
 *.iml

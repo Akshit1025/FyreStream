@@ -1,4 +1,4 @@
-# **FyreStream Music 🌸🎶**
+# **FyreStream Music 🔥🎶**
 
 FyreStream is my experimental Flutter project, a music app designed to bring you ad-free tunes from various sources and learn Flutter for My future projects. Dive into a world of limitless music from platforms like YouTube and Jio Saavn, with more sources blooming soon! 🌼🎵
 

@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <application
         android:label="FyreStream"
-        android:name="${applicationName}"
+        android:name="io.flutter.app.FlutterMultiDexApplication"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/launcher_icon">
         <activity

@@ -1,3 +1,4 @@
+import 'package:fyrestream/screens/screen/home_views/setting_views/check_update_view.dart';
 import 'package:flutter/material.dart';
 import 'package:fyrestream/theme_data/default.dart';
 
@@ -20,14 +21,28 @@ class SettingsView extends StatelessWidget {
           ).merge(Default_Theme.secondoryTextStyle),
         ),
       ),
-      body: Center(
-        child: Text(
-          'FyreStream🔥 is up-to-date!!!',
-          style: TextStyle(
-            color: Default_Theme.accentColor2,
-            fontSize: 20,
-          ).merge(Default_Theme.tertiaryTextStyle),
-        ),
+      body: Column(
+        children: [
+          ListTile(
+            title: Text(
+              "Update",
+              style: const TextStyle(
+                  color: Default_Theme.primaryColor1, fontSize: 20)
+                  .merge(Default_Theme.secondoryTextStyleMedium),
+            ),
+            subtitle: Text(
+              "Check for latest updates",
+              style: TextStyle(
+                  color: Default_Theme.primaryColor1.withOpacity(0.5),
+                  fontSize: 14)
+                  .merge(Default_Theme.secondoryTextStyleMedium),
+            ),
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => CheckUpdateView()));
+            },
+          ),
+        ],
       ),
     );
   }

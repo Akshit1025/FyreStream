@@ -63,15 +63,15 @@ class GlobalRoutes {
         builder: (context, state, navigationShell) =>
             ScaffholdWithNavbar(navigationShell: navigationShell),
         branches: [
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                name: GlobalStrConsts.testScreen,
-                path: '/Test',
-                builder: (context, state) => TestView(),
-              ),
-            ],
-          ),
+          // StatefulShellBranch(
+          //   routes: [
+          //     GoRoute(
+          //       name: GlobalStrConsts.testScreen,
+          //       path: '/Test',
+          //       builder: (context, state) => TestView(),
+          //     ),
+          //   ],
+          // ),
           StatefulShellBranch(
             routes: [
               GoRoute(

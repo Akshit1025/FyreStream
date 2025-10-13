@@ -87,11 +87,11 @@ class ScaffholdWithNavbar extends StatelessWidget {
                 ),
                 backgroundColor: Default_Theme.themeColor.withOpacity(0.3),
                 tabs: const [
-                  GButton(
-                    icon: FluentIcons.bin_full_20_filled,
-                    iconSize: 27,
-                    text: "Test",
-                  ),
+                  // GButton(
+                  //   icon: FluentIcons.bin_full_20_filled,
+                  //   iconSize: 27,
+                  //   text: "Test",
+                  // ),
                   GButton(
                     icon: FluentIcons.home_heart_24_filled,
                     iconSize: 27,

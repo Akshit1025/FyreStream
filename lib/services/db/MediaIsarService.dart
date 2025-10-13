@@ -177,7 +177,7 @@ class MediaIsarDBService {
 
   Future<Isar> openDB() async {
     if (Isar.instanceNames.isEmpty) {
-      String _path = (await getApplicationCacheDirectory()).path;
+      String _path = (await getApplicationDocumentsDirectory()).path;
       print(_path);
       return await Isar.open([
         MediaPlaylistDBSchema,

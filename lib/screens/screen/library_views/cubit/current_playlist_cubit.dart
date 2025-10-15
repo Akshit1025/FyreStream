@@ -50,7 +50,7 @@ class CurrentPlaylistCubit extends Cubit<CurrentPlaylistState> {
         mediaPlaylist!.mediaItems[0].artUri.toString(),
       );
     }
-    // print(paletteGenerator.toString());
+    // log(paletteGenerator.toString());
     emit(
       state.copyWith(
         albumName: mediaPlaylist?.albumName,
@@ -77,7 +77,6 @@ class CurrentPlaylistCubit extends Cubit<CurrentPlaylistState> {
   }
 
   PaletteGenerator? getCurrentPlaylistPallete() {
-    print(paletteGenerator!.dominantColor.toString());
     return paletteGenerator;
   }
 }

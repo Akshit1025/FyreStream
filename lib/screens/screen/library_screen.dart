@@ -76,12 +76,12 @@ class LibraryScreen extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          const UnicodeIcon(
-            strCode: "\uf002",
-            font: Default_Theme.fontAwesomeSolidFont,
-            fontSize: 24.0,
-            padding: EdgeInsets.only(left: 7, right: 7),
-          ),
+          // const UnicodeIcon(
+          //   strCode: "\uf002",
+          //   font: Default_Theme.fontAwesomeSolidFont,
+          //   fontSize: 24.0,
+          //   padding: EdgeInsets.only(left: 7, right: 7),
+          // ),
           InkWell(
             onTap: () {
               createPlaylistBottomSheet(context);

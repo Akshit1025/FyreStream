@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:html_unescape/html_unescape_small.dart';
@@ -30,7 +31,7 @@ class YouTubeServices {
       final Video result = await yt.videos.get(id);
       return result;
     } catch (e) {
-      Logger.root.severe('Error while getting video from id', e);
+      log('Error while getting video from id ${e.toString()}', name: "YoutubeAPI");
       return null;
     }
   }
@@ -142,8 +143,9 @@ class YouTubeServices {
             'playlists': playlistItems,
           };
         } else {
-          Logger.root.severe(
+          log(
             "got null in getMusicHome for '${element['title']['runs'][0]['text']}'",
+            name: "YoutubeAPI"
           );
           return null;
         }
@@ -154,7 +156,7 @@ class YouTubeServices {
 
       return {'body': finalResult, 'head': finalHeadResult};
     } catch (e) {
-      Logger.root.severe('Error in getMusicHome: $e');
+      log('Error in getMusicHome: $e', name: "YoutubeAPI");
       return {};
     }
   }
@@ -175,7 +177,7 @@ class YouTubeServices {
       // return (res['suggestions'] as List).map((e) => unescape.convert(e.toString())).toList();
       return res.map((e) => unescape.convert(e.toString())).toList();
     } catch (e) {
-      Logger.root.severe('Error in getSearchSuggestions: $e');
+      log('Error in getSearchSuggestions: $e', name: "YoutubeAPI");
       return [];
     }
   }
@@ -206,7 +208,7 @@ class YouTubeServices {
 
       return result;
     } catch (e) {
-      Logger.root.severe('Error in formatVideoItems: $e');
+      log('Error in formatVideoItems: $e', name: "YoutubeAPI");
       return List.empty();
     }
   }
@@ -238,7 +240,7 @@ class YouTubeServices {
 
       return result;
     } catch (e) {
-      Logger.root.severe('Error in formatChartItems: $e');
+      log('Error in formatChartItems: $e', name: "YoutubeAPI");
       return List.empty();
     }
   }
@@ -270,7 +272,7 @@ class YouTubeServices {
 
       return result;
     } catch (e) {
-      Logger.root.severe('Error in formatItems: $e');
+      log('Error in formatItems: $e', name: "YoutubeAPI");
       return List.empty();
     }
   }
@@ -305,7 +307,7 @@ class YouTubeServices {
 
       return result;
     } catch (e) {
-      Logger.root.severe('Error in formatHeadItems: $e');
+      log('Error in formatHeadItems: $e', name: "YoutubeAPI");
       return List.empty();
     }
   }

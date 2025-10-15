@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -44,7 +45,7 @@ class ImportMediaFromPlatformsView extends StatelessWidget {
             btnName: "Music from Spotify",
             btnIcon: "\uf1bc",
             onClickFunc: () {
-              print("music from spotify");
+              log("music from spotify");
             },
           ),
           ImportFromBtn(
@@ -62,7 +63,7 @@ class ImportMediaFromPlatformsView extends StatelessWidget {
             btnName: "Music from Youtube",
             btnIcon: "\uf167",
             onClickFunc: () {
-              print("music from youtube");
+              log("music from youtube");
             },
           ),
         ],
@@ -176,13 +177,6 @@ Future getIdAndShowBottomSheet(
                                             .fetchPlaylistFromSpotify(
                                               context.read<MediaDBCubit>(),
                                               value,
-                                            );
-
-                                        context
-                                            .read<SaavnSearchRepositoryCubit>()
-                                            .fetchPlaylistFromSpotify(
-                                              context.read<MediaDBCubit>(),
-                                              value.toString(),
                                             );
                                         showDialog(
                                           barrierDismissible: false,

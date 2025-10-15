@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart';
 import 'package:logging/logging.dart';
@@ -116,7 +117,7 @@ class SpotifyApi {
         );
       }
     } catch (e) {
-      Logger.root.severe('Error in getting spotify user playlists: $e');
+      log('Error in getting spotify user playlists: $e', name: "spotifyAPI");
     }
     return [];
   }
@@ -157,7 +158,6 @@ class SpotifyApi {
           'Error in getHundredTracksOfPlaylist, called: $path, returned: ${response.statusCode}',
           response.body,
         );
-        // print(response.statusCode);
       }
     } catch (e) {
       Logger.root.severe('Error in getting spotify playlist tracks: $e');
@@ -199,7 +199,7 @@ class SpotifyApi {
 
       if (response.statusCode == 200) {
         final result = await jsonDecode(response.body);
-        print(result);
+        log(result, name: "spotifyAPI");
         final List tracks = result['items'] as List;
         final int total = result['total'] as int;
 
@@ -209,10 +209,9 @@ class SpotifyApi {
           'Error in getHundredTracksOfPlaylist, called: $path, returned: ${response.statusCode}',
           response.body,
         );
-        // print(response.statusCode);
       }
     } catch (e) {
-      Logger.root.severe('Error in getting spotify playlist tracks: $e');
+      log('Error in getting spotify playlist tracks: $e', name: "spotifyAPI");
     }
     return {};
   }
@@ -305,7 +304,7 @@ class SpotifyApi {
       }
       return songsData;
     } catch (e) {
-      Logger.root.severe('Error in getting spotify featured playlists: $e');
+      log('Error in getting spotify featured playlists: $e', name: "spotifyAPI");
       return List.empty();
     }
   }
@@ -325,10 +324,9 @@ class SpotifyApi {
         limit: limit,
         type: type,
       );
-      // print(results["tracks"]["items"]);
+      // log(results["tracks"]["items"]);
       String tempQuery;
       if (results["tracks"] != null) {
-        print("inside");
         (results["tracks"]["items"] as List).forEach((e) {
           tempQuery = e["name"].toString();
           (e["artists"] as List).forEach((element) {

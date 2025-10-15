@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:fyrestream/model/MediaPlaylistModel.dart';
 import 'package:fyrestream/model/yt_music_model.dart';
@@ -63,6 +64,6 @@ class FetchSearchResultsCubit extends Cubit<FetchSearchResultsState> {
         loadingState: LoadingState.loaded,
       ),
     );
-    print("got all searches ${_mediaItemList.length}");
+    log("got all searches ${_mediaItemList.length}", name: "FetchSearchRes");
   }
 }

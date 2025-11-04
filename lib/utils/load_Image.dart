@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 Image loadImage(
   coverImageUrl, {
-  placeholderPath = "assets/sample/album_cover_sam1.jpg",
+  placeholderPath = "assets/icons/FyreStream_Logo.png",
 }) {
   ImageProvider<Object> placeHolder = AssetImage(placeholderPath);
   return Image.network(
@@ -49,7 +49,7 @@ Image loadImage(
 
 CachedNetworkImage loadImageCached(
   coverImageURL, {
-  placeholderPath = "assets/sample/album_cover_sam1.jpg",
+  placeholderPath = "assets/icons/FyreStream_Logo.png",
 }) {
   ImageProvider<Object> placeHolder = AssetImage(placeholderPath);
   return CachedNetworkImage(
@@ -89,7 +89,7 @@ CachedNetworkImage loadImageCached(
 
 Future<ImageProvider> getImageProvider(
   String imageUrl, {
-  String placeholderUrl = "assets/sample/album_cover_sam1.jpg",
+  String placeholderUrl = "assets/icons/FyreStream_Logo.png",
 }) async {
   if (imageUrl != "") {
     final response = await http.head(Uri.parse(imageUrl));

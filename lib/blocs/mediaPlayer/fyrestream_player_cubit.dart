@@ -28,6 +28,7 @@ class FyrestreamPlayerCubit extends Cubit<FyreStreamPlayerState> {
         androidNotificationChannelId: 'com.FyreStreamPlayer.notification.status',
         androidNotificationChannelName: 'FyreStream',
         androidResumeOnClick: true,
+        androidShowNotificationBadge: true,
         notificationColor: Default_Theme.accentColor2,
       ),
     );

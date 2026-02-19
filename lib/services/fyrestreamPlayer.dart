@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:async/async.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
@@ -17,6 +18,8 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
   );
   int currentPlayingIdx = 0;
 
+  CancelableOperation<List<String>> getLinkOperation = CancelableOperation.fromFuture(Future.value([]));
+
   FyreStreamMusicPlayer() {
     audioPlayer = AudioPlayer(
       androidOffloadSchedulingEnabled: true,
@@ -25,7 +28,7 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
     audioPlayer.setVolume(1);
 
     audioPlayer.playerStateStream.listen((event) {
-      log(event.playing.toString(), name: "fyrestreamPlayer-event");
+      // log(event.playing.toString(), name: "fyrestreamPlayer-event");
       playbackState.add(
         PlaybackState(
           // Which buttons should appear in the notification now
@@ -96,7 +99,7 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
 
   @override
   Future<void> playMediaItem(MediaItem mediaItem) async {
-    log(mediaItem.extras?["url"], name: "fyrestreamPlayer");
+    // log(mediaItem.extras?["url"], name: "fyrestreamPlayer");
     bool isPlaying = audioPlayer.playing;
     updateMediaItem(mediaItem);
     if (mediaItem.extras?["source"] == "youtube") {
@@ -106,10 +109,22 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
         mediaItem.id.replaceAll("youtube", ''),
       );
       if (tempStrmVideo != null) {
-        final tempStrmLink = await YouTubeServices().getUri(tempStrmVideo);
+        if (!getLinkOperation.isCompleted) {
+          getLinkOperation.cancel();
+        }
 
-        await audioPlayer.setUrl(tempStrmLink.first).then((value) {
-          if (isPlaying) audioPlayer.play();
+        getLinkOperation = CancelableOperation.fromFuture(
+          YouTubeServices().getUri(tempStrmVideo), onCancel: () {
+            log("Cancelled/Skipped - ${mediaItem.title}", name: "fyrestreamPlayer");
+        }
+        );
+
+        getLinkOperation.then((tempStrmLinks) {
+          audioPlayer.setUrl(tempStrmLinks.first).then((value) {
+            if (super.mediaItem.value?.id == mediaItem.id && isPlaying) {
+              audioPlayer.play();
+            }
+          });
         });
       }
       return;
@@ -137,7 +152,7 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
     if (currentPlayingIdx < (currentPlaylist.length - 1)) {
       currentPlayingIdx++;
       prepare4play(idx: currentPlayingIdx);
-      log("skippingNext-------", name: "fyrestreamPlayer");
+      // log("skippingNext-------", name: "fyrestreamPlayer");
     }
   }
 
@@ -158,13 +173,15 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
 
   @override
   Future<void> onTaskRemoved() {
-    audioPlayer.stop();
+    super.stop();
+    audioPlayer.dispose();
     return super.onTaskRemoved();
   }
 
   @override
   Future<void> onNotificationDeleted() {
     audioPlayer.stop();
+    super.stop();
 
     return super.onNotificationDeleted();
   }

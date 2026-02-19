@@ -250,21 +250,20 @@ class _PlaylistState extends State<Playlist> {
       proxyDecorator: proxyDecorator,
       itemBuilder: (context, index) {
         return Dismissible(
-          direction: DismissDirection.endToStart,
-          background: Container(color: Colors.green),
-          secondaryBackground: Container(
+          direction: DismissDirection.startToEnd,
+          background: Container(
             color: Colors.red,
             child: const Row(
               children: [
-                Spacer(),
                 Padding(
-                  padding: EdgeInsets.only(right: 20),
+                  padding: EdgeInsets.only(left: 20),
                   child: Icon(
                     FluentIcons.delete_dismiss_28_regular,
                     color: Colors.white,
                     size: 30,
                   ),
                 ),
+                Spacer(),
               ],
             ),
           ),
@@ -289,7 +288,7 @@ class _PlaylistState extends State<Playlist> {
           ),
         );
       },
-      itemCount: _state.mediaItem.length ?? 0,
+      itemCount: _state.mediaItem.length,
       onReorder: (oldIndex, newIndex) {
         setState(() {
           if (oldIndex < newIndex) {

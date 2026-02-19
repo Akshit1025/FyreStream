@@ -1,7 +1,7 @@
 ![FyreStream](./assets/icons/FyreStream_Logo_cover.png)
 # **FyreStream Music 🔥🎶**
 
-FyreStream is my experimental Flutter project, a music app designed to bring you ad-free tunes from various sources and learn Flutter for My future projects. Dive into a world of limitless music from platforms like YouTube and Jio Saavn, with more sources firing soon! 🔥🎵
+FyreStream is my experimental Flutter project, a music app to learn Flutter for my future projects and designed to bring you ad-free tunes from various sources. Dive into a world of limitless music from platforms like YouTube and Jio Saavn, with more sources firing soon! 🔥🎵
 
 Actually i needed it...was frustrated with Ad-based Music Player 😉😎
 

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
@@ -23,24 +25,34 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
     audioPlayer.setVolume(1);
 
     audioPlayer.playerStateStream.listen((event) {
+      log(event.playing.toString(), name: "fyrestreamPlayer-event");
       playbackState.add(
         PlaybackState(
           // Which buttons should appear in the notification now
           controls: [
             MediaControl.skipToPrevious,
-            event.playing ? MediaControl.pause : MediaControl.play,
-            MediaControl.stop,
+            !event.playing ? MediaControl.play : MediaControl.pause,
+            // MediaControl.stop,
             MediaControl.skipToNext,
           ],
-          // Which other actions should be enabled in the notification
-          systemActions: const {
-            MediaAction.seek,
-            MediaAction.seekForward,
-            MediaAction.seekBackward,
+
+          processingState: switch (event.processingState){
+            ProcessingState.idle => AudioProcessingState.idle,
+            ProcessingState.loading => AudioProcessingState.loading,
+            ProcessingState.buffering => AudioProcessingState.buffering,
+            ProcessingState.ready => AudioProcessingState.ready,
+            ProcessingState.completed => AudioProcessingState.completed,
           },
 
-          androidCompactActionIndices: const [0, 1, 3],
+          // Which other actions should be enabled in the notification
+          systemActions: const {
+            MediaAction.skipToPrevious,
+            MediaAction.playPause,
+            MediaAction.skipToNext,
+          },
 
+          androidCompactActionIndices: const [0, 1, 2],
+          updatePosition: audioPlayer.position,
           playing: event.playing,
         ),
       );
@@ -52,7 +64,7 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
   @override
   Future<void> play() async {
     await audioPlayer.play();
-    // print("playing");
+    // log("playing", name: "fyrestreamPlayer");
   }
 
   @override
@@ -79,12 +91,12 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
   @override
   Future<void> pause() async {
     await audioPlayer.pause();
-    print("paused");
+    log("paused", name: "fyrestreamPlayer");
   }
 
   @override
   Future<void> playMediaItem(MediaItem mediaItem) async {
-    print(mediaItem.extras?["url"]);
+    log(mediaItem.extras?["url"], name: "fyrestreamPlayer");
     bool isPlaying = audioPlayer.playing;
     updateMediaItem(mediaItem);
     if (mediaItem.extras?["source"] == "youtube") {
@@ -125,13 +137,13 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
     if (currentPlayingIdx < (currentPlaylist.length - 1)) {
       currentPlayingIdx++;
       prepare4play(idx: currentPlayingIdx);
-      print("skippingNext-------");
+      log("skippingNext-------", name: "fyrestreamPlayer");
     }
   }
 
   @override
   Future<void> stop() async {
-    // print("Called Stop!!");
+    // log("Called Stop!!");
     // audioPlayer.stop();
     super.stop();
   }

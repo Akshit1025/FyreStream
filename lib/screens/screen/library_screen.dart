@@ -131,24 +131,23 @@ class _ListOfPlaylistsState extends State<ListOfPlaylists> {
         padding: const EdgeInsets.only(bottom: 8),
         child: Dismissible(
           key: ValueKey(widget.state.playlists[index].playlistName),
-          background: Container(color: Colors.green),
-          secondaryBackground: Container(
+          background: Container(
             color: Colors.red,
             child: const Row(
               children: [
-                Spacer(),
                 Padding(
-                  padding: EdgeInsets.only(right: 20),
+                  padding: EdgeInsets.only(left: 20),
                   child: Icon(
                     FluentIcons.delete_dismiss_28_regular,
                     color: Colors.white,
                     size: 30,
                   ),
                 ),
+                Spacer(),
               ],
             ),
           ),
-          direction: DismissDirection.endToStart,
+          direction: DismissDirection.startToEnd,
           onDismissed: (DismissDirection direction) {
             context.read<LibraryItemsCubit>().removePlaylist(
               MediaPlaylistDB(

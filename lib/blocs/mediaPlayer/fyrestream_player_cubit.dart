@@ -25,9 +25,9 @@ class FyrestreamPlayerCubit extends Cubit<FyreStreamPlayerState> {
       builder: () => FyreStreamMusicPlayer(),
       config: const AudioServiceConfig(
         androidStopForegroundOnPause: true,
-        androidNotificationChannelId: 'com.BloomeePlayer.notification.status',
-        androidNotificationChannelName: 'mediaPlayback',
-        androidShowNotificationBadge: true,
+        androidNotificationChannelId: 'com.FyreStreamPlayer.notification.status',
+        androidNotificationChannelName: 'FyreStream',
+        androidResumeOnClick: true,
         notificationColor: Default_Theme.accentColor2,
       ),
     );

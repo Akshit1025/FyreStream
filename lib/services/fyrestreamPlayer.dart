@@ -16,6 +16,7 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
   BehaviorSubject<String> currentQueueName = BehaviorSubject<String>.seeded(
     "Empty",
   );
+  BehaviorSubject<bool> isLinkProcessing = BehaviorSubject<bool>.seeded(false);
   int currentPlayingIdx = 0;
   bool isPaused = false;
 
@@ -108,6 +109,7 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
     if (mediaItem.extras?["source"] == "youtube") {
       audioPlayer.seek(Duration.zero);
       audioPlayer.stop();
+      isLinkProcessing.add(true);
       final tempStrmVideo = await YouTubeServices().getVideoFromId(
         mediaItem.id.replaceAll("youtube", ''),
       );
@@ -124,6 +126,7 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
 
         getLinkOperation.then((tempStrmLinks) {
           audioPlayer.setUrl(tempStrmLinks.first).then((value) {
+            isLinkProcessing.add(false);
             if (super.mediaItem.value?.id == mediaItem.id && !isPaused) {
               audioPlayer.play();
             }

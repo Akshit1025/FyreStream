@@ -1,14 +1,17 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:fyrestream/repository/Youtube/youtube_api.dart';
 import 'package:fyrestream/repository/cubits/fetch_search_results.dart';
 import 'package:fyrestream/theme_data/default.dart';
 
 class searchPageDelegate extends SearchDelegate {
   List<String> searchList = [];
+  SourceEngine _sourceEngine = SourceEngine.eng_YTM;
+  searchPageDelegate(this._sourceEngine,);
 
   @override
-  // TODO: implement searchFieldLabel
   String? get searchFieldLabel => "What you want to listen?";
 
   @override
@@ -42,7 +45,9 @@ class searchPageDelegate extends SearchDelegate {
   @override
   void showResults(BuildContext context) {
     if (query.isNotEmpty) {
-      context.read<FetchSearchResultsCubit>().search(query);
+      context
+          .read<FetchSearchResultsCubit>()
+          .search(query, sourceEngine: _sourceEngine);
     }
     close(context, query);
   }

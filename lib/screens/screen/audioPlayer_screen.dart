@@ -13,6 +13,7 @@ import 'package:fyrestream/services/db/cubit/mediadb_cubit.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:fyrestream/utils/load_Image.dart';
 import 'package:fyrestream/utils/pallete_generator.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import '../../blocs/mediaPlayer/fyrestream_player_cubit.dart';
 import '../../routes_and_consts/global_str_consts.dart';
@@ -382,11 +383,20 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                               size: 35,
                             ),
                           ),
-                          const Icon(
-                            FluentIcons.open_48_filled,
-                            color: Default_Theme.primaryColor1,
-                            size: 35,
-                          ),
+                          InkWell(
+                            child: const Icon(
+                              FluentIcons.open_48_filled,
+                              color: Default_Theme.primaryColor1,
+                              size: 35,
+                            ),
+                            onTap: () {
+                              launchUrlString(context
+                                  .read<FyrestreamPlayerCubit>()
+                                  .fyrestreamPlayer
+                                  .currentMedia
+                                  .extras?['perma_url']);
+                            },
+                          )
                         ],
                       ),
                     ),

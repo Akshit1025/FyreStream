@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:fyrestream/screens/widgets/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fyrestream/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
@@ -72,6 +73,7 @@ class _MyAppState extends State<MyApp> {
               );
             } else {
               return MaterialApp.router(
+                scaffoldMessengerKey: SnackbarService.messengerKey,
                 routerConfig: GlobalRoutes().globalRouter,
               );
             }

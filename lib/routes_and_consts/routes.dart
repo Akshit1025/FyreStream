@@ -9,7 +9,6 @@ import 'package:fyrestream/screens/screen/library_views/import_media_view.dart';
 import 'package:fyrestream/screens/screen/library_views/playlist_screen.dart';
 import 'package:fyrestream/screens/screen/offline_screen.dart';
 import 'package:fyrestream/screens/screen/search_screen.dart';
-import 'package:fyrestream/screens/screen/test_screen.dart';
 import 'package:fyrestream/screens/widgets/global_navbar.dart';
 
 class GlobalRoutes {

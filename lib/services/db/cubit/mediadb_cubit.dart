@@ -1,7 +1,10 @@
 import 'dart:developer';
 
+import 'package:fyrestream/screens/widgets/snackbar.dart';
+import 'package:fyrestream/theme_data/default.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:bloc/bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:fyrestream/model/MediaPlaylistModel.dart';
@@ -14,62 +17,65 @@ part 'mediadb_state.dart';
 class MediaDBCubit extends Cubit<MediadbState> {
   BehaviorSubject<bool> refreshLibrary = BehaviorSubject<bool>.seeded(false);
   MediaIsarDBService isarDBService = MediaIsarDBService();
-
   MediaDBCubit() : super(MediadbInitial()) {
     addNewPlaylistToDB(MediaPlaylistDB(playlistName: "Liked"));
   }
 
-  Future<void> addNewPlaylistToDB(MediaPlaylistDB mediaPlaylistDB) async {
+  Future<void> addNewPlaylistToDB(MediaPlaylistDB mediaPlaylistDB,
+      {bool undo = false}) async {
     List<String> _list = await getListOfPlaylists();
     if (!_list.contains(mediaPlaylistDB.playlistName)) {
       isarDBService.addPlaylist(mediaPlaylistDB);
       refreshLibrary.add(true);
+      if (!undo) {
+        SnackbarService.showMessage(
+            "Playlist ${mediaPlaylistDB.playlistName} added");
+      }
     }
   }
 
   MediaItemDB MediaItem2MediaItemDB(MediaItem mediaItem) {
     return MediaItemDB(
-      title: mediaItem.title,
-      album: mediaItem.album ?? "Unknown",
-      artist: mediaItem.artist ?? "Unknown",
-      artURL: mediaItem.artUri.toString(),
-      genre: mediaItem.genre ?? "Unknown",
-      mediaID: mediaItem.id,
-      streamingURL: mediaItem.extras?["url"],
-      permaURL: mediaItem.extras?["perma_url"],
-      language: mediaItem.extras?["language"] ?? "Unknown",
-      isLiked: false,
-      source: mediaItem.extras?["source"] ?? "Saavn",
-    );
+        title: mediaItem.title,
+        album: mediaItem.album ?? "Unknown",
+        artist: mediaItem.artist ?? "Unknown",
+        artURL: mediaItem.artUri.toString(),
+        genre: mediaItem.genre ?? "Unknown",
+        mediaID: mediaItem.id,
+        streamingURL: mediaItem.extras?["url"],
+        permaURL: mediaItem.extras?["perma_url"],
+        language: mediaItem.extras?["language"] ?? "Unknown",
+        isLiked: false,
+        source: mediaItem.extras?["source"] ?? "Saavn");
   }
 
   MediaItemModel MediaItemDB2MediaItem(MediaItemDB mediaItemDB) {
     return MediaItemModel(
-      id: mediaItemDB.mediaID,
-      title: mediaItemDB.title,
-      album: mediaItemDB.album,
-      artist: mediaItemDB.artist,
-      artUri: Uri.parse(mediaItemDB.artURL),
-      genre: mediaItemDB.genre,
-      extras: {
-        "url": mediaItemDB.streamingURL,
-        "source": mediaItemDB.source ?? "None",
-        "perma_url": mediaItemDB.permaURL,
-        "language": mediaItemDB.language,
-      },
-    );
+        id: mediaItemDB.mediaID,
+        title: mediaItemDB.title,
+        album: mediaItemDB.album,
+        artist: mediaItemDB.artist,
+        artUri: Uri.parse(mediaItemDB.artURL),
+        genre: mediaItemDB.genre,
+        extras: {
+          "url": mediaItemDB.streamingURL,
+          "source": mediaItemDB.source ?? "None",
+          "perma_url": mediaItemDB.permaURL,
+          "language": mediaItemDB.language,
+        });
   }
 
   Future<void> setLike(MediaItem mediaItem, {isLiked = false}) async {
-    isarDBService.addMediaItem(
-      MediaItem2MediaItemDB(mediaItem),
-      MediaPlaylistDB(playlistName: "Liked"),
-    );
+    isarDBService.addMediaItem(MediaItem2MediaItemDB(mediaItem),
+        MediaPlaylistDB(playlistName: "Liked"));
     refreshLibrary.add(true);
-    isarDBService.likeMediaItem(
-      MediaItem2MediaItemDB(mediaItem),
-      isLiked: isLiked,
-    );
+    isarDBService.likeMediaItem(MediaItem2MediaItemDB(mediaItem),
+        isLiked: isLiked);
+    if (isLiked) {
+      SnackbarService.showMessage("${mediaItem.title} is Liked!!");
+    } else {
+      SnackbarService.showMessage("${mediaItem.title} is Unliked!!");
+    }
   }
 
   Future<bool> isLiked(MediaItem mediaItem) {
@@ -78,9 +84,7 @@ class MediaDBCubit extends Cubit<MediadbState> {
   }
 
   List<MediaItemDB> reorderByRank(
-    List<MediaItemDB> orgMediaList,
-    List<int> rankIndex,
-  ) {
+      List<MediaItemDB> orgMediaList, List<int> rankIndex) {
     // rankIndex = rankIndex.toSet().toList();
     // orgMediaList.toSet().toList();
     List<MediaItemDB> reorderedList = orgMediaList;
@@ -90,12 +94,13 @@ class MediaDBCubit extends Cubit<MediadbState> {
     log(rankIndex.toString(), name: "MediaDBCubit");
     if (rankIndex.length == orgMediaList.length) {
       reorderedList = rankIndex
-          .map((e) => orgMediaList.firstWhere((element) => e == element.id))
+          .map((e) => orgMediaList.firstWhere(
+            (element) => e == element.id,
+      ))
           .map((e) => e)
           .toList();
-      log(
-        'ranklist length - ${rankIndex.length} org length - ${orgMediaList.length}', name: "MediaDBCubit"
-      );
+      log('ranklist length - ${rankIndex.length} org length - ${orgMediaList.length}',
+          name: "MediaDBCubit");
       return reorderedList;
     } else {
       return orgMediaList;
@@ -103,18 +108,14 @@ class MediaDBCubit extends Cubit<MediadbState> {
   }
 
   Future<MediaPlaylist> getPlaylistItems(
-    MediaPlaylistDB mediaPlaylistDB,
-  ) async {
-    MediaPlaylist _mediaPlaylist = MediaPlaylist(
-      mediaItems: [],
-      albumName: mediaPlaylistDB.playlistName,
-    );
+      MediaPlaylistDB mediaPlaylistDB) async {
+    MediaPlaylist _mediaPlaylist =
+    MediaPlaylist(mediaItems: [], albumName: mediaPlaylistDB.playlistName);
 
     var _dbList = await isarDBService.getPlaylistItems(mediaPlaylistDB);
     if (_dbList != null) {
-      List<int> _rankList = await isarDBService.getPlaylistItemsRank(
-        mediaPlaylistDB,
-      );
+      List<int> _rankList =
+      await isarDBService.getPlaylistItemsRank(mediaPlaylistDB);
 
       if (_rankList.isNotEmpty) {
         _dbList = reorderByRank(_dbList, _rankList);
@@ -129,9 +130,7 @@ class MediaDBCubit extends Cubit<MediadbState> {
   }
 
   Future<void> setPlayListItemsRank(
-    MediaPlaylistDB mediaPlaylistDB,
-    List<int> rankList,
-  ) async {
+      MediaPlaylistDB mediaPlaylistDB, List<int> rankList) async {
     isarDBService.setPlaylistItemsRank(mediaPlaylistDB, rankList);
   }
 
@@ -151,10 +150,8 @@ class MediaDBCubit extends Cubit<MediadbState> {
   }
 
   MediaPlaylist fromPlaylistDB2MediaPlaylist(MediaPlaylistDB mediaPlaylistDB) {
-    MediaPlaylist mediaPlaylist = MediaPlaylist(
-      mediaItems: [],
-      albumName: mediaPlaylistDB.playlistName,
-    );
+    MediaPlaylist mediaPlaylist =
+    MediaPlaylist(mediaItems: [], albumName: mediaPlaylistDB.playlistName);
     if (mediaPlaylistDB.mediaItems.isNotEmpty) {
       mediaPlaylistDB.mediaItems.forEach((element) {
         mediaPlaylist.mediaItems.add(MediaItemDB2MediaItem(element));
@@ -175,38 +172,48 @@ class MediaDBCubit extends Cubit<MediadbState> {
   }
 
   Future<void> reorderPositionOfItemInDB(
-    String playlistName,
-    int old_idx,
-    int new_idx,
-  ) async {
+      String playlistName, int old_idx, int new_idx) async {
     isarDBService.reorderItemPositionInPlaylist(
-      MediaPlaylistDB(playlistName: playlistName),
-      old_idx,
-      new_idx,
-    );
+        MediaPlaylistDB(playlistName: playlistName), old_idx, new_idx);
   }
 
   Future<void> removePlaylist(MediaPlaylistDB mediaPlaylistDB) async {
     isarDBService.removePlaylist(mediaPlaylistDB);
+    SnackbarService.showMessage("${mediaPlaylistDB.playlistName} is Deleted!!",
+        duration: const Duration(seconds: 3),
+        action: SnackBarAction(
+          label: "Undo",
+          textColor: Default_Theme.accentColor2,
+          onPressed: () => addNewPlaylistToDB(mediaPlaylistDB, undo: true),
+        ));
   }
 
   Future<void> removeMediaFromPlaylist(
-    MediaItem mediaItem,
-    MediaPlaylistDB mediaPlaylistDB,
-  ) async {
+      MediaItem mediaItem, MediaPlaylistDB mediaPlaylistDB) async {
     MediaItemDB _mediaItemDB = MediaItem2MediaItemDB(mediaItem);
-    isarDBService.removeMediaItem(_mediaItemDB, mediaPlaylistDB);
+    isarDBService.removeMediaItem(_mediaItemDB, mediaPlaylistDB).then((value) {
+      SnackbarService.showMessage(
+          "${mediaItem.title} is removed from ${mediaPlaylistDB.playlistName}!!",
+          duration: const Duration(seconds: 3),
+          action: SnackBarAction(
+              label: "Undo",
+              textColor: Default_Theme.accentColor2,
+              onPressed: () => addMediaItemToPlaylist(
+                  MediaItemDB2MediaItem(_mediaItemDB), mediaPlaylistDB,
+                  undo: true)));
+    });
   }
 
   Future<void> addMediaItemToPlaylist(
-    MediaItemModel mediaItemModel,
-    MediaPlaylistDB mediaPlaylistDB,
-  ) async {
+      MediaItemModel mediaItemModel, MediaPlaylistDB mediaPlaylistDB,
+      {bool undo = false}) async {
     isarDBService.addMediaItem(
-      MediaItem2MediaItemDB(mediaItemModel),
-      mediaPlaylistDB,
-    );
+        MediaItem2MediaItemDB(mediaItemModel), mediaPlaylistDB);
     refreshLibrary.add(true);
+    if (!undo) {
+      SnackbarService.showMessage(
+          "${mediaItemModel.title} is added to ${mediaPlaylistDB.playlistName}!!");
+    }
   }
 
   @override

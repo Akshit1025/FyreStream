@@ -14,14 +14,14 @@ class NotificationView extends StatelessWidget {
         foregroundColor: Default_Theme.primaryColor1,
         title: Text(
           'Notifications',
-          style: TextStyle(
+          style: const TextStyle(
             color: Default_Theme.primaryColor1,
             fontSize: 25,
             fontWeight: FontWeight.bold,
           ).merge(Default_Theme.secondoryTextStyle),
         ),
       ),
-      body: const Center(child: Text('GeeksForGeeks')),
+      body: const Center(child: Text('FyreStream Notifications View')),
     );
   }
 }

@@ -209,7 +209,6 @@ class MiniPlayerWidget extends StatelessWidget {
                         onPressed: () => context
                             .read<FyrestreamPlayerCubit>()
                             .fyrestreamPlayer
-                            .audioPlayer
                             .stop(),
                         icon: const Icon(
                           Icons.close_rounded,

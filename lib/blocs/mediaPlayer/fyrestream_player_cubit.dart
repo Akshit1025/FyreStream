@@ -64,9 +64,9 @@ class FyrestreamPlayerCubit extends Cubit<FyreStreamPlayerState> {
   @override
   Future<void> close() {
     EasyDebounce.cancelAll();
-    fyrestreamPlayer.audioPlayer.dispose();
-    fyrestreamPlayer.currentQueueName.close();
     fyrestreamPlayer.stop();
+    fyrestreamPlayer.currentQueueName.close();
+    fyrestreamPlayer.audioPlayer.dispose();
     return super.close();
   }
 }

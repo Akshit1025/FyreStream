@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.2.4+30
+version: 1.2.5+31
 
 environment:
   sdk: '>=3.0.6 <4.0.0'
@@ -84,17 +84,31 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+# dart run icons_launcher:create
+# icons_launcher:
+#   image_path: "assets/icons/new_bloomee_logo_zoomedout.png"
+#   platforms:
+#     android:
+#       enable: true
+#       adaptive_icon_background: "assets/icons/bloomee_new_logo_gradient_bg.png"
+#       adaptive_icon_foreground: "assets/icons/new_bloomee_logo_zoomedout.png"
+#       adaptive_monochrome_image: "assets/icons/new_bloomee_logo_mono.png"
+#     ios:
+#       enable: true
+#     windows:
+#       enable: true
+
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  adaptive_icon_background: "assets/icons/FyreStream_Logo_back_4"
-  adaptive_icon_foreground: "assets/icons/FyreStream_Logo_mini.png"
-  image_path: "assets/icons/FyreStream_Logo.png"
+  adaptive_icon_background: "assets/icons/fyrestream_new_logo_gradient_bg.png"
+  adaptive_icon_foreground: "assets/icons/new_fyrestream_logo_zoomedout.png"
+  image_path: "assets/icons/fyrestream_new_logo_transparent_c.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
 
   macos:
     generate: true
-    image_path: "assets/icons/FyreStream_Logo_masked.png"
+    image_path: "assets/icons/fyrestream_new_logo_c.png"
 
 # The following section is specific to Flutter packages.
 flutter:
@@ -106,7 +120,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/icons/FyreStream_Logo.png
+    - assets/icons/fyrestream_logo.png
     - assets/.env
 
   # An image asset can refer to one or more resolution-specific "variants", see

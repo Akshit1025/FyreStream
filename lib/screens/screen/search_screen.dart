@@ -1,14 +1,17 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:fyrestream/repository/cubits/fetch_search_results.dart';
 import 'package:fyrestream/screens/screen/search_views/search_page.dart';
 import 'package:fyrestream/screens/widgets/horizontalSongCard_widget.dart';
 import 'package:fyrestream/theme_data/default.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+  String searchQuery = "";
+  SearchScreen({Key? key, this.searchQuery = ""}) : super(key: key);
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -18,6 +21,17 @@ class _SearchScreenState extends State<SearchScreen> {
   int _selectedSearchEngine = 0;
   SourceEngine _sourceEngine = SourceEngine.eng_JIS;
   final TextEditingController _textEditingController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.searchQuery != "") {
+      _textEditingController.text = widget.searchQuery;
+      context
+          .read<FetchSearchResultsCubit>()
+          .search(widget.searchQuery.toString(), sourceEngine: _sourceEngine);
+    }
+  }
 
   Widget sourceEngineRadioButton(
       String text, int index, SourceEngine sourceEngine) {
@@ -55,10 +69,10 @@ class _SearchScreenState extends State<SearchScreen> {
             child: Text(
               text,
               style: TextStyle(
-                  color: _selectedSearchEngine == index
-                      ? Default_Theme.primaryColor2
-                      : Default_Theme.accentColor2,
-                  fontSize: 15)
+                      color: _selectedSearchEngine == index
+                          ? Default_Theme.primaryColor2
+                          : Default_Theme.accentColor2,
+                      fontSize: 15)
                   .merge(Default_Theme.secondoryTextStyleMedium),
             ),
           ),
@@ -100,9 +114,9 @@ class _SearchScreenState extends State<SearchScreen> {
             child: InkWell(
               onTap: () {
                 showSearch(
-                    context: context,
-                    delegate: searchPageDelegate(_sourceEngine),
-                    query: _textEditingController.text)
+                        context: context,
+                        delegate: searchPageDelegate(_sourceEngine),
+                        query: _textEditingController.text)
                     .then((value) {
                   if ((value as String) != 'null') {
                     _textEditingController.text = value.toString();
@@ -134,7 +148,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                             color:
-                            Default_Theme.primaryColor1.withOpacity(0.7)),
+                                Default_Theme.primaryColor1.withOpacity(0.7)),
                         borderRadius: BorderRadius.circular(50))),
               ),
             ),
@@ -163,7 +177,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 itemBuilder: (context, index) {
                   return Padding(
                     padding:
-                    const EdgeInsets.only(left: 18, bottom: 5, right: 18),
+                        const EdgeInsets.only(left: 18, bottom: 5, right: 18),
                     child: HorizontalSongCardWidget(
                       index: index,
                       mediaPlaylist: state,
@@ -192,7 +206,7 @@ class _SearchScreenState extends State<SearchScreen> {
                         textAlign: TextAlign.center,
                         style: Default_Theme.tertiaryTextStyle.merge(TextStyle(
                             color:
-                            Default_Theme.primaryColor2.withOpacity(0.6))),
+                                Default_Theme.primaryColor2.withOpacity(0.6))),
                       ),
                     ),
                   ],

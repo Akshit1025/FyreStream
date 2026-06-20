@@ -1,3 +1,4 @@
+import 'package:fyrestream/plugins/chart_defines.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
@@ -10,6 +11,7 @@ import 'package:fyrestream/screens/screen/library_views/playlist_screen.dart';
 import 'package:fyrestream/screens/screen/offline_screen.dart';
 import 'package:fyrestream/screens/screen/search_screen.dart';
 import 'package:fyrestream/screens/widgets/global_navbar.dart';
+import 'package:fyrestream/screens/screen/chart/chart_view.dart';
 
 class GlobalRoutes {
   static final globalRouterKey = GlobalKey<NavigatorState>();
@@ -79,8 +81,23 @@ class GlobalRoutes {
                 name: GlobalStrConsts.exploreScreen,
                 path: '/Explore',
                 builder: (context, state) => ExploreScreen(),
-              ),
-            ],
+                routes: [
+                  GoRoute(
+                    name: GlobalStrConsts.ChartScreen,
+                    path: "ChartScreen",
+                    builder: (context, state) => ChartScreen(
+                      chartInfo: () {
+                        if (state.extra != null) {
+                          return state.extra as ChartInfo;
+                        } else {
+                          return null;
+                        }
+                      }(),
+                    )
+                  ),
+                ]
+              )
+            ]
           ),
           StatefulShellBranch(
             routes: [
@@ -101,10 +118,19 @@ class GlobalRoutes {
           ),
           StatefulShellBranch(
             routes: [
+              // Create stateful shell branch for search screen
               GoRoute(
                 name: GlobalStrConsts.searchScreen,
                 path: '/Search',
-                builder: (context, state) => SearchScreen(),
+                builder: (context, state) {
+                  if (state.uri.queryParameters['query'] != null) {
+                    return SearchScreen(
+                      searchQuery: state.uri.queryParameters['query']!.toString(),
+                    );
+                  } else {
+                    return SearchScreen();
+                  }
+                },
               ),
             ],
           ),
@@ -113,7 +139,7 @@ class GlobalRoutes {
               GoRoute(
                 name: GlobalStrConsts.offlineScreen,
                 path: '/Offline',
-                builder: (context, state) => OfflineScreen(),
+                builder: (context, state) => const OfflineScreen(),
               ),
             ],
           ),

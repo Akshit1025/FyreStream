@@ -1,17 +1,18 @@
+import 'package:fyrestream/screens/screen/chart/chart_widget.dart';
+import 'package:fyrestream/screens/screen/chart/show_charts.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fyrestream/repository/Saavn/cubit/saavn_repository_cubit.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/widgets/unicode_icons.dart';
 import 'package:fyrestream/theme_data/default.dart';
 
-import '../../blocs/mediaPlayer/fyrestream_player_cubit.dart';
-import 'carousel_card_view.dart';
-
 class CaraouselWidget extends StatefulWidget {
-  CaraouselWidget({super.key});
+  CaraouselWidget({
+    super.key,
+  }) {
+    chartInfoList.shuffle();
+  }
 
   @override
   State<CaraouselWidget> createState() => _CaraouselWidgetState();
@@ -35,14 +36,12 @@ class _CaraouselWidgetState extends State<CaraouselWidget> {
                 child: Row(
                   children: [
                     Text(
-                      "Trending",
+                      "Trendings",
                       style: Default_Theme.secondoryTextStyle.merge(
-                        const TextStyle(
-                          color: Default_Theme.primaryColor1,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 19,
-                        ),
-                      ),
+                          const TextStyle(
+                              color: Default_Theme.primaryColor1,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 19)),
                     ),
                     const UnicodeIcon(strCode: "\uf0e7"),
                   ],
@@ -51,80 +50,33 @@ class _CaraouselWidgetState extends State<CaraouselWidget> {
             ),
           ),
         ),
-        BlocBuilder<SaavnRepositoryCubit, SaavnRepositoryState>(
-          buildWhen: (previous, current) {
-            if (current.albumName == "Trendings" && previous != current) {
-              return true;
-            } else {
-              return false;
-            }
-          },
-          builder: (context, state) {
-            if (state is SaavnRepositoryInitial) {
-              return const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    width: 80,
-                    height: 80,
-                    child: CircularProgressIndicator.adaptive(),
-                  ),
+        CarouselSlider(
+          options: CarouselOptions(
+              onPageChanged: (index, _) {
+                setState(() {
+                  _visibility = index == 0;
+                });
+              },
+              height: 320.0,
+              viewportFraction: 0.7,
+              // aspectRatio: 15 / 16,
+              enableInfiniteScroll: false,
+              enlargeFactor: 0.2,
+              initialPage: 0,
+              enlargeCenterPage: true),
+          items: [
+            for (int i = 0; i < chartInfoList.length; i++)
+              InkWell(
+                onTap: () {
+                  GoRouter.of(context).push(
+                      "/${GlobalStrConsts.exploreScreen}/${GlobalStrConsts.ChartScreen}",
+                      extra: chartInfoList[i]);
+                },
+                child: ChartWidget(
+                  chartInfo: chartInfoList[i],
                 ),
-              );
-            } else {
-              return CarouselSlider(
-                options: CarouselOptions(
-                  onPageChanged: (index, _) {
-                    setState(() {
-                      _visibility = index == 0;
-                    });
-                  },
-                  height: 320.0,
-                  viewportFraction: 0.7,
-                  // aspectRatio: 15 / 16,
-                  enableInfiniteScroll: false,
-                  enlargeFactor: 0.2,
-                  initialPage: 0,
-                  enlargeCenterPage: true,
-                ),
-                items: [
-                  for (var index = 0; index < state.mediaItems.length; index++)
-                    GestureDetector(
-                      onTap: () {
-                        if (context
-                                .read<FyrestreamPlayerCubit>()
-                                .fyrestreamPlayer
-                                .currentPlaylist !=
-                            state.mediaItems) {
-                          context
-                              .read<FyrestreamPlayerCubit>()
-                              .fyrestreamPlayer
-                              .loadPlaylist(state, idx: index);
-                        } else if (context
-                                .read<FyrestreamPlayerCubit>()
-                                .fyrestreamPlayer
-                                .currentMedia !=
-                            state.mediaItems[index]) {
-                          context
-                              .read<FyrestreamPlayerCubit>()
-                              .fyrestreamPlayer
-                              .prepare4play(idx: index);
-                        }
-                        context
-                            .read<FyrestreamPlayerCubit>()
-                            .fyrestreamPlayer
-                            .play();
-                        context.pushNamed(GlobalStrConsts.playerScreen);
-                      },
-                      child: CarouselCardView(
-                        coverImageUrl: state.mediaItems[index].artUri
-                            .toString(),
-                      ),
-                    ),
-                ],
-              );
-            }
-          },
+              ),
+          ],
         ),
       ],
     );

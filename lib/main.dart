@@ -7,7 +7,6 @@ import 'package:fyrestream/model/youtube_vid_model.dart';
 import 'package:fyrestream/repository/Youtube/youtube_api.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/widgets/snackbar.dart';
-import 'package:fyrestream/services/fyrestreamPlayer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fyrestream/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
@@ -19,7 +18,6 @@ import 'package:fyrestream/screens/screen/library_views/cubit/current_playlist_c
 import 'package:fyrestream/screens/screen/library_views/cubit/import_playlist_cubit.dart';
 import 'package:fyrestream/services/db/cubit/mediadb_cubit.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:go_router/go_router.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 import 'blocs/mediaPlayer/fyrestream_player_cubit.dart';
@@ -87,7 +85,7 @@ void setupPlayerCubit() {
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
+  // FlutterDownloader.initialize(debug: true);
   try {
     dotenv.load(fileName: "assets/.env");
   } on Exception catch (e) {

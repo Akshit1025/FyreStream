@@ -1,4 +1,4 @@
-import 'package:audio_service/audio_service.dart';
+import 'package:fyrestream/services/audio_service_singleton.dart';
 import 'package:bloc/bloc.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:easy_debounce/easy_throttle.dart';
@@ -6,14 +6,12 @@ import 'package:just_audio/just_audio.dart';
 import 'package:rxdart/rxdart.dart';
 
 import 'package:fyrestream/services/fyrestreamPlayer.dart';
-import 'package:fyrestream/theme_data/default.dart';
 
 part 'fyrestream_player_state.dart';
 
 class FyrestreamPlayerCubit extends Cubit<FyreStreamPlayerState> {
   late FyreStreamMusicPlayer fyrestreamPlayer;
 
-  // late AudioSession audioSession;
   late Stream<ProgressBarStreams> progressStreams;
 
   FyrestreamPlayerCubit() : super(FyreStreamPlayerInitial()) {
@@ -21,18 +19,7 @@ class FyrestreamPlayerCubit extends Cubit<FyreStreamPlayerState> {
   }
 
   Future<void> setupPlayer() async {
-    fyrestreamPlayer = await AudioService.init(
-      builder: () => FyreStreamMusicPlayer(),
-      config: const AudioServiceConfig(
-        androidStopForegroundOnPause: true,
-        androidNotificationChannelId: 'com.FyreStreamPlayer.notification.status',
-        androidNotificationChannelName: 'FyreStream',
-        androidResumeOnClick: true,
-        // androidNotificationIcon: 'assets/icons/FyreStream_Logo_fore.png',
-        androidShowNotificationBadge: true,
-        notificationColor: Default_Theme.accentColor2,
-      ),
-    );
+    fyrestreamPlayer = await PlayerInitializer().getPlayer();
 
     progressStreams = Rx.defer(
       () => Rx.combineLatest3(

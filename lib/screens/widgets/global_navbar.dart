@@ -1,8 +1,8 @@
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/widgets/mini_player_widget.dart';
@@ -88,22 +88,22 @@ class ScaffholdWithNavbar extends StatelessWidget {
                 backgroundColor: Default_Theme.themeColor.withOpacity(0.3),
                 tabs: const [
                   // GButton(
-                  //   icon: FluentIcons.bin_full_20_filled,
+                  //   icon: MingCute.home_4_fill,
                   //   iconSize: 27,
                   //   text: "Test",
                   // ),
                   GButton(
-                    icon: FluentIcons.home_heart_24_filled,
+                    icon: MingCute.home_4_fill,
                     iconSize: 27,
                     text: "Home",
                   ),
                   GButton(
-                    icon: FluentIcons.book_add_24_filled,
+                    icon: MingCute.book_5_fill,
                     text: "Library",
                   ),
-                  GButton(icon: FluentIcons.search_24_filled, text: "Search"),
+                  GButton(icon: MingCute.search_2_fill, text: "Search"),
                   GButton(
-                    icon: FluentIcons.arrow_download_24_filled,
+                    icon: MingCute.folder_download_fill,
                     text: "Offline",
                   ),
                 ],

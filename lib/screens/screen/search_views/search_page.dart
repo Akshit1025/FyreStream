@@ -1,10 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:fyrestream/repository/Youtube/youtube_api.dart';
 import 'package:fyrestream/repository/cubits/fetch_search_results.dart';
 import 'package:fyrestream/theme_data/default.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 class searchPageDelegate extends SearchDelegate {
   List<String> searchList = [];
@@ -59,7 +59,7 @@ class searchPageDelegate extends SearchDelegate {
         onPressed: () {
           query = '';
         },
-        icon: const Icon(Icons.clear),
+        icon: const Icon(MingCute.close_fill),
       ),
     ];
   }
@@ -67,7 +67,7 @@ class searchPageDelegate extends SearchDelegate {
   @override
   Widget? buildLeading(BuildContext context) {
     return IconButton(
-      icon: const Icon(Icons.arrow_back),
+      icon: const Icon(MingCute.arrow_left_fill),
       onPressed: () => Navigator.of(context).pop(),
       // Exit from the search screen.
     );

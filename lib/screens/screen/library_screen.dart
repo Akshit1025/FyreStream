@@ -1,4 +1,3 @@
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -7,9 +6,8 @@ import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/widgets/createPlaylist_bottomsheet.dart';
 import 'package:fyrestream/screens/widgets/smallPlaylistCard_widget.dart';
 import 'package:fyrestream/services/db/MediaDB.dart';
-
 import 'package:fyrestream/theme_data/default.dart';
-import '../widgets/unicode_icons.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 class LibraryScreen extends StatelessWidget {
   const LibraryScreen({super.key});
@@ -86,22 +84,23 @@ class LibraryScreen extends StatelessWidget {
             onTap: () {
               createPlaylistBottomSheet(context);
             },
-            child: const UnicodeIcon(
-              strCode: "\u002b",
-              font: Default_Theme.fontAwesomeSolidFont,
-              fontSize: 25.0,
-              padding: EdgeInsets.only(left: 7, right: 7),
+            child: const Icon(
+              MingCute.add_fill,
+              size: 25,
+              color: Default_Theme.primaryColor1,
             ),
           ),
           InkWell(
             onTap: () {
               context.pushNamed(GlobalStrConsts.ImportMediaFromPlatforms);
             },
-            child: const UnicodeIcon(
-              strCode: "\uf56f",
-              font: Default_Theme.fontAwesomeSolidFont,
-              fontSize: 25.0,
-              padding: EdgeInsets.only(left: 7, right: 5),
+            child: const Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: Icon(
+                FontAwesome.file_import_solid,
+                size: 25,
+                color: Default_Theme.primaryColor1,
+              ),
             ),
           ),
         ],
@@ -138,7 +137,7 @@ class _ListOfPlaylistsState extends State<ListOfPlaylists> {
                 Padding(
                   padding: EdgeInsets.only(left: 20),
                   child: Icon(
-                    FluentIcons.delete_dismiss_28_regular,
+                    MingCute.delete_3_line,
                     color: Colors.white,
                     size: 30,
                   ),

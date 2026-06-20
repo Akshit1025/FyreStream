@@ -3,13 +3,13 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:fyrestream/repository/Saavn/cubit/saavn_repository_cubit.dart';
 import 'package:fyrestream/screens/screen/library_views/cubit/import_playlist_cubit.dart';
 import 'package:fyrestream/screens/widgets/import_playlist.dart';
 import 'package:fyrestream/services/db/cubit/mediadb_cubit.dart';
 import 'package:fyrestream/theme_data/default.dart';
-import '../../widgets/unicode_icons.dart';
 
 class ImportMediaFromPlatformsView extends StatelessWidget {
   const ImportMediaFromPlatformsView({super.key});
@@ -36,21 +36,21 @@ class ImportMediaFromPlatformsView extends StatelessWidget {
         children: [
           ImportFromBtn(
             btnName: "Playlist from Spotify",
-            btnIcon: "\uf1bc",
+            btnIcon: FontAwesome.spotify_brand,
             onClickFunc: () {
               getIdAndShowBottomSheet(context);
             },
           ),
           ImportFromBtn(
             btnName: "Music from Spotify",
-            btnIcon: "\uf1bc",
+            btnIcon: FontAwesome.spotify_brand,
             onClickFunc: () {
               log("music from spotify");
             },
           ),
           ImportFromBtn(
             btnName: "Playlist from Youtube",
-            btnIcon: "\uf167",
+            btnIcon: FontAwesome.youtube_brand,
             onClickFunc: () {
               getIdAndShowBottomSheet(
                 context,
@@ -61,7 +61,7 @@ class ImportMediaFromPlatformsView extends StatelessWidget {
           ),
           ImportFromBtn(
             btnName: "Music from Youtube",
-            btnIcon: "\uf167",
+            btnIcon: FontAwesome.youtube_brand,
             onClickFunc: () {
               log("music from youtube");
             },
@@ -74,7 +74,7 @@ class ImportMediaFromPlatformsView extends StatelessWidget {
 
 class ImportFromBtn extends StatelessWidget {
   final String btnName;
-  final String btnIcon;
+  final IconData btnIcon;
   final VoidCallback onClickFunc;
 
   const ImportFromBtn({
@@ -90,11 +90,13 @@ class ImportFromBtn extends StatelessWidget {
       onPressed: () {
         onClickFunc();
       },
-      icon: UnicodeIcon(
-        strCode: btnIcon,
-        font: const TextStyle(fontFamily: "FontAwesome-Brands"),
-        fontSize: 25.0,
-        padding: const EdgeInsets.only(left: 7, right: 5),
+      icon: Padding(
+        padding: const EdgeInsets.only(left: 8, right: 8),
+        child: Icon(
+          btnIcon,
+          color: Default_Theme.primaryColor1,
+          size: 30
+        ),
       ),
       label: Text(
         btnName,

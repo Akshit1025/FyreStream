@@ -1,13 +1,12 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:fyrestream/repository/cubits/fetch_search_results.dart';
 import 'package:fyrestream/screens/screen/search_views/search_page.dart';
 import 'package:fyrestream/screens/widgets/horizontalSongCard_widget.dart';
 import 'package:fyrestream/theme_data/default.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 class SearchScreen extends StatefulWidget {
   String searchQuery = "";
@@ -133,7 +132,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 decoration: InputDecoration(
                     filled: true,
                     suffixIcon: Icon(
-                      Icons.search,
+                      MingCute.search_2_fill,
                       color: Default_Theme.primaryColor1.withOpacity(0.4),
                     ),
                     fillColor: Default_Theme.primaryColor2.withOpacity(0.07),
@@ -157,13 +156,6 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
         backgroundColor: Default_Theme.themeColor,
         body: BlocBuilder<FetchSearchResultsCubit, FetchSearchResultsState>(
-          // buildWhen: (previous, current) {
-          //   if (current != previous && current.albumName == "Search") {
-          //     return true;
-          //   } else {
-          //     return false;
-          //   }
-          // },
           builder: (context, state) {
             if (state is FetchSearchResultsLoading) {
               return const Center(
@@ -172,20 +164,51 @@ class _SearchScreenState extends State<SearchScreen> {
                 ),
               );
             } else if (state.loadingState == LoadingState.loaded) {
-              return ListView.builder(
-                itemCount: state.mediaItems.length,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding:
-                        const EdgeInsets.only(left: 18, bottom: 5, right: 18),
-                    child: HorizontalSongCardWidget(
-                      index: index,
-                      mediaPlaylist: state,
-                      showLiked: true,
-                    ),
-                  );
-                },
-              );
+              if (state.mediaItems.isNotEmpty) {
+                return ListView.builder(
+                  itemCount: state.mediaItems.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding:
+                      const EdgeInsets.only(left: 18, bottom: 5, right: 18),
+                      child: HorizontalSongCardWidget(
+                        index: index,
+                        mediaPlaylist: state,
+                        showLiked: true,
+                      ),
+                    );
+                  },
+                );
+              } else {
+                return Center(
+                  child: Wrap(
+                    children: [
+                      Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Icon(
+                              MingCute.sweats_line,
+                              color:
+                              Default_Theme.primaryColor2.withOpacity(0.7),
+                              size: 40,
+                            ),
+                          ),
+                          Text(
+                            "No results found!\nTry another keyword or source engine!",
+                            textAlign: TextAlign.center,
+                            style: Default_Theme.tertiaryTextStyle.merge(
+                                TextStyle(
+                                    color: Default_Theme.primaryColor2
+                                        .withOpacity(0.7),
+                                    fontSize: 14)),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                );
+              }
             } else {
               return Center(
                 child: Column(

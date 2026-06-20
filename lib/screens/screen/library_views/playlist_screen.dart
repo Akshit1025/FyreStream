@@ -1,6 +1,6 @@
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:icons_plus/icons_plus.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/screens/screen/library_views/cubit/current_playlist_cubit.dart';
@@ -258,7 +258,7 @@ class _PlaylistState extends State<Playlist> {
                 Padding(
                   padding: EdgeInsets.only(left: 20),
                   child: Icon(
-                    FluentIcons.delete_dismiss_28_regular,
+                    MingCute.delete_3_line,
                     color: Colors.white,
                     size: 30,
                   ),

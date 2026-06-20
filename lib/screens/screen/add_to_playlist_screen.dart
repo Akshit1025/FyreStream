@@ -1,6 +1,4 @@
-import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fyrestream/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
@@ -12,6 +10,7 @@ import 'package:fyrestream/services/db/cubit/mediadb_cubit.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:fyrestream/routes_and_consts/global_consts.dart';
 import 'package:fyrestream/utils/load_Image.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 class AddToPlaylistScreen extends StatefulWidget {
   AddToPlaylistScreen({super.key});
@@ -227,7 +226,7 @@ class _AddToPlaylistScreenState extends State<AddToPlaylistScreen> {
       ),
       floatingActionButton: FloatingActionButton.extended(
         icon: const Icon(
-          FluentIcons.add_48_filled,
+          MingCute.add_fill,
           size: 25,
           color: Default_Theme.primaryColor1,
         ),

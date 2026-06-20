@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:fyrestream/plugins/billboard_charts.dart';
 import 'package:bloc/bloc.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:rxdart/rxdart.dart';
@@ -30,13 +31,17 @@ class SaavnRepositoryCubit extends Cubit<SaavnRepositoryState> {
   Future<void> fetchTopResultsfromSaavn() async {
     emit(state);
     final trends = await saavnAPI.getTopSearches();
+    final billboardIndia = await getBillboardChart(url: BillboardChartLinks.INDIA_SONGS);
 
     List<MediaItemModel> trendings = [];
 
-    for (int i = 0; i < trends.length; i++) {
-      final trendingResults = await saavnAPI.fetchSongSearchResults(
-          searchQuery: trends[i], count: 2);
-
+    try {
+      for (int i = 0; i < trends.length; i++) {
+        final trendingResults = await saavnAPI.fetchSongSearchResults(searchQuery: "${billboardIndia[i]["title"]} by ${billboardIndia[i]["label"]}", count: 1);
+        trendings += fromSaavnSongMapList2MediaItemList(trendingResults["songs"]);
+      }
+    } catch (e) {
+      final trendingResults = await saavnAPI.fetchSongSearchResults(searchQuery: trends[0], count: 1);
       trendings += fromSaavnSongMapList2MediaItemList(trendingResults["songs"]);
     }
 

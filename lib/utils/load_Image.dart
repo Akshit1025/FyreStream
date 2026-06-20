@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 Image loadImage(
   coverImageUrl, {
-  placeholderPath = "assets/icons/FyreStream_Logo.png",
+  placeholderPath = "assets/icons/fyrestream_logo.png",
 }) {
   ImageProvider<Object> placeHolder = AssetImage(placeholderPath);
   return Image.network(
@@ -49,7 +49,7 @@ Image loadImage(
 
 CachedNetworkImage loadImageCached(
   coverImageURL, {
-  placeholderPath = "assets/icons/FyreStream_Logo.png",
+  placeholderPath = "assets/icons/fyrestream_logo.png",
 }) {
   ImageProvider<Object> placeHolder = AssetImage(placeholderPath);
   return CachedNetworkImage(
@@ -64,17 +64,21 @@ CachedNetworkImage loadImageCached(
             return SizedBox(
               height: constraints.maxWidth,
               width: constraints.maxWidth,
-              child: const CircularProgressIndicator(
-                color: Default_Theme.accentColor2,
-              ),
+              child: const AspectRatio(aspectRatio: 1.0, child: Center(
+                child: CircularProgressIndicator(
+                  color: Default_Theme.accentColor2
+                ),
+              ),),
             );
           } else {
             return SizedBox(
               height: constraints.maxHeight,
               width: constraints.maxHeight,
-              child: const CircularProgressIndicator(
-                color: Default_Theme.accentColor2,
-              ),
+              child: const AspectRatio(aspectRatio: 1.0, child: Center(
+                child: CircularProgressIndicator(
+                  color: Default_Theme.accentColor2
+                ),
+              ),),
             );
           }
         },
@@ -89,7 +93,7 @@ CachedNetworkImage loadImageCached(
 
 Future<ImageProvider> getImageProvider(
   String imageUrl, {
-  String placeholderUrl = "assets/icons/FyreStream_Logo.png",
+  String placeholderUrl = "assets/icons/fyrestream_logo.png",
 }) async {
   if (imageUrl != "") {
     final response = await http.head(Uri.parse(imageUrl));

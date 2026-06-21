@@ -7,11 +7,11 @@ class PlayerInitializer {
   factory PlayerInitializer() {
     return _instance;
   }
-  static late FyreStreamMusicPlayer fyrestreamPlayer;
 
   PlayerInitializer._internal();
 
   static bool _isInitialized = false;
+  static FyreStreamMusicPlayer? fyrestreamPlayer;
 
   Future<void> _initialize() async {
     fyrestreamPlayer = await AudioService.init(
@@ -27,11 +27,11 @@ class PlayerInitializer {
     );
   }
 
-  Future<FyreStreamMusicPlayer> getPlayer() async {
+  Future<FyreStreamMusicPlayer> getAudioHandler() async {
     if (!_isInitialized) {
       await _initialize();
       _isInitialized = true;
     }
-    return fyrestreamPlayer;
+    return fyrestreamPlayer!;
   }
 }

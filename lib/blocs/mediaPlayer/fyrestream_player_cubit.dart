@@ -1,4 +1,4 @@
-import 'package:fyrestream/services/audio_service_singleton.dart';
+import 'package:fyrestream/services/audio_service_initializer.dart';
 import 'package:bloc/bloc.dart';
 import 'package:easy_debounce/easy_debounce.dart';
 import 'package:easy_debounce/easy_throttle.dart';
@@ -19,7 +19,7 @@ class FyrestreamPlayerCubit extends Cubit<FyreStreamPlayerState> {
   }
 
   Future<void> setupPlayer() async {
-    fyrestreamPlayer = await PlayerInitializer().getPlayer();
+    fyrestreamPlayer = await PlayerInitializer().getAudioHandler();
 
     progressStreams = Rx.defer(
       () => Rx.combineLatest3(

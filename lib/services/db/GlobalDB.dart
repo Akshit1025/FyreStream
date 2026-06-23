@@ -3,7 +3,7 @@
 
 import 'package:isar/isar.dart';
 
-part 'MediaDB.g.dart';
+part 'GlobalDB.g.dart';
 
 @collection
 class MediaPlaylistDB {
@@ -36,7 +36,7 @@ class MediaItemDB {
   String artist;
   String artURL;
   String genre;
-
+  int? duration;
   String mediaID;
   String streamingURL;
   String? source;
@@ -46,27 +46,6 @@ class MediaItemDB {
 
   // @Backlink(to: "mediaItems")
   IsarLinks<MediaPlaylistDB> mediaInPlaylistsDB = IsarLinks<MediaPlaylistDB>();
-
-  // void setLike(bool isliked) {
-  //   if (isliked != isLiked) {
-  //     isLiked = isliked;
-  //     print("object1");
-  //     if (isLiked == true) {
-  //       print("object2");
-  //       if (!mediaInPlaylistsDB
-  //           .contains(MediaPlaylistDB(playlistName: "Liked"))) {
-  //         print("object3");
-  //         mediaInPlaylistsDB.add(MediaPlaylistDB(playlistName: "Liked"));
-  //       }
-  //     } else {
-  //       if (mediaInPlaylistsDB
-  //           .contains(MediaPlaylistDB(playlistName: "Liked"))) {
-  //         print("object2.5");
-  //         mediaInPlaylistsDB.remove(MediaPlaylistDB(playlistName: "Liked"));
-  //       }
-  //     }
-  //   }
-  // }
 
   MediaItemDB({
     this.id,
@@ -78,6 +57,7 @@ class MediaItemDB {
     required this.mediaID,
     required this.streamingURL,
     this.source,
+    this.duration,
     required this.permaURL,
     required this.language,
     required this.isLiked,
@@ -96,6 +76,7 @@ class MediaItemDB {
         other.mediaID == mediaID &&
         other.streamingURL == streamingURL &&
         other.source == source &&
+        other.duration == duration &&
         other.permaURL == permaURL &&
         other.language == language;
   }
@@ -111,6 +92,7 @@ class MediaItemDB {
         mediaID.hashCode ^
         streamingURL.hashCode ^
         source.hashCode ^
+        duration.hashCode ^
         permaURL.hashCode ^
         language.hashCode;
   }
@@ -129,4 +111,47 @@ int fastHash(String string) {
   }
 
   return hash;
+}
+
+@collection
+class AppSettingsStrDB {
+  Id get isarId => fastHash(settingName);
+  String settingName;
+  String settingValue;
+  AppSettingsStrDB({
+    required this.settingName,
+    required this.settingValue,
+  });
+
+  @override
+  bool operator ==(covariant AppSettingsStrDB other) {
+    if (identical(this, other)) return true;
+
+    return other.settingName == settingName && other.settingValue == settingValue;
+  }
+
+  @override
+  int get hashCode => settingName.hashCode ^ settingValue.hashCode;
+}
+
+@collection
+class AppSettingsBoolDB {
+  Id get isarId => fastHash(settingName);
+  String settingName;
+  bool settingValue;
+  AppSettingsBoolDB({
+    required this.settingName,
+    required this.settingValue,
+  });
+
+  @override
+  bool operator ==(covariant AppSettingsBoolDB other) {
+    if (identical(this, other)) return true;
+
+    return other.settingName == settingName &&
+        other.settingValue == settingValue;
+  }
+
+  @override
+  int get hashCode => settingName.hashCode ^ settingValue.hashCode;
 }

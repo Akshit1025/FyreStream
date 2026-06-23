@@ -19,7 +19,7 @@ class FyrestreamPlayerCubit extends Cubit<FyreStreamPlayerState> {
   }
 
   Future<void> setupPlayer() async {
-    fyrestreamPlayer = await PlayerInitializer().getAudioHandler();
+    fyrestreamPlayer = await PlayerInitializer().getFyreStreamMusicPlayer();
 
     progressStreams = Rx.defer(
       () => Rx.combineLatest3(

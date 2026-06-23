@@ -16,7 +16,7 @@ import 'package:fyrestream/repository/cubits/fetch_search_results.dart';
 import 'package:fyrestream/routes_and_consts/routes.dart';
 import 'package:fyrestream/screens/screen/library_views/cubit/current_playlist_cubit.dart';
 import 'package:fyrestream/screens/screen/library_views/cubit/import_playlist_cubit.dart';
-import 'package:fyrestream/services/db/cubit/mediadb_cubit.dart';
+import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
@@ -148,19 +148,19 @@ class _MyAppState extends State<MyApp> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => fyrestreamPlayerCubit, lazy: false),
-        BlocProvider(create: (context) => MediaDBCubit(), lazy: false),
+        BlocProvider(create: (context) => FyreStreamDBCubit(), lazy: false),
         BlocProvider(
           create: (context) =>
-              CurrentPlaylistCubit(mediaDBCubit: context.read<MediaDBCubit>()),
+              CurrentPlaylistCubit(fyrestreamDBCubit: context.read<FyreStreamDBCubit>()),
           lazy: false,
         ),
         BlocProvider(
           create: (context) =>
-              LibraryItemsCubit(mediaDBCubit: context.read<MediaDBCubit>()),
+              LibraryItemsCubit(fyrestreamDBCubit: context.read<FyreStreamDBCubit>()),
         ),
         BlocProvider(
           create: (context) =>
-              AddToPlaylistCubit(mediaDBCubit: context.read<MediaDBCubit>()),
+              AddToPlaylistCubit(fyrestreamDBCubit: context.read<FyreStreamDBCubit>()),
           lazy: false,
         ),
         BlocProvider(create: (context) => ImportPlaylistCubit()),

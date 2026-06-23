@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:async/async.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
@@ -13,14 +12,15 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
     with SeekHandler, QueueHandler {
   late AudioPlayer audioPlayer;
   List<MediaItemModel> currentPlaylist = [];
-  BehaviorSubject<String> currentQueueName = BehaviorSubject<String>.seeded(
-    "Empty",
-  );
+  BehaviorSubject<String> currentQueueName =
+  BehaviorSubject<String>.seeded("Empty");
+
   BehaviorSubject<bool> isLinkProcessing = BehaviorSubject<bool>.seeded(false);
   int currentPlayingIdx = 0;
   bool isPaused = false;
 
-  CancelableOperation<List<String>> getLinkOperation = CancelableOperation.fromFuture(Future.value([]));
+  CancelableOperation<List<String>> getLinkOperation =
+  CancelableOperation.fromFuture(Future.value([]));
 
   FyreStreamMusicPlayer() {
     audioPlayer = AudioPlayer(
@@ -28,40 +28,40 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
       handleInterruptions: true,
     );
     audioPlayer.setVolume(1);
+    audioPlayer.playbackEventStream.listen(_broadcastPlayerEvent);
+  }
 
-    audioPlayer.playerStateStream.listen((event) {
-      // log(event.playing.toString(), name: "fyrestreamPlayer-event");
-      playbackState.add(
-        PlaybackState(
-          // Which buttons should appear in the notification now
-          controls: [
-            MediaControl.skipToPrevious,
-            !event.playing ? MediaControl.play : MediaControl.pause,
-            // MediaControl.stop,
-            MediaControl.skipToNext,
-          ],
-
-          processingState: switch (event.processingState){
-            ProcessingState.idle => AudioProcessingState.idle,
-            ProcessingState.loading => AudioProcessingState.loading,
-            ProcessingState.buffering => AudioProcessingState.buffering,
-            ProcessingState.ready => AudioProcessingState.ready,
-            ProcessingState.completed => AudioProcessingState.completed,
-          },
-
-          // Which other actions should be enabled in the notification
-          systemActions: const {
-            MediaAction.skipToPrevious,
-            MediaAction.playPause,
-            MediaAction.skipToNext,
-          },
-
-          androidCompactActionIndices: const [0, 1, 2],
-          updatePosition: audioPlayer.position,
-          playing: event.playing,
-        ),
-      );
-    });
+  void _broadcastPlayerEvent(PlaybackEvent event) {
+    bool isPlaying = audioPlayer.playing;
+    // log(event.playing.toString(), name: "fyrestreamPlayer-event");
+    playbackState.add(PlaybackState(
+      // Which buttons should appear in the notification now
+      controls: [
+        MediaControl.skipToPrevious,
+        isPlaying ? MediaControl.pause : MediaControl.play,
+        // MediaControl.stop,
+        MediaControl.skipToNext,
+      ],
+      processingState: switch (event.processingState) {
+        ProcessingState.idle => AudioProcessingState.idle,
+        ProcessingState.loading => AudioProcessingState.loading,
+        ProcessingState.buffering => AudioProcessingState.buffering,
+        ProcessingState.ready => AudioProcessingState.ready,
+        ProcessingState.completed => AudioProcessingState.completed,
+      },
+      // Which other actions should be enabled in the notification
+      systemActions: const {
+        MediaAction.skipToPrevious,
+        MediaAction.playPause,
+        MediaAction.skipToNext,
+      },
+      androidCompactActionIndices: const [0, 1, 2],
+      updatePosition: audioPlayer.position,
+      playing: isPlaying,
+      bufferedPosition: audioPlayer.bufferedPosition,
+      speed: audioPlayer.speed,
+      // playing: audioPlayer.playerState.playing,
+    ));
   }
 
   MediaItemModel get currentMedia => currentPlaylist[currentPlayingIdx];
@@ -83,11 +83,8 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
     super.mediaItem.add(mediaItem);
   }
 
-  Future<void> loadPlaylist(
-    MediaPlaylist mediaList, {
-    int idx = 0,
-    bool doPlay = false,
-  }) async {
+  Future<void> loadPlaylist(MediaPlaylist mediaList,
+      {int idx = 0, bool doPlay = false}) async {
     currentPlaylist = mediaList.mediaItems;
     currentQueueName.add(mediaList.albumName);
     await prepare4play(idx: idx, doPlay: doPlay);
@@ -109,19 +106,18 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
       isLinkProcessing.add(true);
       audioPlayer.pause();
       audioPlayer.seek(Duration.zero);
-      final tempStrmVideo = await YouTubeServices().getVideoFromId(
-        mediaItem.id.replaceAll("youtube", ''),
-      );
+
+      final tempStrmVideo = await YouTubeServices()
+          .getVideoFromId(mediaItem.id.replaceAll("youtube", ''));
       if (tempStrmVideo != null) {
         if (!getLinkOperation.isCompleted) {
           getLinkOperation.cancel();
         }
 
         getLinkOperation = CancelableOperation.fromFuture(
-          YouTubeServices().getUri(tempStrmVideo), onCancel: () {
-            log("Cancelled/Skipped - ${mediaItem.title}", name: "fyrestreamPlayer");
-        }
-        );
+            YouTubeServices().getUri(tempStrmVideo), onCancel: () {
+          log("Canceled/Skipped - ${mediaItem.title}", name: "fyrestreamPlayer");
+        });
 
         getLinkOperation.then((tempStrmLinks) {
           isLinkProcessing.add(false);

@@ -1,12 +1,12 @@
 import 'dart:developer';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:fyrestream/services/db/MediaDB.dart';
+import 'package:fyrestream/services/db/GlobalDB.dart';
 
-class MediaIsarDBService {
-  late Future<Isar> db;
+class FyreStreamDBService {
+  static late Future<Isar> db;
 
-  MediaIsarDBService() {
+  FyreStreamDBService() {
     db = openDB();
   }
 
@@ -65,7 +65,16 @@ class MediaIsarDBService {
     // isarDB.writeTxnSync(() => isarDB.mediaItemDBs.putSync(mediaItemDB));
   }
 
-  Future<void> removeMediaItem(
+  Future<void> removeMediaItem(MediaItemDB mediaItemDB) async {
+    Isar isarDB = await db;
+    bool _res = false;
+    isarDB.writeTxnSync(() => _res = isarDB.mediaItemDBs.deleteSync(mediaItemDB.id!));
+    if (_res) {
+      log("${mediaItemDB.title} is Deleted!", name: "DB");
+    }
+  }
+
+  Future<void> removeMediaItemFromPlaylist(
     MediaItemDB mediaItemDB,
     MediaPlaylistDB mediaPlaylistDB,
   ) async {
@@ -85,6 +94,9 @@ class MediaIsarDBService {
         _mediaitem.mediaInPlaylistsDB.remove(mediaPlaylistDB);
         log("Removed from playlist", name: "DB");
         isarDB.writeTxnSync(() => isarDB.mediaItemDBs.putSync(_mediaitem));
+        if (_mediaitem.mediaInPlaylistsDB.isEmpty) {
+          removeMediaItem(_mediaitem);
+        }
         if (_mediaPlaylistDB.mediaRanks.contains(_mediaitem.id)) {
           // _mediaPlaylistDB.mediaRanks.indexOf(_mediaitem.id!)
 
@@ -129,7 +141,7 @@ class MediaIsarDBService {
     if (isLiked && _mediaItem != null) {
       addMediaItem(mediaItemDB, MediaPlaylistDB(playlistName: "Liked"));
     } else if (_mediaItem != null) {
-      removeMediaItem(mediaItemDB, MediaPlaylistDB(playlistName: "Liked"));
+      removeMediaItemFromPlaylist(mediaItemDB, MediaPlaylistDB(playlistName: "Liked"));
     }
   }
 
@@ -183,6 +195,8 @@ class MediaIsarDBService {
       return await Isar.open([
         MediaPlaylistDBSchema,
         MediaItemDBSchema,
+        AppSettingsBoolDBSchema,
+        AppSettingsStrDBSchema
       ], directory: _path);
     }
     return Future.value(Isar.getInstance());
@@ -245,5 +259,39 @@ class MediaIsarDBService {
     if (_res) {
       log("${mediaPlaylistDB.playlistName} is Deleted!!", name: "DB");
     }
+  }
+
+  Future<void> putSettingStr(String key, String value) async {
+    Isar isarDB = await db;
+    if (key.isNotEmpty && value.isNotEmpty) {
+      isarDB.writeTxnSync(() => isarDB.appSettingsStrDBs
+          .putSync(AppSettingsStrDB(settingName: key, settingValue: value)));
+    }
+  }
+
+  Future<void> putSettingBool(String key, bool value) async {
+    Isar isarDB = await db;
+    if (key.isNotEmpty) {
+      isarDB.writeTxnSync(() => isarDB.appSettingsBoolDBs
+          .putSync(AppSettingsBoolDB(settingName: key, settingValue: value)));
+    }
+  }
+
+  Future<String?> getSettingStr(String key) async {
+    Isar isarDB = await db;
+    return isarDB.appSettingsStrDBs
+        .filter()
+        .settingNameEqualTo(key)
+        .findFirstSync()
+        ?.settingValue;
+  }
+
+  Future<bool?> getSettingBool(String key) async {
+    Isar isarDB = await db;
+    return isarDB.appSettingsBoolDBs
+        .filter()
+        .settingNameEqualTo(key)
+        .findFirstSync()
+        ?.settingValue;
   }
 }

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:fyrestream/services/db/MediaDB.dart';
-import 'package:fyrestream/services/db/cubit/mediadb_cubit.dart';
+import 'package:fyrestream/services/db/GlobalDB.dart';
+import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/theme_data/default.dart';
 
 void createPlaylistBottomSheet(BuildContext context) {
@@ -99,7 +99,7 @@ void createPlaylistBottomSheet(BuildContext context) {
                                 print(value);
                                 if (value.isNotEmpty && value.length > 2) {
                                   context
-                                      .read<MediaDBCubit>()
+                                      .read<FyreStreamDBCubit>()
                                       .addNewPlaylistToDB(
                                         MediaPlaylistDB(playlistName: value),
                                       );

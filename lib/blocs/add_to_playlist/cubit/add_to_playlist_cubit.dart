@@ -7,7 +7,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/routes_and_consts/global_consts.dart';
 
-import 'package:fyrestream/services/db/cubit/mediadb_cubit.dart';
+import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/utils/load_Image.dart';
 
 import '../../../model/MediaPlaylistModel.dart';
@@ -15,12 +15,12 @@ import '../../../model/MediaPlaylistModel.dart';
 part 'add_to_playlist_state.dart';
 
 class AddToPlaylistCubit extends Cubit<AddToPlaylistState> {
-  MediaDBCubit mediaDBCubit;
+  FyreStreamDBCubit fyrestreamDBCubit;
   BehaviorSubject<MediaItemModel> mediaItemModelBS = BehaviorSubject.seeded(
     mediaItemModelNull,
   );
 
-  AddToPlaylistCubit({required this.mediaDBCubit})
+  AddToPlaylistCubit({required this.fyrestreamDBCubit})
     : super(AddToPlaylistInitial()) {
     getAndEmitPlaylists();
   }
@@ -35,7 +35,7 @@ class AddToPlaylistCubit extends Cubit<AddToPlaylistState> {
     addToPlaylistState = AddToPlaylistState(
       playlists: List.empty(growable: true),
     );
-    mediaPlaylist = await mediaDBCubit.getListOfPlaylists2();
+    mediaPlaylist = await fyrestreamDBCubit.getListOfPlaylists2();
     List<String> _playlists = List.empty(growable: true);
     if (addToPlaylistState.playlists.isNotEmpty) {
       for (var element in addToPlaylistState.playlists) {

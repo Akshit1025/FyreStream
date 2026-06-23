@@ -1,23 +1,21 @@
 import 'dart:developer';
-
 import 'package:fyrestream/screens/widgets/snackbar.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:fyrestream/model/MediaPlaylistModel.dart';
 import 'package:fyrestream/model/songModel.dart';
-import 'package:fyrestream/services/db/MediaDB.dart';
-import 'package:fyrestream/services/db/MediaIsarService.dart';
+import 'package:fyrestream/services/db/GlobalDB.dart';
+import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 
-part 'mediadb_state.dart';
+part 'fyrestream_db_state.dart';
 
-class MediaDBCubit extends Cubit<MediadbState> {
+class FyreStreamDBCubit extends Cubit<MediadbState> {
   BehaviorSubject<bool> refreshLibrary = BehaviorSubject<bool>.seeded(false);
-  MediaIsarDBService isarDBService = MediaIsarDBService();
-  MediaDBCubit() : super(MediadbInitial()) {
+  FyreStreamDBService fyrestreamDBService = FyreStreamDBService();
+  FyreStreamDBCubit() : super(MediadbInitial()) {
     addNewPlaylistToDB(MediaPlaylistDB(playlistName: "Liked"));
   }
 
@@ -25,7 +23,7 @@ class MediaDBCubit extends Cubit<MediadbState> {
       {bool undo = false}) async {
     List<String> _list = await getListOfPlaylists();
     if (!_list.contains(mediaPlaylistDB.playlistName)) {
-      isarDBService.addPlaylist(mediaPlaylistDB);
+      fyrestreamDBService.addPlaylist(mediaPlaylistDB);
       refreshLibrary.add(true);
       if (!undo) {
         SnackbarService.showMessage(
@@ -42,6 +40,7 @@ class MediaDBCubit extends Cubit<MediadbState> {
         artURL: mediaItem.artUri.toString(),
         genre: mediaItem.genre ?? "Unknown",
         mediaID: mediaItem.id,
+        duration: mediaItem.duration?.inSeconds,
         streamingURL: mediaItem.extras?["url"],
         permaURL: mediaItem.extras?["perma_url"],
         language: mediaItem.extras?["language"] ?? "Unknown",
@@ -55,6 +54,9 @@ class MediaDBCubit extends Cubit<MediadbState> {
         title: mediaItemDB.title,
         album: mediaItemDB.album,
         artist: mediaItemDB.artist,
+        duration: mediaItemDB.duration != null
+            ? Duration(seconds: mediaItemDB.duration!)
+            : const Duration(seconds: 120),
         artUri: Uri.parse(mediaItemDB.artURL),
         genre: mediaItemDB.genre,
         extras: {
@@ -66,10 +68,10 @@ class MediaDBCubit extends Cubit<MediadbState> {
   }
 
   Future<void> setLike(MediaItem mediaItem, {isLiked = false}) async {
-    isarDBService.addMediaItem(MediaItem2MediaItemDB(mediaItem),
+    fyrestreamDBService.addMediaItem(MediaItem2MediaItemDB(mediaItem),
         MediaPlaylistDB(playlistName: "Liked"));
     refreshLibrary.add(true);
-    isarDBService.likeMediaItem(MediaItem2MediaItemDB(mediaItem),
+    fyrestreamDBService.likeMediaItem(MediaItem2MediaItemDB(mediaItem),
         isLiked: isLiked);
     if (isLiked) {
       SnackbarService.showMessage("${mediaItem.title} is Liked!!");
@@ -80,7 +82,7 @@ class MediaDBCubit extends Cubit<MediadbState> {
 
   Future<bool> isLiked(MediaItem mediaItem) {
     // bool res = true;
-    return isarDBService.isMediaLiked(MediaItem2MediaItemDB(mediaItem));
+    return fyrestreamDBService.isMediaLiked(MediaItem2MediaItemDB(mediaItem));
   }
 
   List<MediaItemDB> reorderByRank(
@@ -89,9 +91,9 @@ class MediaDBCubit extends Cubit<MediadbState> {
     // orgMediaList.toSet().toList();
     List<MediaItemDB> reorderedList = orgMediaList;
     orgMediaList.forEach((element) {
-      log('orgMEdia - ${element.id} - ${element.title}', name: "MediaDBCubit");
+      log('orgMEdia - ${element.id} - ${element.title}', name: "FyreStreamDBCubit");
     });
-    log(rankIndex.toString(), name: "MediaDBCubit");
+    log(rankIndex.toString(), name: "FyreStreamDBCubit");
     if (rankIndex.length == orgMediaList.length) {
       reorderedList = rankIndex
           .map((e) => orgMediaList.firstWhere(
@@ -100,7 +102,7 @@ class MediaDBCubit extends Cubit<MediadbState> {
           .map((e) => e)
           .toList();
       log('ranklist length - ${rankIndex.length} org length - ${orgMediaList.length}',
-          name: "MediaDBCubit");
+          name: "FyreStreamDBCubit");
       return reorderedList;
     } else {
       return orgMediaList;
@@ -112,10 +114,10 @@ class MediaDBCubit extends Cubit<MediadbState> {
     MediaPlaylist _mediaPlaylist =
     MediaPlaylist(mediaItems: [], albumName: mediaPlaylistDB.playlistName);
 
-    var _dbList = await isarDBService.getPlaylistItems(mediaPlaylistDB);
+    var _dbList = await fyrestreamDBService.getPlaylistItems(mediaPlaylistDB);
     if (_dbList != null) {
       List<int> _rankList =
-      await isarDBService.getPlaylistItemsRank(mediaPlaylistDB);
+      await fyrestreamDBService.getPlaylistItemsRank(mediaPlaylistDB);
 
       if (_rankList.isNotEmpty) {
         _dbList = reorderByRank(_dbList, _rankList);
@@ -131,16 +133,16 @@ class MediaDBCubit extends Cubit<MediadbState> {
 
   Future<void> setPlayListItemsRank(
       MediaPlaylistDB mediaPlaylistDB, List<int> rankList) async {
-    isarDBService.setPlaylistItemsRank(mediaPlaylistDB, rankList);
+    fyrestreamDBService.setPlaylistItemsRank(mediaPlaylistDB, rankList);
   }
 
   Future<Stream> getStreamOfPlaylist(MediaPlaylistDB mediaPlaylistDB) async {
-    return await isarDBService.getStream4MediaList(mediaPlaylistDB);
+    return await fyrestreamDBService.getStream4MediaList(mediaPlaylistDB);
   }
 
   Future<List<String>> getListOfPlaylists() async {
     List<String> mediaPlaylists = [];
-    final _albumList = await isarDBService.getPlaylists4Library();
+    final _albumList = await fyrestreamDBService.getPlaylists4Library();
     if (_albumList.isNotEmpty) {
       _albumList.toList().forEach((element) {
         mediaPlaylists.add(element.playlistName);
@@ -162,7 +164,7 @@ class MediaDBCubit extends Cubit<MediadbState> {
 
   Future<List<MediaPlaylist>> getListOfPlaylists2() async {
     List<MediaPlaylist> mediaPlaylists = [];
-    final _albumList = await isarDBService.getPlaylists4Library();
+    final _albumList = await fyrestreamDBService.getPlaylists4Library();
     if (_albumList.isNotEmpty) {
       _albumList.toList().forEach((element) {
         mediaPlaylists.add(fromPlaylistDB2MediaPlaylist(element));
@@ -173,12 +175,12 @@ class MediaDBCubit extends Cubit<MediadbState> {
 
   Future<void> reorderPositionOfItemInDB(
       String playlistName, int old_idx, int new_idx) async {
-    isarDBService.reorderItemPositionInPlaylist(
+    fyrestreamDBService.reorderItemPositionInPlaylist(
         MediaPlaylistDB(playlistName: playlistName), old_idx, new_idx);
   }
 
   Future<void> removePlaylist(MediaPlaylistDB mediaPlaylistDB) async {
-    isarDBService.removePlaylist(mediaPlaylistDB);
+    fyrestreamDBService.removePlaylist(mediaPlaylistDB);
     SnackbarService.showMessage("${mediaPlaylistDB.playlistName} is Deleted!!",
         duration: const Duration(seconds: 3),
         action: SnackBarAction(
@@ -191,7 +193,7 @@ class MediaDBCubit extends Cubit<MediadbState> {
   Future<void> removeMediaFromPlaylist(
       MediaItem mediaItem, MediaPlaylistDB mediaPlaylistDB) async {
     MediaItemDB _mediaItemDB = MediaItem2MediaItemDB(mediaItem);
-    isarDBService.removeMediaItem(_mediaItemDB, mediaPlaylistDB).then((value) {
+    fyrestreamDBService.removeMediaItemFromPlaylist(_mediaItemDB, mediaPlaylistDB).then((value) {
       SnackbarService.showMessage(
           "${mediaItem.title} is removed from ${mediaPlaylistDB.playlistName}!!",
           duration: const Duration(seconds: 3),
@@ -204,15 +206,37 @@ class MediaDBCubit extends Cubit<MediadbState> {
     });
   }
 
+  Future<void> removeMediaItemFromDB(MediaItemDB, mediaItemDB) async {}
+
   Future<void> addMediaItemToPlaylist(
       MediaItemModel mediaItemModel, MediaPlaylistDB mediaPlaylistDB,
       {bool undo = false}) async {
-    isarDBService.addMediaItem(
+    fyrestreamDBService.addMediaItem(
         MediaItem2MediaItemDB(mediaItemModel), mediaPlaylistDB);
     refreshLibrary.add(true);
     if (!undo) {
       SnackbarService.showMessage(
           "${mediaItemModel.title} is added to ${mediaPlaylistDB.playlistName}!!");
+    }
+  }
+
+  Future<bool?> getSettingBool(String key) async {
+    return await fyrestreamDBService.getSettingBool(key);
+  }
+
+  Future<void> putSettingBool(String key, bool value) async {
+    if (key.isNotEmpty) {
+      fyrestreamDBService.putSettingBool(key, value);
+    }
+  }
+
+  Future<String?> getSettingStr(String key) async {
+    return await fyrestreamDBService.getSettingStr(key);
+  }
+
+  Future<void> putSettingStr(String key, String value) async {
+    if (key.isNotEmpty && value.isNotEmpty) {
+      fyrestreamDBService.putSettingStr(key, value);
     }
   }
 

@@ -3,8 +3,8 @@ import 'package:bloc/bloc.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:fyrestream/model/MediaPlaylistModel.dart';
 import 'package:fyrestream/model/songModel.dart';
-import 'package:fyrestream/services/db/MediaDB.dart';
-import 'package:fyrestream/services/db/cubit/mediadb_cubit.dart';
+import 'package:fyrestream/services/db/GlobalDB.dart';
+import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/utils/pallete_generator.dart';
 
 part 'current_playlist_state.dart';
@@ -17,14 +17,14 @@ part 'current_playlist_state.dart';
 class CurrentPlaylistCubit extends Cubit<CurrentPlaylistState> {
   MediaPlaylist? mediaPlaylist;
   PaletteGenerator? paletteGenerator;
-  late MediaDBCubit mediaDBCubit;
+  late FyreStreamDBCubit fyrestreamDBCubit;
 
-  CurrentPlaylistCubit({this.mediaPlaylist, required this.mediaDBCubit})
+  CurrentPlaylistCubit({this.mediaPlaylist, required this.fyrestreamDBCubit})
     : super(CurrentPlaylistInitial()) {}
 
   Future<void> loadPlaylist(String playlistName) async {
     if (mediaPlaylist !=
-        await mediaDBCubit.getPlaylistItems(
+        await fyrestreamDBCubit.getPlaylistItems(
           MediaPlaylistDB(playlistName: playlistName),
         )) {
       setupPlaylist(playlistName);
@@ -41,7 +41,7 @@ class CurrentPlaylistCubit extends Cubit<CurrentPlaylistState> {
 
   Future<void> setupPlaylist(String playlistName) async {
     emit(CurrentPlaylistLoading());
-    mediaPlaylist = await mediaDBCubit.getPlaylistItems(
+    mediaPlaylist = await fyrestreamDBCubit.getPlaylistItems(
       MediaPlaylistDB(playlistName: playlistName),
     );
 

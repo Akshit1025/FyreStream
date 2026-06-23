@@ -5,8 +5,8 @@ import 'package:fyrestream/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dar
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/screens/widgets/createPlaylist_bottomsheet.dart';
 import 'package:fyrestream/screens/widgets/smallPlaylistCard_widget.dart';
-import 'package:fyrestream/services/db/MediaDB.dart';
-import 'package:fyrestream/services/db/cubit/mediadb_cubit.dart';
+import 'package:fyrestream/services/db/GlobalDB.dart';
+import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:fyrestream/routes_and_consts/global_consts.dart';
 import 'package:fyrestream/utils/load_Image.dart';
@@ -197,7 +197,7 @@ class _AddToPlaylistScreenState extends State<AddToPlaylistScreen> {
                         onTap: () {
                           if (_finalList[index].playlistName != null &&
                               currentMediaModel != mediaItemModelNull) {
-                            context.read<MediaDBCubit>().addMediaItemToPlaylist(
+                            context.read<FyreStreamDBCubit>().addMediaItemToPlaylist(
                               currentMediaModel,
                               MediaPlaylistDB(
                                 playlistName: _finalList[index].playlistName!,

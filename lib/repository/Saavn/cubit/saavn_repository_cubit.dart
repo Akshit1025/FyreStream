@@ -9,8 +9,8 @@ import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/repository/Saavn/saavn_api.dart';
 import 'package:fyrestream/repository/Spotify/spotify_api.dart';
 import 'package:fyrestream/screens/screen/library_views/cubit/import_playlist_cubit.dart';
-import 'package:fyrestream/services/db/MediaDB.dart';
-import 'package:fyrestream/services/db/cubit/mediadb_cubit.dart';
+import 'package:fyrestream/services/db/GlobalDB.dart';
+import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 
 part 'saavn_repository_state.dart';
 
@@ -53,7 +53,7 @@ class SaavnSearchRepositoryCubit extends Cubit<SaavnRepositoryState> {
   BehaviorSubject<String?> searchQuery = BehaviorSubject<String?>.seeded(null);
   SpotifyApi spotifyApi = SpotifyApi();
   String? accessSpotifyToken;
-  MediaDBCubit? mediaDBCubit;
+  FyreStreamDBCubit? fyrestreamDBCubit;
   BehaviorSubject<ImportPlaylistState> importFromSpotifyState =
   BehaviorSubject.seeded(ImportPlaylistStateInitial());
 
@@ -113,8 +113,8 @@ class SaavnSearchRepositoryCubit extends Cubit<SaavnRepositoryState> {
   }
 
   Future<void> fetchPlaylistFromSpotify(
-      MediaDBCubit _mediaDBCubit, String playListID) async {
-    mediaDBCubit = _mediaDBCubit;
+      FyreStreamDBCubit _fyrestreamDBCubit, String playListID) async {
+    fyrestreamDBCubit = _fyrestreamDBCubit;
 
     String? _playlistID = getPlaylistIdFromSpotifyUrl(playListID);
 
@@ -152,7 +152,7 @@ class SaavnSearchRepositoryCubit extends Cubit<SaavnRepositoryState> {
                 itemName: searchResultsList[0].title,
                 totalLength: _spotifyList.length - 1,
                 currentItem: k));
-            _mediaDBCubit.addMediaItemToPlaylist(searchResultsList[0],
+            _fyrestreamDBCubit.addMediaItemToPlaylist(searchResultsList[0],
                 MediaPlaylistDB(playlistName: playlistName));
           }
 

@@ -11,6 +11,11 @@ MediaItemModel fromYtVidSongMap2MediaItem(Map<dynamic, dynamic> songItem) {
       "https://img.youtube.com/vi/${songItem["id"].toString().replaceAll("youtube", '')}/hqdefault.jpg",
     ),
     genre: songItem["genre"] ?? 'Unknown',
+    duration: Duration(
+      seconds: (songItem["duration"] == "null" || songItem["duration"] == null)
+          ? 120
+          : int.parse(songItem["duration"]),
+    ),
     extras: {
       "url": 'Unknown',
       "source": "youtube",

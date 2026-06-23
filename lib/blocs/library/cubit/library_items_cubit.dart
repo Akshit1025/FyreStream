@@ -4,22 +4,22 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:fyrestream/model/MediaPlaylistModel.dart';
-import 'package:fyrestream/services/db/MediaDB.dart';
+import 'package:fyrestream/services/db/GlobalDB.dart';
 
-import 'package:fyrestream/services/db/cubit/mediadb_cubit.dart';
+import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/utils/load_Image.dart';
 
 part 'library_items_state.dart';
 
 class LibraryItemsCubit extends Cubit<LibraryItemsState> {
-  MediaDBCubit mediaDBCubit;
+  FyreStreamDBCubit fyrestreamDBCubit;
   List<MediaPlaylist> mediaPlaylist = [];
   LibraryItemsState libraryItemsState =
   LibraryItemsState(playlists: List.empty(growable: true));
 
-  LibraryItemsCubit({required this.mediaDBCubit})
+  LibraryItemsCubit({required this.fyrestreamDBCubit})
       : super(LibraryItemsInitial()) {
-    mediaDBCubit.refreshLibrary.listen(
+    fyrestreamDBCubit.refreshLibrary.listen(
           (value) {
         log(value.toString(), name: "libItemsCubit");
         if (value) {
@@ -36,7 +36,7 @@ class LibraryItemsCubit extends Cubit<LibraryItemsState> {
     libraryItemsState =
         LibraryItemsState(playlists: List.empty(growable: true));
 
-    mediaPlaylist = await mediaDBCubit.getListOfPlaylists2();
+    mediaPlaylist = await fyrestreamDBCubit.getListOfPlaylists2();
 
     // List<String> _playlists = List.empty(growable: true);
 
@@ -80,7 +80,7 @@ class LibraryItemsCubit extends Cubit<LibraryItemsState> {
 
   void removePlaylist(MediaPlaylistDB mediaPlaylistDB) {
     if (mediaPlaylistDB.playlistName != "Null") {
-      mediaDBCubit.removePlaylist(mediaPlaylistDB);
+      fyrestreamDBCubit.removePlaylist(mediaPlaylistDB);
       getAndEmitPlaylists();
     }
   }

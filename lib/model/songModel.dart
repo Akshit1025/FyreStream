@@ -10,6 +10,7 @@ class MediaItemModel extends MediaItem {
   String? artist;
   Map<String, dynamic>? extras;
   String? genre;
+  Duration? duration;
 
   MediaItemModel({
     required this.id,
@@ -19,6 +20,7 @@ class MediaItemModel extends MediaItem {
     this.artist,
     this.extras,
     this.genre,
+    this.duration,
   }) : super(
          id: id,
          title: title,
@@ -27,6 +29,7 @@ class MediaItemModel extends MediaItem {
          artist: artist,
          extras: extras,
          genre: genre,
+         duration: duration,
        );
 
   @override

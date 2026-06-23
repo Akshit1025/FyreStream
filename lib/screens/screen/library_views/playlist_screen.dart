@@ -6,8 +6,8 @@ import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/screens/screen/library_views/cubit/current_playlist_cubit.dart';
 import 'package:fyrestream/screens/widgets/horizontalSongCard_widget.dart';
 import 'package:fyrestream/screens/widgets/playPause_widget.dart';
-import 'package:fyrestream/services/db/MediaDB.dart';
-import 'package:fyrestream/services/db/cubit/mediadb_cubit.dart';
+import 'package:fyrestream/services/db/GlobalDB.dart';
+import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:fyrestream/utils/load_Image.dart';
 
@@ -268,7 +268,7 @@ class _PlaylistState extends State<Playlist> {
             ),
           ),
           onDismissed: (direction) {
-            context.read<MediaDBCubit>().removeMediaFromPlaylist(
+            context.read<FyreStreamDBCubit>().removeMediaFromPlaylist(
               _state.mediaItem[index],
               MediaPlaylistDB(playlistName: _state.albumName),
             );
@@ -296,7 +296,7 @@ class _PlaylistState extends State<Playlist> {
           }
           final MediaItemModel item = _state.mediaItems.removeAt(oldIndex);
           _state.mediaItems.insert(newIndex, item);
-          context.read<MediaDBCubit>().reorderPositionOfItemInDB(
+          context.read<FyreStreamDBCubit>().reorderPositionOfItemInDB(
             _state.albumName,
             oldIndex,
             newIndex,

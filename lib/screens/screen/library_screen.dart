@@ -5,7 +5,7 @@ import 'package:fyrestream/blocs/library/cubit/library_items_cubit.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/widgets/createPlaylist_bottomsheet.dart';
 import 'package:fyrestream/screens/widgets/smallPlaylistCard_widget.dart';
-import 'package:fyrestream/services/db/MediaDB.dart';
+import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:icons_plus/icons_plus.dart';
 

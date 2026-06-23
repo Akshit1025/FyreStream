@@ -5,8 +5,8 @@ import 'package:fyrestream/model/youtube_vid_model.dart';
 import 'package:fyrestream/model/yt_music_model.dart';
 import 'package:fyrestream/repository/Youtube/youtube_api.dart';
 import 'package:fyrestream/screens/screen/library_views/playlist_screen.dart';
-import 'package:fyrestream/services/db/MediaDB.dart';
-import 'package:fyrestream/services/db/cubit/mediadb_cubit.dart';
+import 'package:fyrestream/services/db/GlobalDB.dart';
+import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 
 class ImportPlaylistState {
   String playlistName;
@@ -83,7 +83,7 @@ class ImportPlaylistCubit extends Cubit<ImportPlaylistState> {
 
   Future<void> fetchYtPlaylistByID(
     String ytPlaylistID,
-    MediaDBCubit mediaDBCubit,
+    FyreStreamDBCubit fyrestreamDBCubit,
   ) async {
     importYtPlaylistBS.add(ImportPlaylistStateInitial());
     // try {
@@ -108,7 +108,7 @@ class ImportPlaylistCubit extends Cubit<ImportPlaylistState> {
         // print("5 ${playlist[i].toString()}");
         MediaItemModel mediaItemModel = fromYtVidSongMap2MediaItem(playlist[i]);
         print("5 ${mediaItemModel.toString()}");
-        mediaDBCubit.addMediaItemToPlaylist(
+        fyrestreamDBCubit.addMediaItemToPlaylist(
           mediaItemModel,
           MediaPlaylistDB(playlistName: result[0]["metadata"].title),
         );

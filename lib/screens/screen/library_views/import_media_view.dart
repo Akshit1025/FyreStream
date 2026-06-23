@@ -8,7 +8,7 @@ import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:fyrestream/repository/Saavn/cubit/saavn_repository_cubit.dart';
 import 'package:fyrestream/screens/screen/library_views/cubit/import_playlist_cubit.dart';
 import 'package:fyrestream/screens/widgets/import_playlist.dart';
-import 'package:fyrestream/services/db/cubit/mediadb_cubit.dart';
+import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/theme_data/default.dart';
 
 class ImportMediaFromPlatformsView extends StatelessWidget {
@@ -177,7 +177,7 @@ Future getIdAndShowBottomSheet(
                                         context
                                             .read<SaavnSearchRepositoryCubit>()
                                             .fetchPlaylistFromSpotify(
-                                              context.read<MediaDBCubit>(),
+                                              context.read<FyreStreamDBCubit>(),
                                               value,
                                             );
                                         showDialog(
@@ -194,7 +194,7 @@ Future getIdAndShowBottomSheet(
                                       .read<ImportPlaylistCubit>()
                                       .fetchYtPlaylistByID(
                                         "PLDIoUOhQQPlXr63I_vwF9GD8sAKh77dWU",
-                                        context.read<MediaDBCubit>(),
+                                        context.read<FyreStreamDBCubit>(),
                                       );
                                   showDialog(
                                     barrierDismissible: false,

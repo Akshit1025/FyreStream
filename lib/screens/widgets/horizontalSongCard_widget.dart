@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fyrestream/model/MediaPlaylistModel.dart';
 import 'package:fyrestream/screens/widgets/like_widget.dart';
-import 'package:fyrestream/services/db/cubit/mediadb_cubit.dart';
+import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:fyrestream/utils/load_Image.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -189,7 +189,7 @@ class HorizontalSongCardWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 FutureBuilder(
-                  future: context.read<MediaDBCubit>().isLiked(
+                  future: context.read<FyreStreamDBCubit>().isLiked(
                     mediaPlaylist!.mediaItems[index],
                   ),
                   builder: (context, snapshot) {
@@ -211,13 +211,13 @@ class HorizontalSongCardWidget extends StatelessWidget {
                                   isLiked: snapshot.data ?? false,
                                   iconSize: 29,
                                   onLiked: () =>
-                                      context.read<MediaDBCubit>().setLike(
+                                      context.read<FyreStreamDBCubit>().setLike(
                                         mediaPlaylist!.mediaItems[index],
                                         isLiked: true,
                                       ),
                                   isPlaying: true,
                                   onDisliked: () =>
-                                      context.read<MediaDBCubit>().setLike(
+                                      context.read<FyreStreamDBCubit>().setLike(
                                         mediaPlaylist!.mediaItems[index],
                                         isLiked: false,
                                       ),
@@ -227,12 +227,12 @@ class HorizontalSongCardWidget extends StatelessWidget {
                                   isLiked: snapshot.data ?? false,
                                   iconSize: 29,
                                   onLiked: () =>
-                                      context.read<MediaDBCubit>().setLike(
+                                      context.read<FyreStreamDBCubit>().setLike(
                                         mediaPlaylist!.mediaItems[index],
                                         isLiked: true,
                                       ),
                                   onDisliked: () =>
-                                      context.read<MediaDBCubit>().setLike(
+                                      context.read<FyreStreamDBCubit>().setLike(
                                         mediaPlaylist!.mediaItems[index],
                                         isLiked: false,
                                       ),

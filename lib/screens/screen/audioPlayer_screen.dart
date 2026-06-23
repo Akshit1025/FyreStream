@@ -7,7 +7,7 @@ import 'package:icons_plus/icons_plus.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:fyrestream/screens/widgets/like_widget.dart';
 import 'package:fyrestream/screens/widgets/playPause_widget.dart';
-import 'package:fyrestream/services/db/cubit/mediadb_cubit.dart';
+import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:fyrestream/utils/load_Image.dart';
 import 'package:fyrestream/utils/pallete_generator.dart';
@@ -205,7 +205,7 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                         ),
                         const Spacer(),
                         FutureBuilder(
-                          future: context.read<MediaDBCubit>().isLiked(
+                          future: context.read<FyreStreamDBCubit>().isLiked(
                             context
                                 .read<FyrestreamPlayerCubit>()
                                 .fyrestreamPlayer
@@ -223,7 +223,7 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                                   isLiked: snapshot.data ?? false,
                                   iconSize: 35,
                                   onLiked: () =>
-                                      context.read<MediaDBCubit>().setLike(
+                                      context.read<FyreStreamDBCubit>().setLike(
                                         context
                                             .read<FyrestreamPlayerCubit>()
                                             .fyrestreamPlayer
@@ -231,7 +231,7 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                                         isLiked: true,
                                       ),
                                   onDisliked: () =>
-                                      context.read<MediaDBCubit>().setLike(
+                                      context.read<FyreStreamDBCubit>().setLike(
                                         context
                                             .read<FyrestreamPlayerCubit>()
                                             .fyrestreamPlayer

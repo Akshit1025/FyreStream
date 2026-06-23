@@ -27,7 +27,7 @@ class PlayerInitializer {
     );
   }
 
-  Future<FyreStreamMusicPlayer> getAudioHandler() async {
+  Future<FyreStreamMusicPlayer> getFyreStreamMusicPlayer() async {
     if (!_isInitialized) {
       await _initialize();
       _isInitialized = true;

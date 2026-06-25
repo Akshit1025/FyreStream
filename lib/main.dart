@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io' as io;
+import 'package:fyrestream/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:fyrestream/model/MediaPlaylistModel.dart';
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/model/youtube_vid_model.dart';
@@ -149,6 +150,10 @@ class _MyAppState extends State<MyApp> {
       providers: [
         BlocProvider(create: (context) => fyrestreamPlayerCubit, lazy: false),
         BlocProvider(create: (context) => FyreStreamDBCubit(), lazy: false),
+        BlocProvider(
+          create: (context) => SettingsCubit(),
+          lazy: false,
+        ),
         BlocProvider(
           create: (context) =>
               CurrentPlaylistCubit(fyrestreamDBCubit: context.read<FyreStreamDBCubit>()),

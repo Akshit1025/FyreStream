@@ -1,29 +1,22 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:fyrestream/blocs/settings_cubit/cubit/settings_cubit.dart';
+import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fyrestream/screens/screen/home_views/setting_views/check_update_view.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
-
   @override
   State<SettingsView> createState() => _SettingsViewState();
 }
 
 class _SettingsViewState extends State<SettingsView> {
-  bool value = false;
   @override
   void initState() {
     super.initState();
-
-    context.read<FyreStreamDBCubit>().getSettingBool("auto_update_notify").then((value) {
-      setState(() {
-        this.value = value ?? false;
-      });
-    });
   }
 
   @override
@@ -42,64 +35,57 @@ class _SettingsViewState extends State<SettingsView> {
               .merge(Default_Theme.secondoryTextStyle),
         ),
       ),
-      body: Column(
-        children: [
-          SettingTile(
-            title: "Check for updates",
-            subtitle: "Check for new updates",
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const CheckUpdateView(),
-                ),
-              );
-            },
-          ),
-          AnimatedContainer(
-            duration: const Duration(seconds: 1),
-            child: SwitchListTile(
-              value: value,
-              subtitle: Text(
-                "Get notified when new updates are available on startup",
-                style: TextStyle(
-                  color: Default_Theme.primaryColor1.withOpacity(0.5),
-                  fontSize: 14
-                ).merge(Default_Theme.secondoryTextStyleMedium),
+      body: BlocBuilder<SettingsCubit, SettingsState>(
+        builder: (context, state) {
+          return Column(
+            children: [
+              SettingTile(
+                title: "Check for updates",
+                subtitle: "Check for new updates",
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CheckUpdateView(),
+                    ),
+                  );
+                },
               ),
-              title: Text(
-                "Auto Update Notify",
-                style: TextStyle(
-                  color: Default_Theme.primaryColor1,
-                  fontSize: 20
-                ).merge(Default_Theme.secondoryTextStyleMedium),
-              ),
-              onChanged: (value) {
-                setState(() {
-                  this.value = value;
-                });
-                context.read<FyreStreamDBCubit>().putSettingBool("auto_update_notify", value);
-              }
-            ),
-          ),
-        ],
+              SwitchListTile(
+                  value: state.autoUpdateNotify,
+                  subtitle: Text(
+                    "Get notified when new updates are available in app start up.",
+                    style: TextStyle(
+                        color: Default_Theme.primaryColor1.withOpacity(0.5),
+                        fontSize: 14)
+                        .merge(Default_Theme.secondoryTextStyleMedium),
+                  ),
+                  title: Text(
+                    "Auto update notify",
+                    style: const TextStyle(
+                        color: Default_Theme.primaryColor1, fontSize: 20)
+                        .merge(Default_Theme.secondoryTextStyleMedium),
+                  ),
+                  onChanged: (value) {
+                    context.read<SettingsCubit>().updateAutoUpdateNotify(value);
+                  }),
+            ],
+          );
+        },
       ),
     );
   }
 }
-
 class SettingTile extends StatelessWidget {
   final String title;
   final String subtitle;
   final Function onTap;
-
   const SettingTile({
     Key? key,
     required this.title,
     required this.subtitle,
     required this.onTap,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return ListTile(

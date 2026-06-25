@@ -10,7 +10,7 @@ class FyreStreamDBService {
     db = openDB();
   }
 
-  Future<void> addMediaItem(
+  static Future<void> addMediaItem(
     MediaItemDB mediaItemDB,
     MediaPlaylistDB mediaPlaylistDB,
   ) async {
@@ -65,7 +65,7 @@ class FyreStreamDBService {
     // isarDB.writeTxnSync(() => isarDB.mediaItemDBs.putSync(mediaItemDB));
   }
 
-  Future<void> removeMediaItem(MediaItemDB mediaItemDB) async {
+  static Future<void> removeMediaItem(MediaItemDB mediaItemDB) async {
     Isar isarDB = await db;
     bool _res = false;
     isarDB.writeTxnSync(() => _res = isarDB.mediaItemDBs.deleteSync(mediaItemDB.id!));
@@ -74,7 +74,7 @@ class FyreStreamDBService {
     }
   }
 
-  Future<void> removeMediaItemFromPlaylist(
+  static Future<void> removeMediaItemFromPlaylist(
     MediaItemDB mediaItemDB,
     MediaPlaylistDB mediaPlaylistDB,
   ) async {
@@ -113,7 +113,7 @@ class FyreStreamDBService {
     // isarDB.writeTxnSync(() => isarDB.mediaItemDBs.putSync(mediaItemDB));
   }
 
-  Future<void> addPlaylist(MediaPlaylistDB mediaPlaylistDB) async {
+  static Future<void> addPlaylist(MediaPlaylistDB mediaPlaylistDB) async {
     Isar isarDB = await db;
     MediaPlaylistDB? _mediaPlaylist = isarDB.mediaPlaylistDBs
         .filter()
@@ -129,7 +129,7 @@ class FyreStreamDBService {
     }
   }
 
-  Future<void> likeMediaItem(MediaItemDB mediaItemDB, {isLiked = false}) async {
+  static Future<void> likeMediaItem(MediaItemDB mediaItemDB, {isLiked = false}) async {
     Isar isarDB = await db;
     addPlaylist(MediaPlaylistDB(playlistName: "Liked"));
     MediaItemDB? _mediaItem = isarDB.mediaItemDBs
@@ -145,7 +145,7 @@ class FyreStreamDBService {
     }
   }
 
-  Future<void> reorderItemPositionInPlaylist(
+  static Future<void> reorderItemPositionInPlaylist(
     MediaPlaylistDB mediaPlaylistDB,
     int old_idx,
     int new_idx,
@@ -172,7 +172,7 @@ class FyreStreamDBService {
     }
   }
 
-  Future<bool> isMediaLiked(MediaItemDB mediaItemDB) async {
+  static Future<bool> isMediaLiked(MediaItemDB mediaItemDB) async {
     Isar isarDB = await db;
     MediaItemDB? _mediaItemDB = isarDB.mediaItemDBs
         .filter()
@@ -188,7 +188,7 @@ class FyreStreamDBService {
     }
   }
 
-  Future<Isar> openDB() async {
+  static Future<Isar> openDB() async {
     if (Isar.instanceNames.isEmpty) {
       String _path = (await getApplicationDocumentsDirectory()).path;
       log(_path, name: "DB");
@@ -202,12 +202,12 @@ class FyreStreamDBService {
     return Future.value(Isar.getInstance());
   }
 
-  Future<Stream> getStream4MediaList(MediaPlaylistDB mediaPlaylistDB) async {
+  static Future<Stream> getStream4MediaList(MediaPlaylistDB mediaPlaylistDB) async {
     Isar isarDB = await db;
     return isarDB.mediaPlaylistDBs.watchObject(mediaPlaylistDB.isarId);
   }
 
-  Future<List<int>> getPlaylistItemsRank(
+  static Future<List<int>> getPlaylistItemsRank(
     MediaPlaylistDB mediaPlaylistDB,
   ) async {
     Isar isarDB = await db;
@@ -218,7 +218,7 @@ class FyreStreamDBService {
         [];
   }
 
-  Future<void> setPlaylistItemsRank(
+  static Future<void> setPlaylistItemsRank(
     MediaPlaylistDB mediaPlaylistDB,
     List<int> rankList,
   ) async {
@@ -235,7 +235,7 @@ class FyreStreamDBService {
     }
   }
 
-  Future<List<MediaItemDB>?> getPlaylistItems(
+  static Future<List<MediaItemDB>?> getPlaylistItems(
     MediaPlaylistDB mediaPlaylistDB,
   ) async {
     Isar isarDB = await db;
@@ -245,12 +245,12 @@ class FyreStreamDBService {
         .toList();
   }
 
-  Future<List<MediaPlaylistDB>> getPlaylists4Library() async {
+  static Future<List<MediaPlaylistDB>> getPlaylists4Library() async {
     Isar isarDB = await db;
     return await isarDB.mediaPlaylistDBs.where().findAll();
   }
 
-  Future<void> removePlaylist(MediaPlaylistDB mediaPlaylistDB) async {
+  static Future<void> removePlaylist(MediaPlaylistDB mediaPlaylistDB) async {
     Isar isarDB = await db;
     bool _res = false;
     isarDB.writeTxnSync(
@@ -261,7 +261,7 @@ class FyreStreamDBService {
     }
   }
 
-  Future<void> putSettingStr(String key, String value) async {
+  static Future<void> putSettingStr(String key, String value) async {
     Isar isarDB = await db;
     if (key.isNotEmpty && value.isNotEmpty) {
       isarDB.writeTxnSync(() => isarDB.appSettingsStrDBs
@@ -269,7 +269,7 @@ class FyreStreamDBService {
     }
   }
 
-  Future<void> putSettingBool(String key, bool value) async {
+  static Future<void> putSettingBool(String key, bool value) async {
     Isar isarDB = await db;
     if (key.isNotEmpty) {
       isarDB.writeTxnSync(() => isarDB.appSettingsBoolDBs
@@ -277,7 +277,7 @@ class FyreStreamDBService {
     }
   }
 
-  Future<String?> getSettingStr(String key) async {
+  static Future<String?> getSettingStr(String key) async {
     Isar isarDB = await db;
     return isarDB.appSettingsStrDBs
         .filter()
@@ -286,12 +286,57 @@ class FyreStreamDBService {
         ?.settingValue;
   }
 
-  Future<bool?> getSettingBool(String key) async {
+  static Future<bool?> getSettingBool(String key) async {
     Isar isarDB = await db;
     return isarDB.appSettingsBoolDBs
         .filter()
         .settingNameEqualTo(key)
         .findFirstSync()
         ?.settingValue;
+  }
+
+  static Future<Stream<AppSettingsStrDB?>?> getWatcher4SettingStr(
+      String key) async {
+    Isar isarDB = await db;
+    int? id = isarDB.appSettingsStrDBs
+        .filter()
+        .settingNameEqualTo(key)
+        .findFirstSync()
+        ?.isarId;
+    if (id != null) {
+      return isarDB.appSettingsStrDBs.watchObject(
+        id,
+        fireImmediately: true,
+      );
+    } else {
+      return null;
+    }
+  }
+
+  static Future<Stream<AppSettingsBoolDB?>?> getWatcher4SettingBool(
+      String key) async {
+    Isar isarDB = await db;
+    int? id = isarDB.appSettingsBoolDBs
+        .filter()
+        .settingNameEqualTo(key)
+        .findFirstSync()
+        ?.isarId;
+    if (id != null) {
+      return isarDB.appSettingsBoolDBs.watchObject(
+        id,
+        fireImmediately: true,
+      );
+    } else {
+      isarDB.writeTxnSync(() => isarDB.appSettingsBoolDBs
+          .putSync(AppSettingsBoolDB(settingName: key, settingValue: false)));
+      return isarDB.appSettingsBoolDBs.watchObject(
+        isarDB.appSettingsBoolDBs
+            .filter()
+            .settingNameEqualTo(key)
+            .findFirstSync()!
+            .isarId,
+        fireImmediately: true,
+      );
+    }
   }
 }

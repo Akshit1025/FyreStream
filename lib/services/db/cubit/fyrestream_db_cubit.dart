@@ -23,7 +23,7 @@ class FyreStreamDBCubit extends Cubit<MediadbState> {
       {bool undo = false}) async {
     List<String> _list = await getListOfPlaylists();
     if (!_list.contains(mediaPlaylistDB.playlistName)) {
-      fyrestreamDBService.addPlaylist(mediaPlaylistDB);
+      FyreStreamDBService.addPlaylist(mediaPlaylistDB);
       refreshLibrary.add(true);
       if (!undo) {
         SnackbarService.showMessage(
@@ -68,10 +68,10 @@ class FyreStreamDBCubit extends Cubit<MediadbState> {
   }
 
   Future<void> setLike(MediaItem mediaItem, {isLiked = false}) async {
-    fyrestreamDBService.addMediaItem(MediaItem2MediaItemDB(mediaItem),
+    FyreStreamDBService.addMediaItem(MediaItem2MediaItemDB(mediaItem),
         MediaPlaylistDB(playlistName: "Liked"));
     refreshLibrary.add(true);
-    fyrestreamDBService.likeMediaItem(MediaItem2MediaItemDB(mediaItem),
+    FyreStreamDBService.likeMediaItem(MediaItem2MediaItemDB(mediaItem),
         isLiked: isLiked);
     if (isLiked) {
       SnackbarService.showMessage("${mediaItem.title} is Liked!!");
@@ -82,7 +82,7 @@ class FyreStreamDBCubit extends Cubit<MediadbState> {
 
   Future<bool> isLiked(MediaItem mediaItem) {
     // bool res = true;
-    return fyrestreamDBService.isMediaLiked(MediaItem2MediaItemDB(mediaItem));
+    return FyreStreamDBService.isMediaLiked(MediaItem2MediaItemDB(mediaItem));
   }
 
   List<MediaItemDB> reorderByRank(
@@ -114,10 +114,10 @@ class FyreStreamDBCubit extends Cubit<MediadbState> {
     MediaPlaylist _mediaPlaylist =
     MediaPlaylist(mediaItems: [], albumName: mediaPlaylistDB.playlistName);
 
-    var _dbList = await fyrestreamDBService.getPlaylistItems(mediaPlaylistDB);
+    var _dbList = await FyreStreamDBService.getPlaylistItems(mediaPlaylistDB);
     if (_dbList != null) {
       List<int> _rankList =
-      await fyrestreamDBService.getPlaylistItemsRank(mediaPlaylistDB);
+      await FyreStreamDBService.getPlaylistItemsRank(mediaPlaylistDB);
 
       if (_rankList.isNotEmpty) {
         _dbList = reorderByRank(_dbList, _rankList);
@@ -133,16 +133,16 @@ class FyreStreamDBCubit extends Cubit<MediadbState> {
 
   Future<void> setPlayListItemsRank(
       MediaPlaylistDB mediaPlaylistDB, List<int> rankList) async {
-    fyrestreamDBService.setPlaylistItemsRank(mediaPlaylistDB, rankList);
+    FyreStreamDBService.setPlaylistItemsRank(mediaPlaylistDB, rankList);
   }
 
   Future<Stream> getStreamOfPlaylist(MediaPlaylistDB mediaPlaylistDB) async {
-    return await fyrestreamDBService.getStream4MediaList(mediaPlaylistDB);
+    return await FyreStreamDBService.getStream4MediaList(mediaPlaylistDB);
   }
 
   Future<List<String>> getListOfPlaylists() async {
     List<String> mediaPlaylists = [];
-    final _albumList = await fyrestreamDBService.getPlaylists4Library();
+    final _albumList = await FyreStreamDBService.getPlaylists4Library();
     if (_albumList.isNotEmpty) {
       _albumList.toList().forEach((element) {
         mediaPlaylists.add(element.playlistName);
@@ -164,7 +164,7 @@ class FyreStreamDBCubit extends Cubit<MediadbState> {
 
   Future<List<MediaPlaylist>> getListOfPlaylists2() async {
     List<MediaPlaylist> mediaPlaylists = [];
-    final _albumList = await fyrestreamDBService.getPlaylists4Library();
+    final _albumList = await FyreStreamDBService.getPlaylists4Library();
     if (_albumList.isNotEmpty) {
       _albumList.toList().forEach((element) {
         mediaPlaylists.add(fromPlaylistDB2MediaPlaylist(element));
@@ -175,12 +175,12 @@ class FyreStreamDBCubit extends Cubit<MediadbState> {
 
   Future<void> reorderPositionOfItemInDB(
       String playlistName, int old_idx, int new_idx) async {
-    fyrestreamDBService.reorderItemPositionInPlaylist(
+    FyreStreamDBService.reorderItemPositionInPlaylist(
         MediaPlaylistDB(playlistName: playlistName), old_idx, new_idx);
   }
 
   Future<void> removePlaylist(MediaPlaylistDB mediaPlaylistDB) async {
-    fyrestreamDBService.removePlaylist(mediaPlaylistDB);
+    FyreStreamDBService.removePlaylist(mediaPlaylistDB);
     SnackbarService.showMessage("${mediaPlaylistDB.playlistName} is Deleted!!",
         duration: const Duration(seconds: 3),
         action: SnackBarAction(
@@ -193,7 +193,7 @@ class FyreStreamDBCubit extends Cubit<MediadbState> {
   Future<void> removeMediaFromPlaylist(
       MediaItem mediaItem, MediaPlaylistDB mediaPlaylistDB) async {
     MediaItemDB _mediaItemDB = MediaItem2MediaItemDB(mediaItem);
-    fyrestreamDBService.removeMediaItemFromPlaylist(_mediaItemDB, mediaPlaylistDB).then((value) {
+    FyreStreamDBService.removeMediaItemFromPlaylist(_mediaItemDB, mediaPlaylistDB).then((value) {
       SnackbarService.showMessage(
           "${mediaItem.title} is removed from ${mediaPlaylistDB.playlistName}!!",
           duration: const Duration(seconds: 3),
@@ -211,7 +211,7 @@ class FyreStreamDBCubit extends Cubit<MediadbState> {
   Future<void> addMediaItemToPlaylist(
       MediaItemModel mediaItemModel, MediaPlaylistDB mediaPlaylistDB,
       {bool undo = false}) async {
-    fyrestreamDBService.addMediaItem(
+    FyreStreamDBService.addMediaItem(
         MediaItem2MediaItemDB(mediaItemModel), mediaPlaylistDB);
     refreshLibrary.add(true);
     if (!undo) {
@@ -221,22 +221,44 @@ class FyreStreamDBCubit extends Cubit<MediadbState> {
   }
 
   Future<bool?> getSettingBool(String key) async {
-    return await fyrestreamDBService.getSettingBool(key);
+    return await FyreStreamDBService.getSettingBool(key);
   }
 
   Future<void> putSettingBool(String key, bool value) async {
     if (key.isNotEmpty) {
-      fyrestreamDBService.putSettingBool(key, value);
+      FyreStreamDBService.putSettingBool(key, value);
     }
   }
 
   Future<String?> getSettingStr(String key) async {
-    return await fyrestreamDBService.getSettingStr(key);
+    return await FyreStreamDBService.getSettingStr(key);
   }
 
   Future<void> putSettingStr(String key, String value) async {
     if (key.isNotEmpty && value.isNotEmpty) {
-      fyrestreamDBService.putSettingStr(key, value);
+      FyreStreamDBService.putSettingStr(key, value);
+    }
+  }
+
+  Future<Stream<AppSettingsStrDB?>?> getWatcher4SettingStr(String key) async {
+    if (key.isNotEmpty) {
+      return await FyreStreamDBService.getWatcher4SettingStr(key);
+    } else {
+      return null;
+    }
+  }
+
+  Future<Stream<AppSettingsBoolDB?>?> getWatcher4SettingBool(String key) async {
+    if (key.isNotEmpty) {
+      var _watcher = await FyreStreamDBService.getWatcher4SettingBool(key);
+      if (_watcher != null) {
+        return _watcher;
+      } else {
+        FyreStreamDBService.putSettingBool(key, false);
+        return FyreStreamDBService.getWatcher4SettingBool(key);
+      }
+    } else {
+      return null;
     }
   }
 

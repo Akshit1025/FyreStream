@@ -1,40 +1,32 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:fyrestream/plugins/chart_defines.dart';
+import 'package:fyrestream/blocs/explore/cubit/explore_cubits.dart';
+import 'package:fyrestream/model/chart_model.dart';
 import 'package:flutter/material.dart';
-import 'package:fyrestream/plugins/billboard_charts.dart';
 import 'package:fyrestream/screens/widgets/chart_list_tile.dart';
 import 'package:fyrestream/theme_data/default.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ChartScreen extends StatefulWidget {
-  ChartInfo? chartInfo;
-  ChartScreen({Key? key, this.chartInfo}) : super(key: key) {
-    chartInfo ??= ChartInfo(
-      chartFunction: getBillboardChart,
-      title: BillboardCharts.BILLBOARD_200.title,
-      url: BillboardCharts.BILLBOARD_200.url,
-      imgUrl: billboardRandomIMGs.getImage(),
-    );
-  }
+  ChartCubit? chartCubit;
+  ChartScreen({Key? key, this.chartCubit}) : super(key: key);
 
   @override
   State<ChartScreen> createState() => _ChartScreenState();
 }
 
 class _ChartScreenState extends State<ChartScreen> {
-  late Future _chartData;
   @override
   void initState() {
     super.initState();
-    _chartData = widget.chartInfo!.chartFunction(url: widget.chartInfo!.url);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder(
-        future: _chartData,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
+      body: BlocBuilder<ChartCubit, ChartState>(
+        bloc: widget.chartCubit,
+        builder: (context, state) {
+          if (state is ChartInitial) {
             return const Center(
               child: SizedBox(
                   height: 50,
@@ -43,35 +35,35 @@ class _ChartScreenState extends State<ChartScreen> {
                     color: Default_Theme.accentColor2,
                   )),
             );
-          } else if (snapshot.hasError) {
+          } else if (state.chart.chartItems!.isEmpty) {
             return Center(
-              child: Text(
-                "Error: ${snapshot.error}",
-                style: Default_Theme.secondoryTextStyleMedium,
-              ),
+              child: Text("Error: No Item in Chart",
+                  style: Default_Theme.secondoryTextStyleMedium.merge(
+                      const TextStyle(
+                          fontSize: 24,
+                          color: Color.fromARGB(255, 255, 235, 251)))),
             );
           } else {
-            final List<Map<String, String>>? melon = snapshot.data;
+            final ChartModel chart = state.chart;
             return CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
-                customDiscoverBar(context), //AppBar
+                customDiscoverBar(context, state), //AppBar
                 SliverList(
-                  delegate: SliverChildListDelegate([
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: melon?.length,
-                      itemBuilder: (context, index) {
-                        return ChartListTile(
-                          title: melon![index]['title']!,
-                          subtitle: melon[index]['label']!,
-                          imgUrl: melon[index]['img']!,
-                        );
-                      },
-                    ),
-                  ])
-                ),
+                    delegate: SliverChildListDelegate([
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: chart.chartItems!.length,
+                        itemBuilder: (context, index) {
+                          return ChartListTile(
+                            title: chart.chartItems![index].name!,
+                            subtitle: chart.chartItems![index].subtitle!,
+                            imgUrl: chart.chartItems![index].imageUrl!,
+                          );
+                        },
+                      ),
+                    ]))
               ],
             );
           }
@@ -81,7 +73,7 @@ class _ChartScreenState extends State<ChartScreen> {
     );
   }
 
-  SliverAppBar customDiscoverBar(BuildContext context) {
+  SliverAppBar customDiscoverBar(BuildContext context, ChartState state) {
     return SliverAppBar(
       floating: true,
       surfaceTintColor: Default_Theme.themeColor,
@@ -90,8 +82,8 @@ class _ChartScreenState extends State<ChartScreen> {
       flexibleSpace: FlexibleSpaceBar(
         centerTitle: false,
         titlePadding:
-            const EdgeInsets.only(left: 8, bottom: 0, right: 0, top: 0),
-        title: Text(widget.chartInfo!.title,
+        const EdgeInsets.only(left: 8, bottom: 0, right: 0, top: 0),
+        title: Text(state.chart.chartName,
             textScaleFactor: 1,
             textAlign: TextAlign.start,
             style: Default_Theme.secondoryTextStyleMedium.merge(const TextStyle(
@@ -101,8 +93,7 @@ class _ChartScreenState extends State<ChartScreen> {
             Container(
               decoration: BoxDecoration(
                 image: DecorationImage(
-                    image: NetworkImage(widget.chartInfo!.imgUrl),
-                    fit: BoxFit.cover),
+                    image: NetworkImage(state.coverImg), fit: BoxFit.cover),
               ),
             ),
             Positioned.fill(
@@ -112,11 +103,11 @@ class _ChartScreenState extends State<ChartScreen> {
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
                             colors: [
-                  Default_Theme.themeColor.withOpacity(0.8),
-                  Default_Theme.themeColor.withOpacity(0.4),
-                  Default_Theme.themeColor.withOpacity(0.1),
-                  Default_Theme.themeColor.withOpacity(0),
-                ]))))
+                              Default_Theme.themeColor.withOpacity(0.8),
+                              Default_Theme.themeColor.withOpacity(0.4),
+                              Default_Theme.themeColor.withOpacity(0.1),
+                              Default_Theme.themeColor.withOpacity(0),
+                            ]))))
           ],
         ),
       ),

@@ -1,7 +1,9 @@
+import 'package:fyrestream/blocs/explore/cubit/explore_cubits.dart';
 import 'package:fyrestream/screens/screen/chart/chart_widget.dart';
 import 'package:fyrestream/screens/screen/chart/show_charts.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/theme_data/default.dart';
@@ -20,6 +22,15 @@ class CaraouselWidget extends StatefulWidget {
 
 class _CaraouselWidgetState extends State<CaraouselWidget> {
   bool _visibility = true;
+  List<ChartCubit> chartCubitList = List.empty(growable: true);
+
+  @override
+  void initState() {
+    for (var i in chartInfoList) {
+      chartCubitList.add(ChartCubit(i));
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +79,7 @@ class _CaraouselWidgetState extends State<CaraouselWidget> {
               // enableInfiniteScroll: true,
               enlargeFactor: 0.3,
               initialPage: 0,
+              pauseAutoPlayOnTouch: true,
               enlargeCenterPage: true),
           items: [
             for (int i = 0; i < chartInfoList.length; i++)
@@ -75,10 +87,13 @@ class _CaraouselWidgetState extends State<CaraouselWidget> {
                 onTap: () {
                   GoRouter.of(context).push(
                       "/${GlobalStrConsts.exploreScreen}/${GlobalStrConsts.ChartScreen}",
-                      extra: chartInfoList[i]);
+                      extra: chartCubitList[i]);
                 },
-                child: ChartWidget(
-                  chartInfo: chartInfoList[i],
+                child: BlocProvider(
+                  create: (context) => chartCubitList[i],
+                  child: ChartWidget(
+                    chartInfo: chartInfoList[i],
+                  ),
                 ),
               ),
           ],

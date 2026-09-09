@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:async/async.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
@@ -138,6 +139,7 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
     if (currentPlaylist.isNotEmpty) {
       currentPlayingIdx = idx;
       await playMediaItem(currentMedia, doPlay: doPlay);
+      FyreStreamDBService.putRecentlyPlayed(MediaItem2MediaItemDB(currentMedia));
     }
   }
 

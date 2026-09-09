@@ -1,17 +1,24 @@
-import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
-import 'package:fyrestream/utils/load_Image.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
+import 'package:fyrestream/utils/load_Image.dart';
+
 import '../../theme_data/default.dart';
+
 class ChartListTile extends StatelessWidget {
   final String title;
   final String subtitle;
   final String imgUrl;
+  final bool rectangularImage;
+
   const ChartListTile({
     Key? key,
     required this.title,
     required this.subtitle,
     required this.imgUrl,
+    this.rectangularImage = false,
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -19,11 +26,20 @@ class ChartListTile extends StatelessWidget {
       onTap: () => context.push(
           "/${GlobalStrConsts.searchScreen}?query=${title} by ${subtitle}"),
       child: SizedBox(
-        width: 300,
+        // width: 320,
         child: ListTile(
           leading: ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: SizedBox(height: 60, child: loadImageCached(imgUrl))),
+              child: rectangularImage
+                  ? SizedBox(
+                height: 60,
+                width: 80,
+                child: loadImageCached(imgUrl, fit: BoxFit.cover),
+              )
+                  : SizedBox(
+                  height: 60, width: 60, child: loadImageCached(imgUrl)
+              )
+          ),
           title: Text(
             title,
             textAlign: TextAlign.start,

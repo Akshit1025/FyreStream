@@ -49,7 +49,8 @@ Image loadImage(
 
 CachedNetworkImage loadImageCached(
   coverImageURL, {
-  placeholderPath = "assets/icons/fyrestream_logo.png",
+  placeholderPath = "assets/icons/fyrestream_new_logo_c.png",
+      fit = BoxFit.cover
 }) {
   ImageProvider<Object> placeHolder = AssetImage(placeholderPath);
   return CachedNetworkImage(
@@ -85,9 +86,9 @@ CachedNetworkImage loadImageCached(
       ),
     ),
     errorWidget: (context, url, error) =>
-        Image(image: placeHolder, fit: BoxFit.cover),
-    // fadeInDuration: const Duration(milliseconds: 100),
-    fit: BoxFit.cover,
+        Image(image: placeHolder, fit: fit),
+     fadeInDuration: const Duration(milliseconds: 700),
+    fit: fit,
   );
 }
 

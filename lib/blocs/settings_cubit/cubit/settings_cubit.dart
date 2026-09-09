@@ -1,3 +1,4 @@
+import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
@@ -10,13 +11,13 @@ class SettingsCubit extends Cubit<SettingsState> {
   }
 
   void initSettings() {
-    FyreStreamDBService.getSettingBool("auto_update_notify").then((value) {
+    FyreStreamDBService.getSettingBool(GlobalStrConsts.autoUpdateNotify).then((value) {
       emit(state.copyWith(autoUpdateNotify: value ?? false));
     });
   }
 
   void updateAutoUpdateNotify(bool value) {
-    FyreStreamDBService.putSettingBool("auto_update_notify", value);
+    FyreStreamDBService.putSettingBool(GlobalStrConsts.autoUpdateNotify, value);
     emit(state.copyWith(autoUpdateNotify: value));
   }
 }

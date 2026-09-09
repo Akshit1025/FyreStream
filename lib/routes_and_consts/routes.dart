@@ -1,3 +1,5 @@
+import 'package:fyrestream/blocs/explore/cubit/explore_cubits.dart';
+import 'package:fyrestream/model/chart_model.dart';
 import 'package:fyrestream/plugins/chart_defines.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -86,9 +88,9 @@ class GlobalRoutes {
                     name: GlobalStrConsts.ChartScreen,
                     path: "ChartScreen",
                     builder: (context, state) => ChartScreen(
-                      chartInfo: () {
+                      chartCubit: () {
                         if (state.extra != null) {
-                          return state.extra as ChartInfo;
+                          return state.extra as ChartCubit;
                         } else {
                           return null;
                         }

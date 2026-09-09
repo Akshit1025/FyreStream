@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:fyrestream/model/chart_model.dart';
 import 'package:fyrestream/plugins/chart_defines.dart';
-import 'package:fyrestream/services/db/fyrestream_db_service.dart';
+// import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 import 'package:html/dom.dart';
@@ -171,26 +171,26 @@ Future<ChartModel> getBillboardChart(ChartURL url) async{
           chartItems: chartItems,
           url: url.url,
           lastUpdated: DateTime.now());
-      FyreStreamDBService.putChart(chart);
+      // FyreStreamDBService.putChart(chart);
       log('Billboard Charts: ${chart.chartItems!.length} tracks',
           name: "Billboard");
       return chart;
     } else {
-      final chart = await FyreStreamDBService.getChart(url.title);
-      if (chart != null) {
-        log('Billboard Charts: ${chart.chartItems!.length} tracks loaded from cache',
-            name: "Billboard");
-        return chart;
-      }
+      // final chart = await FyreStreamDBService.getChart(url.title);
+      // if (chart != null) {
+      //   log('Billboard Charts: ${chart.chartItems!.length} tracks loaded from cache',
+      //       name: "Billboard");
+      //   return chart;
+      // }
       throw Exception("Failed to load page");
     }
   } catch (e) {
-    final chart = await FyreStreamDBService.getChart(url.title);
-    if (chart != null) {
-      log('Billboard Charts: ${chart.chartItems!.length} tracks loaded from cache',
-          name: "Billboard");
-      return chart;
-    }
+    // final chart = await FyreStreamDBService.getChart(url.title);
+    // if (chart != null) {
+    //   log('Billboard Charts: ${chart.chartItems!.length} tracks loaded from cache',
+    //       name: "Billboard");
+    //   return chart;
+    // }
     throw Exception("Error: $e");
   }
 }

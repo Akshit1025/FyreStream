@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:fyrestream/model/chart_model.dart';
 import 'package:fyrestream/plugins/chart_defines.dart';
-import 'package:fyrestream/services/db/fyrestream_db_service.dart';
+// import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
 
@@ -59,28 +59,28 @@ Future<ChartModel> getLastFmCharts(ChartURL url) async {
           chartItems: chartItems,
           url: url.url,
           lastUpdated: DateTime.now());
-      FyreStreamDBService.putChart(lastfmModel);
+      // FyreStreamDBService.putChart(lastfmModel);
       log('Last.fm Charts: ${lastfmModel.chartItems!.length} tracks',
           name: "LastFM");
 
       return lastfmModel;
     } else {
-      final chart = await FyreStreamDBService.getChart(url.title);
-      if (chart != null) {
-        log('LastFM Charts: ${chart.chartItems!.length} tracks loaded from cache',
-            name: "LastFM");
-        return chart;
-      }
+      // final chart = await FyreStreamDBService.getChart(url.title);
+      // if (chart != null) {
+      //   log('LastFM Charts: ${chart.chartItems!.length} tracks loaded from cache',
+      //       name: "LastFM");
+      //   return chart;
+      // }
       throw Exception(
           'Failed to load page with status code: ${response.statusCode}');
     }
   } on Exception catch (e) {
-    final chart = await FyreStreamDBService.getChart(url.title);
-    if (chart != null) {
-      log('LastFM Charts: ${chart.chartItems!.length} tracks loaded from cache',
-          name: "LastFM");
-      return chart;
-    }
+    // final chart = await FyreStreamDBService.getChart(url.title);
+    // if (chart != null) {
+    //   log('LastFM Charts: ${chart.chartItems!.length} tracks loaded from cache',
+    //       name: "LastFM");
+    //   return chart;
+    // }
     throw Exception('Failed to parse page: $e');
   } finally {
     client.close();

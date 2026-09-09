@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:fyrestream/model/chart_model.dart';
 import 'package:fyrestream/plugins/chart_defines.dart';
-import 'package:fyrestream/services/db/fyrestream_db_service.dart';
+// import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:http/http.dart' as http;
 
 const List<String> spotifyIMGs = [
@@ -39,26 +39,26 @@ Future<ChartModel> getSpotifyTop50Chart(ChartURL url) async {
         url: url.url,
         lastUpdated: DateTime.now(),
       );
-      FyreStreamDBService.putChart(chart);
+      // FyreStreamDBService.putChart(chart);
       log('Spotify Charts: ${chart.chartItems!.length} tracks',
           name: "Spotify");
       return chart;
     } else {
-      final chart = await FyreStreamDBService.getChart(url.title);
-      if (chart != null) {
-        log('Spotify Charts: ${chart.chartItems!.length} tracks loaded from cache',
-            name: "Spotify");
-        return chart;
-      }
+      // final chart = await FyreStreamDBService.getChart(url.title);
+      // if (chart != null) {
+      //   log('Spotify Charts: ${chart.chartItems!.length} tracks loaded from cache',
+      //       name: "Spotify");
+      //   return chart;
+      // }
       throw Exception('Failed to load chart');
     }
   } catch (e) {
-    final chart = await FyreStreamDBService.getChart(url.title);
-    if (chart != null) {
-      log('Spotify Charts: ${chart.chartItems!.length} tracks loaded from cache',
-          name: "Spotify");
-      return chart;
-    }
+    // final chart = await FyreStreamDBService.getChart(url.title);
+    // if (chart != null) {
+    //   log('Spotify Charts: ${chart.chartItems!.length} tracks loaded from cache',
+    //       name: "Spotify");
+    //   return chart;
+    // }
     throw Exception('Something went wrong while parsing the page');
   }
 }

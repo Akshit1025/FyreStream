@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:fyrestream/model/chart_model.dart';
 import 'package:fyrestream/plugins/chart_defines.dart';
-import 'package:fyrestream/services/db/fyrestream_db_service.dart';
+// import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
 
@@ -100,27 +100,27 @@ Future<ChartModel> getMelonChart(ChartURL url) async {
           chartItems: chartItems,
           url: url.url,
           lastUpdated: DateTime.now());
-      FyreStreamDBService.putChart(melonChart);
+      // FyreStreamDBService.putChart(melonChart);
       log('Melon Charts: ${melonChart.chartItems!.length} tracks',
           name: "Melon");
       return melonChart;
     } else {
-      final chart = await FyreStreamDBService.getChart(url.title);
-      if (chart != null) {
-        log('Melon Charts: ${chart.chartItems!.length} tracks loaded from cache',
-            name: "Melon");
-        return chart;
-      }
+      // final chart = await FyreStreamDBService.getChart(url.title);
+      // if (chart != null) {
+      //   log('Melon Charts: ${chart.chartItems!.length} tracks loaded from cache',
+      //       name: "Melon");
+      //   return chart;
+      // }
       throw Exception(
           'Parsing failed with status code: ${response.statusCode}');
     }
   } catch (e) {
-    final chart = await FyreStreamDBService.getChart(url.title);
-    if (chart != null) {
-      log('Melon Charts: ${chart.chartItems!.length} tracks loaded from cache',
-          name: "Melon");
-      return chart;
-    }
+    // final chart = await FyreStreamDBService.getChart(url.title);
+    // if (chart != null) {
+    //   log('Melon Charts: ${chart.chartItems!.length} tracks loaded from cache',
+    //       name: "Melon");
+    //   return chart;
+    // }
     throw Exception('Failed to parse page');
   }
 }

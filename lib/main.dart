@@ -9,6 +9,7 @@ import 'package:fyrestream/model/youtube_vid_model.dart';
 import 'package:fyrestream/repository/Youtube/youtube_api.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/widgets/snackbar.dart';
+import 'package:fyrestream/theme_data/default.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fyrestream/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
@@ -200,6 +201,7 @@ class _MyAppState extends State<MyApp> {
               return MaterialApp.router(
                 scaffoldMessengerKey: SnackbarService.messengerKey,
                 routerConfig: GlobalRoutes.globalRouter,
+                theme: Default_Theme().defaultThemeData,
               );
             }
           },

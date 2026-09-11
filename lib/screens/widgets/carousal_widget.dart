@@ -3,6 +3,7 @@ import 'package:fyrestream/blocs/explore/cubit/explore_cubits.dart';
 import 'package:fyrestream/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:fyrestream/screens/screen/chart/chart_widget.dart';
 import 'package:fyrestream/screens/screen/chart/show_charts.dart';
+import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,11 +29,19 @@ class _CaraouselWidgetState extends State<CaraouselWidget> {
   List<ChartCubit> chartCubitList = List.empty(growable: true);
   bool autoSlideCharts = true;
 
+  Future<void> initSettings() async {
+    autoSlideCharts = await FyreStreamDBService.getSettingBool(
+        GlobalStrConsts.autoSlideCharts) ??
+        true;
+    setState(() {});
+  }
+
   @override
   void initState() {
     for (var i in chartInfoList) {
       chartCubitList.add(ChartCubit(i, fetchChartCubit));
     }
+    initSettings();
     super.initState();
     context.read<SettingsCubit>().stream.listen((event) {
       if (autoSlideCharts != event.autoSlideCharts) {

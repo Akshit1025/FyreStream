@@ -14,10 +14,17 @@ class SettingsCubit extends Cubit<SettingsState> {
     FyreStreamDBService.getSettingBool(GlobalStrConsts.autoUpdateNotify).then((value) {
       emit(state.copyWith(autoUpdateNotify: value ?? false));
     });
+    FyreStreamDBService.getSettingBool(GlobalStrConsts.autoSlideCharts).then((value) {
+      emit(state.copyWith(autoSlideCharts: value ?? true));
+    });
   }
 
   void updateAutoUpdateNotify(bool value) {
     FyreStreamDBService.putSettingBool(GlobalStrConsts.autoUpdateNotify, value);
     emit(state.copyWith(autoUpdateNotify: value));
+  }
+  void updateAutoSlideCharts(bool value) {
+    FyreStreamDBService.putSettingBool(GlobalStrConsts.autoSlideCharts, value);
+    emit(state.copyWith(autoSlideCharts: value));
   }
 }

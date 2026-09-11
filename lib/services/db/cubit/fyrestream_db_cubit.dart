@@ -148,16 +148,17 @@ class FyreStreamDBCubit extends Cubit<MediadbState> {
     });
   }
   Future<void> removeMediaItemFromDB(MediaItemDB mediaItemDB) async {}
-  Future<void> addMediaItemToPlaylist(
+  Future<int?> addMediaItemToPlaylist(
       MediaItemModel mediaItemModel, MediaPlaylistDB mediaPlaylistDB,
       {bool undo = false}) async {
-    FyreStreamDBService.addMediaItem(
+    final _id = await FyreStreamDBService.addMediaItem(
         MediaItem2MediaItemDB(mediaItemModel), mediaPlaylistDB);
     // refreshLibrary.add(true);
     if (!undo) {
       SnackbarService.showMessage(
           "${mediaItemModel.title} is added to ${mediaPlaylistDB.playlistName}!!");
     }
+    return _id;
   }
   Future<bool?> getSettingBool(String key) async {
     return await FyreStreamDBService.getSettingBool(key);

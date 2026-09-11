@@ -13,7 +13,7 @@ class PlaylistItemProperties extends Equatable {
   });
 
   @override
-  List<Object?> get props => [playlistName];
+  List<Object?> get props => [playlistName, coverImgUrl, subTitle];
 }
 
 class LibraryItemsState extends Equatable {

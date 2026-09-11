@@ -3,6 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  connectivity_plus
   isar_flutter_libs
   just_audio_windows
   share_plus

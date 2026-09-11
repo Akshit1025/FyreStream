@@ -110,8 +110,7 @@ void showMediaItemOptions(BuildContext context, MediaItemModel mediaItemModel) {
                         onTap: () {
                           context
                               .read<AddToPlaylistCubit>()
-                              .mediaItemModelBS
-                              .add(mediaItemModel);
+                              .setMediaItemModel(mediaItemModel);
                           context.pushNamed(
                             GlobalStrConsts.addToPlaylistScreen,
                           );

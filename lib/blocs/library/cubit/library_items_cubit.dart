@@ -2,86 +2,93 @@
 import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
-import 'package:flutter/material.dart';
-import 'package:fyrestream/model/MediaPlaylistModel.dart';
-import 'package:fyrestream/services/db/GlobalDB.dart';
+import 'package:equatable/equatable.dart';
 
+import 'package:fyrestream/model/songModel.dart';
+import 'package:fyrestream/screens/widgets/snackbar.dart';
+import 'package:fyrestream/services/db/GlobalDB.dart';
+import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
-import 'package:fyrestream/utils/load_Image.dart';
 
 part 'library_items_state.dart';
 
 class LibraryItemsCubit extends Cubit<LibraryItemsState> {
+  Stream<void>? playlistWatcherDB;
+  List<PlaylistItemProperties> playlistItems = List.empty();
   FyreStreamDBCubit fyrestreamDBCubit;
-  List<MediaPlaylist> mediaPlaylist = [];
-  LibraryItemsState libraryItemsState =
-  LibraryItemsState(playlists: List.empty(growable: true));
+  List<MediaPlaylistDB> mediaPlaylistsDB = [];
 
-  LibraryItemsCubit({required this.fyrestreamDBCubit})
-      : super(LibraryItemsInitial()) {
-    fyrestreamDBCubit.refreshLibrary.listen(
-          (value) {
-        log(value.toString(), name: "libItemsCubit");
-        if (value) {
-          getAndEmitPlaylists();
-          log("got refresh command", name: "libItemsCubit");
-        }
-      },
-    );
+  LibraryItemsCubit({
+    required this.fyrestreamDBCubit,
+  }) : super(LibraryItemsInitial()) {
     getAndEmitPlaylists();
+    getDBWatcher();
+  }
+
+  Future<void> getDBWatcher() async {
+    playlistWatcherDB = await FyreStreamDBService.getPlaylistsWatcher();
+    playlistWatcherDB?.listen((event) {
+      getAndEmitPlaylists();
+    });
   }
 
   Future<void> getAndEmitPlaylists() async {
-    List<PlaylistItemProperties> _playlists = List.empty(growable: true);
-    libraryItemsState =
-        LibraryItemsState(playlists: List.empty(growable: true));
+    mediaPlaylistsDB = await FyreStreamDBService.getPlaylists4Library();
+    if (mediaPlaylistsDB.isNotEmpty) {
+      playlistItems = mediaPlaylistsDB2ItemProperties(mediaPlaylistsDB);
 
-    mediaPlaylist = await fyrestreamDBCubit.getListOfPlaylists2();
-
-    // List<String> _playlists = List.empty(growable: true);
-
-    // if (libraryItemsState.playlists.isNotEmpty) {
-    //   for (var element in libraryItemsState.playlists) {
-    //     _playlists.add(element.playlistName ?? "Unknown");
-    //   }
-    //   libraryItemsState.playlists = [];
-    // }
-    libraryItemsState.playlists.clear();
-    log("emitted from library0 ${_playlists.length} - MediaPlaylists ${mediaPlaylist.length}",
-        name: "libItemsCubit");
-
-    if (mediaPlaylist.length > 0) {
-      for (var element in mediaPlaylist) {
-        ImageProvider _tempProvider;
-
-        if (element.mediaItems.length > 0) {
-          _tempProvider =
-          await getImageProvider(element.mediaItems[0].artUri.toString());
-        } else {
-          _tempProvider = await getImageProvider("");
-        }
-        PlaylistItemProperties _playlistItem = PlaylistItemProperties(
-            playlistName: element.albumName,
-            imageProvider: _tempProvider,
-            subTitle: "${element.mediaItems.length} Items");
-        // libraryItemsState.playlists.add(_playlistItem);
-        _playlists.add(_playlistItem);
-
-        // libraryItemsState.playlistNames?.add(element.albumName);
-        // libraryItemsState.subTitles?.add("Saavan");
-      }
-      if (_playlists.length == mediaPlaylist.length) {
-        emit(state.copyWith(playlists: _playlists));
-      }
-      log("emitted from library ${_playlists.length} - MediaPlaylists ${mediaPlaylist.length}",
-          name: "libItemsCubit");
+      emit(LibraryItemsState(playlists: playlistItems));
+    } else {
+      emit(LibraryItemsInitial());
     }
+  }
+
+  List<PlaylistItemProperties> mediaPlaylistsDB2ItemProperties(
+      List<MediaPlaylistDB> _mediaPlaylistsDB) {
+    List<PlaylistItemProperties> _playlists = List.empty(growable: true);
+    if (_mediaPlaylistsDB.isNotEmpty) {
+      for (var element in _mediaPlaylistsDB) {
+        log("${element.playlistName}", name: "libItemCubit");
+        _playlists.add(
+          PlaylistItemProperties(
+            playlistName: element.playlistName,
+            subTitle: "${element.mediaItems.length} Items",
+            coverImgUrl: element.mediaItems.isNotEmpty
+                ? element.mediaItems.first.artURL
+                : null,
+          ),
+        );
+      }
+    }
+    return _playlists;
   }
 
   void removePlaylist(MediaPlaylistDB mediaPlaylistDB) {
     if (mediaPlaylistDB.playlistName != "Null") {
-      fyrestreamDBCubit.removePlaylist(mediaPlaylistDB);
+      FyreStreamDBService.removePlaylist(mediaPlaylistDB);
+      // getAndEmitPlaylists();
+      SnackbarService.showMessage(
+          "Playlist ${mediaPlaylistDB.playlistName} removed");
+    }
+  }
+
+  void addToPlaylist(
+      MediaItemModel mediaItem, MediaPlaylistDB mediaPlaylistDB) {
+    if (mediaPlaylistDB.playlistName != "Null") {
+      fyrestreamDBCubit.addMediaItemToPlaylist(mediaItem, mediaPlaylistDB);
       getAndEmitPlaylists();
+      SnackbarService.showMessage(
+          "Added ${mediaItem.title} to ${mediaPlaylistDB.playlistName}");
+    }
+  }
+
+  void removeFromPlaylist(
+      MediaItemModel mediaItem, MediaPlaylistDB mediaPlaylistDB) {
+    if (mediaPlaylistDB.playlistName != "Null") {
+      fyrestreamDBCubit.removeMediaFromPlaylist(mediaItem, mediaPlaylistDB);
+      getAndEmitPlaylists();
+      SnackbarService.showMessage(
+          "Removed ${mediaItem.title} from ${mediaPlaylistDB.playlistName}");
     }
   }
 }

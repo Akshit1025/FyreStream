@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:palette_generator/palette_generator.dart';
 
 Future<PaletteGenerator> getPalleteFromImage(String url) async {
-  ImageProvider<Object> placeHolder = AssetImage(
-    "assets/icons/FyreStream_Logo.png",
+  ImageProvider<Object> placeHolder = const AssetImage(
+    "assets/icons/fyrestream_new_logo_c.png",
   );
 
   try {

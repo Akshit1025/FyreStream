@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io' as io;
+import 'package:fyrestream/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
 import 'package:fyrestream/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:fyrestream/model/MediaPlaylistModel.dart';
 import 'package:fyrestream/model/songModel.dart';
@@ -13,13 +14,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fyrestream/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
 import 'package:fyrestream/blocs/library/cubit/library_items_cubit.dart';
 import 'package:fyrestream/repository/Saavn/cubit/saavn_repository_cubit.dart';
-import 'package:fyrestream/repository/cubits/fetch_search_results.dart';
+import 'package:fyrestream/blocs/search/fetch_search_results.dart';
 import 'package:fyrestream/routes_and_consts/routes.dart';
 import 'package:fyrestream/screens/screen/library_views/cubit/current_playlist_cubit.dart';
 import 'package:fyrestream/screens/screen/library_views/cubit/import_playlist_cubit.dart';
 import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
 
 import 'blocs/mediaPlayer/fyrestream_player_cubit.dart';
 
@@ -79,6 +81,12 @@ void ProcessIncomingIntent(List<SharedMediaFile> _sharedFiles) {
   }
 }
 
+Future<void> setHighRefreshRate() async {
+  if (io.Platform.isAndroid) {
+    await FlutterDisplayMode.setHighRefreshRate();
+  }
+}
+
 late FyrestreamPlayerCubit fyrestreamPlayerCubit;
 void setupPlayerCubit() {
   fyrestreamPlayerCubit = FyrestreamPlayerCubit();
@@ -86,6 +94,7 @@ void setupPlayerCubit() {
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  setHighRefreshRate();
   // FlutterDownloader.initialize(debug: true);
   try {
     dotenv.load(fileName: "assets/.env");
@@ -155,6 +164,10 @@ class _MyAppState extends State<MyApp> {
           lazy: false,
         ),
         BlocProvider(
+          create: (context) => ConnectivityCubit(),
+          lazy: false,
+        ),
+        BlocProvider(
           create: (context) =>
               CurrentPlaylistCubit(fyrestreamDBCubit: context.read<FyreStreamDBCubit>()),
           lazy: false,
@@ -164,8 +177,7 @@ class _MyAppState extends State<MyApp> {
               LibraryItemsCubit(fyrestreamDBCubit: context.read<FyreStreamDBCubit>()),
         ),
         BlocProvider(
-          create: (context) =>
-              AddToPlaylistCubit(fyrestreamDBCubit: context.read<FyreStreamDBCubit>()),
+          create: (context) => AddToPlaylistCubit(),
           lazy: false,
         ),
         BlocProvider(create: (context) => ImportPlaylistCubit()),

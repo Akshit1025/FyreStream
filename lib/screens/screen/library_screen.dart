@@ -1,3 +1,5 @@
+import 'package:fyrestream/screens/widgets/sign_board_widget.dart';
+import 'package:fyrestream/utils/load_Image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -30,21 +32,13 @@ class LibraryScreen extends StatelessWidget {
                       builder: (context, state) {
                         return AnimatedSwitcher(
                           duration: const Duration(seconds: 1),
-                          child: state.playlists.isNotEmpty
+                          child: state != LibraryItemsInitial()
                               ? ListOfPlaylists(
                             state: state,
                           )
-                              : Center(
-                            child: SizedBox(
-                              width: 100,
-                              height: 50,
-                              child: Text(
-                                "Get started by adding items to library!!",
-                                style: Default_Theme.secondoryTextStyle.merge(
-                                    const TextStyle(
-                                        color: Default_Theme.primaryColor2)),
-                              ),
-                            ),
+                              : const SignBoardWidget(
+                            message: "No Playlists Yet\nCreate One Now!",
+                            icon: MingCute.playlist_line
                           ),
                         );
                       },
@@ -134,8 +128,7 @@ class _ListOfPlaylistsState extends State<ListOfPlaylists> {
                   context.read<LibraryItemsCubit>().removePlaylist(
                       MediaPlaylistDB(
                           playlistName:
-                          widget.state.playlists[index].playlistName ??
-                              "Null"));
+                          widget.state.playlists[index].playlistName));
                   setState(() {
                     widget.state.playlists.removeAt(index);
                   });
@@ -144,16 +137,11 @@ class _ListOfPlaylistsState extends State<ListOfPlaylists> {
                   onTap: () => context
                       .pushNamed(GlobalStrConsts.playlistView, pathParameters: {
                     "playlistName":
-                    widget.state.playlists[index].playlistName ?? "Liked"
-                  }),
+                    widget.state.playlists[index].playlistName}),
                   child: SmallPlaylistCard(
-                      playListTitle:
-                      widget.state.playlists[index].playlistName ??
-                          "Unknown",
-                      coverArt: Image(
-                        image: widget.state.playlists[index].imageProvider!,
-                        fit: BoxFit.fitHeight,
-                      ),
+                      playListTitle: widget.state.playlists[index].playlistName,
+                      coverArt: loadImageCached(
+                          widget.state.playlists[index].coverImgUrl.toString()),
                       playListsubTitle:
                       widget.state.playlists[index].subTitle ?? "Unknown"),
                 ),

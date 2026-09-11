@@ -227,6 +227,10 @@ class FyreStreamDBService {
     Isar isarDB = await db;
     return await isarDB.mediaPlaylistDBs.where().findAll();
   }
+  static Future<Stream<void>> getPlaylistsWatcher() async {
+    Isar isarDB = await db;
+    return isarDB.mediaPlaylistDBs.watchLazy(fireImmediately: true);
+  }
   static Future<void> removePlaylist(MediaPlaylistDB mediaPlaylistDB) async {
     Isar isarDB = await db;
     bool _res = false;

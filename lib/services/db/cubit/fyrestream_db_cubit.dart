@@ -13,7 +13,7 @@ import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 part 'fyrestream_db_state.dart';
 
 class FyreStreamDBCubit extends Cubit<MediadbState> {
-  BehaviorSubject<bool> refreshLibrary = BehaviorSubject<bool>.seeded(false);
+  // BehaviorSubject<bool> refreshLibrary = BehaviorSubject<bool>.seeded(false);
   FyreStreamDBService fyrestreamDBService = FyreStreamDBService();
   FyreStreamDBCubit() : super(MediadbInitial()) {
     addNewPlaylistToDB(MediaPlaylistDB(playlistName: "Liked"));
@@ -23,7 +23,7 @@ class FyreStreamDBCubit extends Cubit<MediadbState> {
     List<String> _list = await getListOfPlaylists();
     if (!_list.contains(mediaPlaylistDB.playlistName)) {
       FyreStreamDBService.addPlaylist(mediaPlaylistDB);
-      refreshLibrary.add(true);
+      // refreshLibrary.add(true);
       if (!undo) {
         SnackbarService.showMessage(
             "Playlist ${mediaPlaylistDB.playlistName} added");
@@ -34,7 +34,7 @@ class FyreStreamDBCubit extends Cubit<MediadbState> {
   Future<void> setLike(MediaItem mediaItem, {isLiked = false}) async {
     FyreStreamDBService.addMediaItem(MediaItem2MediaItemDB(mediaItem),
         MediaPlaylistDB(playlistName: "Liked"));
-    refreshLibrary.add(true);
+    // refreshLibrary.add(true);
     FyreStreamDBService.likeMediaItem(MediaItem2MediaItemDB(mediaItem),
         isLiked: isLiked);
     if (isLiked) {
@@ -153,7 +153,7 @@ class FyreStreamDBCubit extends Cubit<MediadbState> {
       {bool undo = false}) async {
     FyreStreamDBService.addMediaItem(
         MediaItem2MediaItemDB(mediaItemModel), mediaPlaylistDB);
-    refreshLibrary.add(true);
+    // refreshLibrary.add(true);
     if (!undo) {
       SnackbarService.showMessage(
           "${mediaItemModel.title} is added to ${mediaPlaylistDB.playlistName}!!");
@@ -197,7 +197,7 @@ class FyreStreamDBCubit extends Cubit<MediadbState> {
   }
   @override
   Future<void> close() async {
-    refreshLibrary.close();
+    // refreshLibrary.close();
     super.close();
   }
 }

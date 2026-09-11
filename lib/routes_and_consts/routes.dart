@@ -1,8 +1,4 @@
-import 'package:fyrestream/blocs/explore/cubit/explore_cubits.dart';
-import 'package:fyrestream/model/chart_model.dart';
-import 'package:fyrestream/plugins/chart_defines.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/screen/add_to_playlist_screen.dart';

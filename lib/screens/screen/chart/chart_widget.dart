@@ -1,59 +1,56 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+// import 'dart:math';
 import 'dart:math';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 import 'package:fyrestream/blocs/explore/cubit/explore_cubits.dart';
 import 'package:fyrestream/plugins/chart_defines.dart';
 import 'package:fyrestream/utils/load_Image.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ChartWidget extends StatefulWidget {
   final ChartInfo chartInfo;
-
   const ChartWidget({
     required this.chartInfo,
   });
-
   @override
   State<ChartWidget> createState() => _ChartWidgetState();
 }
 
 // create a class which have 2 color variable for text and background
 class TextColorPair {
-  final Color textColor;
-  final Color backgroundColor;
-
+  final Color color1;
+  final Color color2;
   TextColorPair({
-    required this.textColor,
-    required this.backgroundColor,
+    required this.color1,
+    required this.color2,
   });
 }
 
 // create list of color pair which have some light colors with text color, use professional colors like pastel colors
 final List<TextColorPair> colorPair = [
   TextColorPair(
-    textColor: const Color.fromARGB(255, 0, 0, 0),
-    backgroundColor: const Color.fromARGB(255, 255, 141, 141),
+    color1: const Color.fromARGB(255, 223, 205, 0).withOpacity(0.8),
+    color2: const Color.fromARGB(255, 205, 135, 23).withOpacity(0.0),
   ),
   TextColorPair(
-    textColor: const Color.fromARGB(255, 0, 0, 0),
-    backgroundColor: const Color.fromARGB(255, 132, 255, 253),
+    color1: const Color.fromARGB(255, 255, 173, 50).withOpacity(0.8),
+    color2: const Color.fromARGB(255, 205, 132, 23).withOpacity(0.0),
   ),
   TextColorPair(
-    textColor: const Color.fromARGB(255, 0, 0, 0),
-    backgroundColor: const Color.fromARGB(255, 255, 179, 92),
+    color1: const Color.fromARGB(255, 0, 115, 223).withOpacity(0.8),
+    color2: const Color.fromARGB(255, 23, 96, 205).withOpacity(0.0),
   ),
   TextColorPair(
-    textColor: const Color.fromARGB(255, 0, 0, 0),
-    backgroundColor: const Color.fromARGB(255, 255, 129, 154),
-  ),
-  TextColorPair(
-    textColor: const Color.fromARGB(255, 0, 0, 0),
-    backgroundColor: const Color.fromARGB(255, 76, 255, 163),
+    color1: const Color.fromARGB(255, 223, 0, 123).withOpacity(0.8),
+    color2: const Color.fromARGB(255, 205, 23, 56).withOpacity(0.0),
   ),
 ];
 
 class _ChartWidgetState extends State<ChartWidget> {
-  final _random = new Random();
+  final _random = Random();
   TextColorPair _color = colorPair[0];
   @override
   void initState() {
@@ -62,7 +59,6 @@ class _ChartWidgetState extends State<ChartWidget> {
     });
     super.initState();
   }
-  
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -74,10 +70,23 @@ class _ChartWidgetState extends State<ChartWidget> {
           BlocBuilder<ChartCubit, ChartState>(
             bloc: BlocProvider.of<ChartCubit>(context),
             builder: (context, state) {
-              return state is ChartInitial ? const SizedBox() : SizedBox(
-                height: 600,
-                width: 270,
-                child: loadImageCached(state.coverImg),
+              return AnimatedSwitcher(
+                duration: const Duration(seconds: 1),
+                child: state is ChartInitial
+                    ? Stack(children: [
+                  Container(
+                    color: const Color.fromARGB(255, 52, 0, 147),
+                  ),
+                  const Center(
+                    child: Icon(MingCute.music_2_fill,
+                        size: 80, color: Colors.white),
+                  ),
+                ])
+                    : SizedBox(
+                  height: 600,
+                  width: 270,
+                  child: loadImageCached(state.coverImg),
+                ),
               );
             },
           ),
@@ -85,7 +94,18 @@ class _ChartWidgetState extends State<ChartWidget> {
             child: ClipPath(
               clipper: ChartCardClipper(),
               child: Container(
-                color: _color.backgroundColor.withOpacity(0.8),
+                // color: Color.fromARGB(255, 255, 35, 196).withOpacity(0.5),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomRight,
+                    end: Alignment.topLeft,
+                    colors: [
+                      _color.color1,
+                      _color.color2,
+                    ],
+                  ),
+                ),
+                // color: _color.backgroundColor.withOpacity(0.7),
               ),
             ),
           ),
@@ -101,11 +121,12 @@ class _ChartWidgetState extends State<ChartWidget> {
                 textAlign: TextAlign.right,
                 overflow: TextOverflow.ellipsis,
                 textWidthBasis: TextWidthBasis.parent,
-                style: TextStyle(
-                  color: _color.textColor.withOpacity(0.95),
-                  fontSize: 27,
+                style: const TextStyle(
+                  // color: _color.textColor.withOpacity(0.95),
+                  color: Color.fromARGB(255, 255, 255, 255),
+                  fontSize: 28,
                   fontFamily: "Unageo",
-                  fontWeight: FontWeight.w900,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
@@ -115,7 +136,6 @@ class _ChartWidgetState extends State<ChartWidget> {
     );
   }
 }
-
 class ChartCardClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
@@ -130,7 +150,6 @@ class ChartCardClipper extends CustomClipper<Path> {
     path.close();
     return path;
   }
-
   @override
   bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }

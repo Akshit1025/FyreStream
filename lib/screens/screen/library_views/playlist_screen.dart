@@ -1,10 +1,16 @@
+import 'dart:developer';
+
+import 'package:fyrestream/screens/widgets/mediaItemOptions_bottomsheet.dart';
+import 'package:fyrestream/screens/widgets/sign_board_widget.dart';
+import 'package:fyrestream/screens/widgets/song_card_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/screens/screen/library_views/cubit/current_playlist_cubit.dart';
-import 'package:fyrestream/screens/widgets/horizontalSongCard_widget.dart';
 import 'package:fyrestream/screens/widgets/playPause_widget.dart';
 import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
@@ -18,7 +24,7 @@ class PlaylistView extends StatelessWidget {
   String playListName;
 
   PlaylistView({Key? key, required this.playListName}) : super(key: key) {
-    print("Showing playlist: $playListName");
+    log("Showing playlist: $playListName", name: "PlaylistView");
   }
 
   Future<void> setUpPlaylist(BuildContext context) async {
@@ -154,7 +160,7 @@ class PlaylistView extends StatelessWidget {
                       ),
                       Positioned(
                         top: 280,
-                        left: 20,
+                        left: 14,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -214,16 +220,10 @@ class PlaylistView extends StatelessWidget {
               ),
             );
           } else {
-            return Center(
-              child: Wrap(
-                children: [
-                  Text(
-                    "Get started by adding items to library!!",
-                    style: Default_Theme.secondoryTextStyle.merge(
-                      const TextStyle(color: Default_Theme.primaryColor2),
-                    ),
-                  ),
-                ],
+            return const Center(
+              child: SignBoardWidget(
+                message: "No Songs in Playlist",
+                icon: MingCute.music_2_line,
               ),
             );
           }
@@ -277,14 +277,36 @@ class _PlaylistState extends State<Playlist> {
             });
           },
           key: ValueKey(_state.mediaItems[index].id),
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: 5, left: 12, right: 5),
-            child: HorizontalSongCardWidget(
-              mediaPlaylist: _state,
-              index: index,
-              boxWidth: MediaQuery.of(context).size.width * 0.9,
-              showLiked: true,
-            ),
+          child: SongCardWidget(
+            song: _state.mediaItems[index],
+            onTap: () {
+              if (!listEquals(
+                  context
+                      .read<FyrestreamPlayerCubit>()
+                      .fyrestreamPlayer
+                      .currentPlaylist,
+                  _state.mediaItems)) {
+                context
+                    .read<FyrestreamPlayerCubit>()
+                    .fyrestreamPlayer
+                    .loadPlaylist(_state, idx: index, doPlay: true);
+                // context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.play();
+              } else if (context
+                  .read<FyrestreamPlayerCubit>()
+                  .fyrestreamPlayer
+                  .currentMedia !=
+                  _state.mediaItems[index]) {
+                context
+                    .read<FyrestreamPlayerCubit>()
+                    .fyrestreamPlayer
+                    .prepare4play(idx: index, doPlay: true);
+              }
+
+              context.push('/MusicPlayer');
+            },
+            onOptionsTap: () {
+              showMediaItemOptions(context, _state.mediaItems[index]);
+            },
           ),
         );
       },
@@ -317,7 +339,7 @@ Widget proxyDecorator(Widget child, int index, Animation<double> animation) {
       return Material(
         elevation: elevation,
         color: Default_Theme.accentColor2.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(12),
         shadowColor: Colors.transparent,
         child: child,
       );

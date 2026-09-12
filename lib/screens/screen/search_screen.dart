@@ -1,16 +1,20 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:developer';
 
+import 'package:fyrestream/blocs/mediaPlayer/fyrestream_player_cubit.dart';
+import 'package:fyrestream/screens/widgets/mediaItemOptions_bottomsheet.dart';
 import 'package:fyrestream/screens/widgets/sign_board_widget.dart';
+import 'package:fyrestream/screens/widgets/song_card_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
 
 import 'package:fyrestream/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
 import 'package:fyrestream/blocs/search/fetch_search_results.dart';
 import 'package:fyrestream/blocs/search/fetch_search_results.dart';
 import 'package:fyrestream/screens/screen/search_views/search_page.dart';
-import 'package:fyrestream/screens/widgets/horizontalSongCard_widget.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:icons_plus/icons_plus.dart';
 
@@ -187,12 +191,38 @@ class _SearchScreenState extends State<SearchScreen> {
                           itemCount: state.mediaItems.length,
                           itemBuilder: (context, index) {
                             return Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 18, bottom: 5, right: 18),
-                              child: HorizontalSongCardWidget(
-                                index: index,
-                                mediaPlaylist: state,
-                                showLiked: true,
+                              padding: const EdgeInsets.only(left: 4),
+                              child: SongCardWidget(
+                                song: state.mediaItems[index],
+                                onTap: () {
+                                  if (!listEquals(
+                                      context
+                                          .read<FyrestreamPlayerCubit>()
+                                          .fyrestreamPlayer
+                                          .currentPlaylist,
+                                      state.mediaItems)) {
+                                    context
+                                        .read<FyrestreamPlayerCubit>()
+                                        .fyrestreamPlayer
+                                        .loadPlaylist(state,
+                                        idx: index, doPlay: true);
+                                    // context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.play();
+                                  } else if (context
+                                      .read<FyrestreamPlayerCubit>()
+                                      .fyrestreamPlayer
+                                      .currentMedia !=
+                                      state.mediaItems[index]) {
+                                    context
+                                        .read<FyrestreamPlayerCubit>()
+                                        .fyrestreamPlayer
+                                        .prepare4play(
+                                        idx: index, doPlay: true);
+                                  }
+
+                                  context.push('/MusicPlayer');
+                                },
+                                onOptionsTap: () => showMediaItemOptions(
+                                    context, state.mediaItems[index]),
                               ),
                             );
                           },

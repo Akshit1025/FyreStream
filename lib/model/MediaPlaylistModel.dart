@@ -6,7 +6,6 @@ class MediaPlaylist {
   late List<MediaItemModel> mediaItems;
   bool isLiked = false;
   String albumName = "Unknown";
-
   MediaPlaylist({
     required this.mediaItems,
     this.isLiked = false,
@@ -14,8 +13,9 @@ class MediaPlaylist {
   });
 }
 
-MediaPlaylist fromPlaylistDB2MediaPlaylist(MediaPlaylistDB, mediaPlaylistDB) {
-  MediaPlaylist mediaPlaylist = MediaPlaylist(mediaItems: [], albumName: mediaPlaylistDB.playlistName);
+MediaPlaylist fromPlaylistDB2MediaPlaylist(MediaPlaylistDB mediaPlaylistDB) {
+  MediaPlaylist mediaPlaylist =
+  MediaPlaylist(mediaItems: [], albumName: mediaPlaylistDB.playlistName);
   if (mediaPlaylistDB.mediaItems.isNotEmpty) {
     mediaPlaylistDB.mediaItems.forEach((element) {
       mediaPlaylist.mediaItems.add(MediaItemDB2MediaItem(element));

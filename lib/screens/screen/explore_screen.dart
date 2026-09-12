@@ -3,7 +3,8 @@ import 'package:fyrestream/blocs/mediaPlayer/fyrestream_player_cubit.dart';
 import 'package:fyrestream/model/MediaPlaylistModel.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/widgets/chart_list_tile.dart';
-import 'package:fyrestream/screens/widgets/singleSongCard_widget.dart';
+import 'package:fyrestream/screens/widgets/mediaItemOptions_bottomsheet.dart';
+import 'package:fyrestream/screens/widgets/song_card_widget.dart';
 import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/utils/app_updater.dart';
 import 'package:flutter/material.dart';
@@ -81,30 +82,23 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                 ? TabSongListWidget(
                               list: state.mediaPlaylist.mediaItems
                                   .map((e) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(
-                                    bottom: 8.0,
-                                    right: 10,
-                                    left: 15,
-                                  ),
-                                  child: SingleSongCardWidget(
-                                    titleText: e.title,
-                                    subText: e.artist ?? "",
-                                    artUri: e.artUri.toString(),
-                                    showLiked: false,
-                                    onClicked: () {
-                                      context
-                                          .read<FyrestreamPlayerCubit>()
-                                          .fyrestreamPlayer
-                                          .loadPlaylist(
-                                        MediaPlaylist(
-                                          mediaItems: [e],
-                                          albumName: "Recently",
-                                        ),
-                                        doPlay: true,
-                                      );
-                                    },
-                                  ),
+                                return SongCardWidget(
+                                  song: e,
+                                  onTap: () {
+                                    context
+                                        .read<FyrestreamPlayerCubit>()
+                                        .fyrestreamPlayer
+                                        .loadPlaylist(
+                                      MediaPlaylist(
+                                        mediaItems: [e],
+                                        albumName: "Recently",
+                                      ),
+                                      doPlay: true,
+                                    );
+                                  },
+                                  onOptionsTap: () =>
+                                      showMediaItemOptions(
+                                          context, e),
                                 );
                               }).toList(),
                               category: "Recently",

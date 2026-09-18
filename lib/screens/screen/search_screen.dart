@@ -1,8 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:developer';
-
 import 'package:fyrestream/blocs/mediaPlayer/fyrestream_player_cubit.dart';
-import 'package:fyrestream/screens/widgets/mediaItemOptions_bottomsheet.dart';
+import 'package:fyrestream/screens/widgets/more_bottom_sheet.dart';
 import 'package:fyrestream/screens/widgets/sign_board_widget.dart';
 import 'package:fyrestream/screens/widgets/song_card_widget.dart';
 import 'package:flutter/foundation.dart';
@@ -10,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
-
 import 'package:fyrestream/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
 import 'package:fyrestream/blocs/search/fetch_search_results.dart';
 import 'package:fyrestream/blocs/search/fetch_search_results.dart';
@@ -149,8 +147,10 @@ class _SearchScreenState extends State<SearchScreen> {
                     contentPadding: const EdgeInsets.only(top: 20),
                     hintText: "Find your next song obsession...",
                     hintStyle: TextStyle(
-                        color: Default_Theme.primaryColor1.withOpacity(0.4),
-                        fontFamily: "Gilroy"),
+                      color: Default_Theme.primaryColor1.withOpacity(0.3),
+                      fontFamily: "Unageo",
+                      fontWeight: FontWeight.normal,
+                    ),
                     disabledBorder: OutlineInputBorder(
                         borderSide: const BorderSide(style: BorderStyle.none),
                         borderRadius: BorderRadius.circular(50)),
@@ -221,7 +221,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
                                   context.push('/MusicPlayer');
                                 },
-                                onOptionsTap: () => showMediaItemOptions(
+                                onOptionsTap: () => showMoreBottomSheet(
                                     context, state.mediaItems[index]),
                               ),
                             );

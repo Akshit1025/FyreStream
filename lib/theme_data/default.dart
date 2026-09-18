@@ -42,7 +42,7 @@ class Default_Theme {
     ),
     progressIndicatorTheme: const ProgressIndicatorThemeData(color: accentColor2),
     textSelectionTheme: const TextSelectionThemeData(
-      cursorColor: Colors.white,
+      cursorColor: accentColor2,
       selectionColor: accentColor2,
       selectionHandleColor: accentColor2,
     ),
@@ -57,6 +57,9 @@ class Default_Theme {
             ? accentColor1
             : primaryColor2.withOpacity(0)
         )
+    ),
+    searchBarTheme: SearchBarThemeData(
+      backgroundColor: MaterialStateProperty.all(themeColor),
     ),
   );
 }

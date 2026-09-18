@@ -1,6 +1,5 @@
 import 'dart:developer';
-
-import 'package:fyrestream/screens/widgets/mediaItemOptions_bottomsheet.dart';
+import 'package:fyrestream/screens/widgets/more_bottom_sheet.dart';
 import 'package:fyrestream/screens/widgets/sign_board_widget.dart';
 import 'package:fyrestream/screens/widgets/song_card_widget.dart';
 import 'package:flutter/foundation.dart';
@@ -95,7 +94,7 @@ class PlaylistView extends StatelessWidget {
                           stream: context
                               .watch<FyrestreamPlayerCubit>()
                               .fyrestreamPlayer
-                              .currentQueueName,
+                              .queueTitle,
                           builder: (context, snapshot) {
                             if (snapshot.hasData &&
                                 snapshot.data == playListName) {
@@ -305,7 +304,7 @@ class _PlaylistState extends State<Playlist> {
               context.push('/MusicPlayer');
             },
             onOptionsTap: () {
-              showMediaItemOptions(context, _state.mediaItems[index]);
+              showMoreBottomSheet(context, _state.mediaItems[index]);
             },
           ),
         );

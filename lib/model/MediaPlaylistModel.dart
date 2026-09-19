@@ -1,8 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/services/db/GlobalDB.dart';
+import 'package:equatable/equatable.dart';
 
-class MediaPlaylist {
+class MediaPlaylist extends Equatable {
   late List<MediaItemModel> mediaItems;
   bool isLiked = false;
   String albumName = "Unknown";
@@ -11,6 +12,9 @@ class MediaPlaylist {
     this.isLiked = false,
     required this.albumName,
   });
+
+  @override
+  List<Object> get props => [mediaItems, isLiked, albumName];
 }
 
 MediaPlaylist fromPlaylistDB2MediaPlaylist(MediaPlaylistDB mediaPlaylistDB) {

@@ -26,12 +26,17 @@ class FyreStreamDBService {
         .findFirstSync();
     log(_mediaPlaylistDB.toString(), name: "DB");
     if (_mediaPlaylistDB == null) {
-      addPlaylist(mediaPlaylistDB);
+      final tmpId = await addPlaylist(mediaPlaylistDB);
+      _mediaPlaylistDB = isarDB.mediaPlaylistDBs
+          .filter()
+          .isarIdEqualTo(mediaPlaylistDB.isarId)
+          .findFirstSync();
+      log("${_mediaPlaylistDB.toString()} ID: $tmpId", name: "DB");
     }
 
     if (_mediaitem != null) {
       // log("1", name: "DB");
-      _mediaitem.mediaInPlaylistsDB.add(mediaPlaylistDB);
+      _mediaitem.mediaInPlaylistsDB.add(_mediaPlaylistDB!);
       _id = _mediaitem.id;
       // log("2", name: "DB");
       isarDB.writeTxnSync(() => isarDB.mediaItemDBs.putSync(_mediaitem!));
@@ -104,19 +109,31 @@ class FyreStreamDBService {
     }
     // isarDB.writeTxnSync(() => isarDB.mediaItemDBs.putSync(mediaItemDB));
   }
-  static Future<void> addPlaylist(MediaPlaylistDB mediaPlaylistDB) async {
+  static Future<int?> addPlaylist(MediaPlaylistDB mediaPlaylistDB) async {
     Isar isarDB = await db;
+    int? id;
     MediaPlaylistDB? _mediaPlaylist = isarDB.mediaPlaylistDBs
         .filter()
         .isarIdEqualTo(mediaPlaylistDB.isarId)
         .findFirstSync();
     if (_mediaPlaylist == null) {
       isarDB
-          .writeTxnSync(() => isarDB.mediaPlaylistDBs.putSync(mediaPlaylistDB));
+          .writeTxnSync(() => id = isarDB.mediaPlaylistDBs.putSync(mediaPlaylistDB));
     } else {
       log("Already created", name: "DB");
+      id = _mediaPlaylist.isarId;
     }
+    return id;
   }
+
+  static Future<MediaPlaylistDB?> getPlaylist(String playlistName) async {
+    Isar isarDB = await db;
+    return isarDB.mediaPlaylistDBs
+        .filter()
+        .playlistNameEqualTo(playlistName)
+        .findFirstSync();
+  }
+
   static Future<void> likeMediaItem(MediaItemDB mediaItemDB,
       {isLiked = false}) async {
     Isar isarDB = await db;
@@ -377,7 +394,9 @@ class FyreStreamDBService {
     isarDB.recentlyPlayedDBs.where().sortByLastPlayedDesc().findAllSync();
     List<MediaItemModel> _mediaItems = [];
     for (var element in _recentlyPlayed) {
-      _mediaItems.add(MediaItemDB2MediaItem(element.mediaItem.value!));
+      if (element.mediaItem.value != null) {
+        _mediaItems.add(MediaItemDB2MediaItem(element.mediaItem.value!));
+      }
     }
     return MediaPlaylist(mediaItems: _mediaItems, albumName: "Recently Played");
   }

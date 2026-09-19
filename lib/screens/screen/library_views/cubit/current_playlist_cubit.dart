@@ -1,18 +1,13 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:fyrestream/model/MediaPlaylistModel.dart';
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/utils/pallete_generator.dart';
-
 part 'current_playlist_state.dart';
-
-// load current playlist
-// return if data is loaded or not
-// provide function to return length of playlist
-// provide album art
 
 class CurrentPlaylistCubit extends Cubit<CurrentPlaylistState> {
   MediaPlaylist? mediaPlaylist;
@@ -33,8 +28,8 @@ class CurrentPlaylistCubit extends Cubit<CurrentPlaylistState> {
         state.copyWith(
           albumName: mediaPlaylist?.albumName,
           isFetched: true,
-          mediaItem: mediaPlaylist?.mediaItems,
-        ),
+            mediaItem: List<MediaItemModel>.from(mediaPlaylist!.mediaItems)
+        )
       );
     }
   }
@@ -55,8 +50,8 @@ class CurrentPlaylistCubit extends Cubit<CurrentPlaylistState> {
       state.copyWith(
         albumName: mediaPlaylist?.albumName,
         isFetched: true,
-        mediaItem: mediaPlaylist?.mediaItems,
-      ),
+          mediaItem: List<MediaItemModel>.from(mediaPlaylist!.mediaItems)
+      )
     );
   }
 

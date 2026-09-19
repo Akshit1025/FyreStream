@@ -1,15 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:developer';
+import 'package:fyrestream/screens/widgets/snackbar.dart';
 import 'package:fyrestream/utils/external_list_importer.dart';
+import 'package:fyrestream/utils/file_manager.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:fyrestream/repository/Saavn/cubit/saavn_repository_cubit.dart';
-import 'package:fyrestream/screens/screen/library_views/cubit/import_playlist_cubit.dart';
 import 'package:fyrestream/screens/widgets/import_playlist.dart';
-import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/theme_data/default.dart';
 
 class ImportMediaFromPlatformsView extends StatelessWidget {
@@ -66,6 +65,27 @@ class ImportMediaFromPlatformsView extends StatelessWidget {
             onClickFunc: () {
               log("music from youtube");
             },
+          ),
+          ImportFromBtn(
+            btnName: "Import Playlist from Storage",
+            btnIcon: FontAwesome.file,
+            onClickFunc: () {
+              FilePicker.platform.pickFiles().then((value) {
+                if (value != null) {
+                  log(value.files[0].path.toString(), name: "Import File");
+                  if (value.files[0].path != null) {
+                    if (value.files[0].path!.endsWith('.blm')) {
+                      FyreStreamFileManager.importPlaylist(value.files[0].path!);
+                      SnackbarService.showMessage(
+                          "Started Importing Playlist");
+                    } else {
+                      log("Invalid File Format", name: "Import File");
+                      SnackbarService.showMessage("Invalid File Format");
+                    }
+                  }
+                }
+              });
+            }
           ),
         ],
       ),

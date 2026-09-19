@@ -1,6 +1,5 @@
 import 'package:fyrestream/blocs/explore/cubit/explore_cubits.dart';
 import 'package:fyrestream/blocs/mediaPlayer/fyrestream_player_cubit.dart';
-import 'package:fyrestream/model/MediaPlaylistModel.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/widgets/chart_list_tile.dart';
 import 'package:fyrestream/screens/widgets/more_bottom_sheet.dart';
@@ -158,41 +157,50 @@ class _ExploreScreenState extends State<ExploreScreen> {
               style: Default_Theme.primaryTextStyle.merge(const TextStyle(
                   fontSize: 34, color: Default_Theme.primaryColor1))),
           const Spacer(),
-          Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: InkWell(
-              splashColor: Colors.transparent,
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const NotificationView()));
-              },
-              child: const Icon(MingCute.notification_line,
-                  color: Default_Theme.primaryColor1, size: 30.0),
+          IconButton(
+            padding: const EdgeInsets.all(5),
+            constraints: const BoxConstraints(),
+            style: const ButtonStyle(
+              tapTargetSize:
+              MaterialTapTargetSize.shrinkWrap, // the '2023' part
             ),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const NotificationView()));
+            },
+            icon: const Icon(MingCute.notification_line,
+                color: Default_Theme.primaryColor1, size: 30.0),
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 10),
-            child: InkWell(
-              splashColor: Colors.transparent,
-              onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const TimerView()));
-              },
-              child: const Icon(MingCute.stopwatch_line,
-                  color: Default_Theme.primaryColor1, size: 30.0),
+          IconButton(
+            padding: EdgeInsets.all(5),
+            constraints: const BoxConstraints(),
+            style: const ButtonStyle(
+              tapTargetSize:
+              MaterialTapTargetSize.shrinkWrap, // the '2023' part
             ),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const TimerView()));
+            },
+            icon: const Icon(MingCute.stopwatch_line,
+                color: Default_Theme.primaryColor1, size: 30.0),
           ),
-          InkWell(
-              splashColor: Colors.transparent,
-              onTap: () {
+          IconButton(
+              padding: EdgeInsets.all(5),
+              constraints: const BoxConstraints(),
+              style: const ButtonStyle(
+                tapTargetSize:
+                MaterialTapTargetSize.shrinkWrap, // the '2023' part
+              ),
+              onPressed: () {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => const SettingsView()));
               },
-              child: const Icon(MingCute.settings_3_line,
+              icon: const Icon(MingCute.settings_3_line,
                   color: Default_Theme.primaryColor1, size: 30.0)),
         ],
       ),

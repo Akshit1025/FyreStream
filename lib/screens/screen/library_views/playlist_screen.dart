@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'package:fyrestream/model/MediaPlaylistModel.dart';
 import 'package:fyrestream/screens/widgets/more_bottom_sheet.dart';
 import 'package:fyrestream/screens/widgets/sign_board_widget.dart';
 import 'package:fyrestream/screens/widgets/song_card_widget.dart';
@@ -20,19 +20,11 @@ import '../../../blocs/mediaPlayer/fyrestream_player_cubit.dart';
 import 'dart:ui';
 
 class PlaylistView extends StatelessWidget {
-  String playListName;
-
-  PlaylistView({Key? key, required this.playListName}) : super(key: key) {
-    log("Showing playlist: $playListName", name: "PlaylistView");
-  }
-
-  Future<void> setUpPlaylist(BuildContext context) async {
-    context.read<CurrentPlaylistCubit>().loadPlaylist(playListName);
-  }
+  PlaylistView({Key? key, }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    setUpPlaylist(context);
+    // setUpPlaylist(context);
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Default_Theme.themeColor,
@@ -45,6 +37,7 @@ class PlaylistView extends StatelessWidget {
         builder: (context, state) {
           if (state is! CurrentPlaylistInitial && state.mediaItems.isNotEmpty) {
             return Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 SizedBox(
                   height: 380,
@@ -57,7 +50,7 @@ class PlaylistView extends StatelessWidget {
                           height: 260,
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.blueAccent.shade400,
+                              color: Colors.transparent,
                               boxShadow: [
                                 BoxShadow(
                                   color:
@@ -81,9 +74,10 @@ class PlaylistView extends StatelessWidget {
                         child: Container(
                           color: Colors.blueAccent.shade400,
                           child: loadImageCached(
-                            context
-                                .read<CurrentPlaylistCubit>()
-                                .getPlaylistCoverArt(),
+                              context
+                                  .read<CurrentPlaylistCubit>()
+                                  .getPlaylistCoverArt(),
+                              fit: BoxFit.cover
                           ),
                         ),
                       ),
@@ -97,7 +91,7 @@ class PlaylistView extends StatelessWidget {
                               .queueTitle,
                           builder: (context, snapshot) {
                             if (snapshot.hasData &&
-                                snapshot.data == playListName) {
+                                snapshot.data == state.albumName) {
                               return StreamBuilder<PlayerState>(
                                 stream: context
                                     .read<FyrestreamPlayerCubit>()
@@ -145,7 +139,9 @@ class PlaylistView extends StatelessWidget {
                                   context
                                       .read<FyrestreamPlayerCubit>()
                                       .fyrestreamPlayer
-                                      .loadPlaylist(state);
+                                      .loadPlaylist(MediaPlaylist(
+                                      mediaItems: state.mediaItems,
+                                      albumName: state.albumName));
                                   context
                                       .read<FyrestreamPlayerCubit>()
                                       .fyrestreamPlayer
@@ -166,7 +162,7 @@ class PlaylistView extends StatelessWidget {
                             SizedBox(
                               width: 300,
                               child: Text(
-                                playListName,
+                                state.albumName,
                                 maxLines: 2,
                                 overflow: TextOverflow.fade,
                                 style: Default_Theme.secondoryTextStyle.merge(
@@ -191,7 +187,7 @@ class PlaylistView extends StatelessWidget {
                             Padding(
                               padding: const EdgeInsets.only(top: 20),
                               child: Text(
-                                "${state.mediaItem.length} Songs",
+                                "${state.mediaItems.length} Songs",
                                 style: Default_Theme.secondoryTextStyle.merge(
                                   TextStyle(
                                     color: Default_Theme.primaryColor1
@@ -219,11 +215,8 @@ class PlaylistView extends StatelessWidget {
               ),
             );
           } else {
-            return const Center(
-              child: SignBoardWidget(
-                message: "No Songs in Playlist",
-                icon: MingCute.music_2_line,
-              ),
+            return const SignBoardWidget(
+                message: "No Songs Yet", icon: MingCute.playlist_line
             );
           }
         },
@@ -246,6 +239,7 @@ class _PlaylistState extends State<Playlist> {
   Widget build(BuildContext context) {
     final _state = widget.state;
     return ReorderableListView.builder(
+      physics: const BouncingScrollPhysics(),
       proxyDecorator: proxyDecorator,
       itemBuilder: (context, index) {
         return Dismissible(
@@ -268,7 +262,7 @@ class _PlaylistState extends State<Playlist> {
           ),
           onDismissed: (direction) {
             context.read<FyreStreamDBCubit>().removeMediaFromPlaylist(
-              _state.mediaItem[index],
+              _state.mediaItems[index],
               MediaPlaylistDB(playlistName: _state.albumName),
             );
             setState(() {
@@ -285,10 +279,12 @@ class _PlaylistState extends State<Playlist> {
                       .fyrestreamPlayer
                       .currentPlaylist,
                   _state.mediaItems)) {
-                context
-                    .read<FyrestreamPlayerCubit>()
-                    .fyrestreamPlayer
-                    .loadPlaylist(_state, idx: index, doPlay: true);
+                context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.loadPlaylist(
+                    MediaPlaylist(
+                        mediaItems: _state.mediaItems,
+                        albumName: _state.albumName),
+                    idx: index,
+                    doPlay: true);
                 // context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.play();
               } else if (context
                   .read<FyrestreamPlayerCubit>()
@@ -309,7 +305,7 @@ class _PlaylistState extends State<Playlist> {
           ),
         );
       },
-      itemCount: _state.mediaItem.length,
+      itemCount: _state.mediaItems.length,
       onReorder: (oldIndex, newIndex) {
         setState(() {
           if (oldIndex < newIndex) {
@@ -323,7 +319,7 @@ class _PlaylistState extends State<Playlist> {
             newIndex,
           );
         });
-        print(_state.mediaItem.toList().toString());
+        print(_state.mediaItems.toList().toString());
       },
     );
   }

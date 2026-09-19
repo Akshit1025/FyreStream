@@ -5,10 +5,8 @@ import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/widgets/snackbar.dart';
 import 'package:fyrestream/screens/widgets/song_card_widget.dart';
 import 'package:fyrestream/theme_data/default.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -81,6 +79,7 @@ void showMoreBottomSheet(
                       .read<FyrestreamPlayerCubit>()
                       .fyrestreamPlayer
                       .addQueueItem(song, doPlay: false);
+                  SnackbarService.showMessage("Added to Next in Queue", duration: const Duration(seconds: 2));
                 },
               ),
               ListTile(
@@ -103,6 +102,7 @@ void showMoreBottomSheet(
                       .read<FyrestreamPlayerCubit>()
                       .fyrestreamPlayer
                       .addQueueItem(song, atLast: true, doPlay: false);
+                  SnackbarService.showMessage("Added to Queue", duration: const Duration(seconds: 2));
                 },
               ),
               ListTile(
@@ -142,7 +142,7 @@ void showMoreBottomSheet(
                 onTap: () {
                   Navigator.pop(context);
                   Share.share(
-                    "Check out this song on Bloomee\n${song.title} by ${song.artist}\n${song.extras?['perma_url']}",
+                    "Check out this song on FyreStream\n${song.title} by ${song.artist}\n${song.extras?['perma_url']}",
                   );
                 },
               ),

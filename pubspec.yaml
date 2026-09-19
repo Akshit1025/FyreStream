@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 2.4.1+58
+version: 2.4.2+59
 
 environment:
   sdk: '>=3.0.6 <4.0.0'
@@ -86,13 +86,13 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 # dart run icons_launcher:create
 # icons_launcher:
-#   image_path: "assets/icons/new_bloomee_logo_zoomedout.png"
+#   image_path: "assets/icons/new_fyrestream_logo_zoomedout.png"
 #   platforms:
 #     android:
 #       enable: true
-#       adaptive_icon_background: "assets/icons/bloomee_new_logo_gradient_bg.png"
-#       adaptive_icon_foreground: "assets/icons/new_bloomee_logo_zoomedout.png"
-#       adaptive_monochrome_image: "assets/icons/new_bloomee_logo_mono.png"
+#       adaptive_icon_background: "assets/icons/fyrestream_new_logo_gradient_bg.png"
+#       adaptive_icon_foreground: "assets/icons/new_fyrestream_logo_zoomedout.png"
+#       adaptive_monochrome_image: "assets/icons/new_fyrestream_logo_mono.png"
 #     ios:
 #       enable: true
 #     windows:

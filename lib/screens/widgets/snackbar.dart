@@ -1,3 +1,4 @@
+import 'package:fyrestream/theme_data/default.dart';
 import 'package:flutter/material.dart';
 
 class SnackbarService {
@@ -6,14 +7,16 @@ class SnackbarService {
   static void showMessage(String message, {SnackBarAction? action, Duration duration = const Duration(seconds: 2)}) {
     messengerKey.currentState!.showSnackBar(
       SnackBar(
-        content: Text(message, style: const TextStyle(color: Colors.black, fontSize: 16)),
+        content: Text(message, style: const TextStyle(
+          color: Default_Theme.primaryColor1, fontSize: 16
+        )),
         duration: duration,
         showCloseIcon: false,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-        closeIconColor: Colors.black,
+        closeIconColor: Default_Theme.primaryColor1,
         elevation: 0,
         action: action,
-        backgroundColor: const Color.fromARGB(255, 231, 231, 231),
+        backgroundColor: Color.fromARGB(255, 16, 15, 15),
       ),
     );
   }

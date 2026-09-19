@@ -126,7 +126,7 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
               left: MediaQuery.of(context).size.width * 0.08 * 0.5,
               child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.92,
-                height: MediaQuery.of(context).size.width * 0.92,
+                // height: MediaQuery.of(context).size.width * 0.92,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(25),
                   child: StreamBuilder<MediaItem?>(
@@ -137,6 +137,7 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                     builder: (context, snapshot) {
                       return loadImageCached(
                         (snapshot.data?.artUri ?? "").toString(),
+                        fit: BoxFit.fitWidth
                       );
                     },
                   ),

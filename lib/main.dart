@@ -3,19 +3,15 @@ import 'dart:developer';
 import 'dart:io' as io;
 import 'package:fyrestream/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
 import 'package:fyrestream/blocs/settings_cubit/cubit/settings_cubit.dart';
-import 'package:fyrestream/model/MediaPlaylistModel.dart';
-import 'package:fyrestream/model/songModel.dart';
-import 'package:fyrestream/model/youtube_vid_model.dart';
-import 'package:fyrestream/repository/Youtube/youtube_api.dart';
-import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/widgets/snackbar.dart';
 import 'package:fyrestream/theme_data/default.dart';
-import 'package:fyrestream/utils/file_manager.dart';
+import 'package:fyrestream/services/file_manager.dart';
+import 'package:fyrestream/utils/external_list_importer.dart';
+import 'package:fyrestream/utils/url_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fyrestream/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
 import 'package:fyrestream/blocs/library/cubit/library_items_cubit.dart';
-import 'package:fyrestream/repository/Saavn/cubit/saavn_repository_cubit.dart';
 import 'package:fyrestream/blocs/search/fetch_search_results.dart';
 import 'package:fyrestream/routes_and_consts/routes.dart';
 import 'package:fyrestream/screens/screen/library_views/cubit/current_playlist_cubit.dart';
@@ -23,66 +19,46 @@ import 'package:fyrestream/screens/screen/library_views/cubit/import_playlist_cu
 import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'blocs/mediaPlayer/fyrestream_player_cubit.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 
-import 'blocs/mediaPlayer/fyrestream_player_cubit.dart';
-
-bool isYoutubeLink(String link) {
-  if (link.contains("youtube.com") || link.contains("youtu.be")) {
-    return true;
-  } else {
-    return false;
-  }
-}
-
-String? extractVideoId(String url) {
-  Uri uri = Uri.parse(url);
-
-  // Check if the URL is from youtube.com
-  if (uri.host == 'youtube.com') {
-    return uri.queryParameters['v']; // Retrieve video ID from query parameter
-  }
-
-  // Check if the URL is from youtu.be
-  if (uri.host == 'youtu.be') {
-    return uri.pathSegments.first; // Retrieve video ID from path
-  }
-
-  // Invalid URL format
-  return null;
-}
-
-void processIncomingIntent(List<SharedMediaFile> _sharedFiles) {
-  if (Uri.tryParse(_sharedFiles[0].path) != null &&
-      isYoutubeLink(_sharedFiles[0].path)) {
-    var _tempId = extractVideoId(_sharedFiles[0].path);
-    if (_tempId != null) {
-      log(extractVideoId(_sharedFiles[0].path).toString(),
-          name: "Shared Files");
-      var _tempVid = YouTubeServices().getVideoFromId(_tempId);
-      _tempVid.then((value) {
-        if (value != null) {
-          YouTubeServices()
-              .formatVideo(video: value, quality: "High")
-              .then((value) async {
-            if (value != null) {
-              MediaItemModel _mIM = fromYtVidSongMap2MediaItem(value);
-              MediaPlaylist _tempPlaylist = MediaPlaylist(
-                albumName: "Shared Playlist",
-                mediaItems: [_mIM],
-              );
-              log(_mIM.title, name: "Shared Files");
-              await fyrestreamPlayerCubit.fyrestreamPlayer
-                  .loadPlaylist(_tempPlaylist, doPlay: true);
-              GlobalRoutes.globalRouter.pushNamed(GlobalStrConsts.playerScreen);
-            }
-          });
+void processIncomingIntent(List<SharedMediaFile> sharedMediaFiles) {
+  if (isUrl(sharedMediaFiles[0].path)) {
+    final urlType = getUrlType(sharedMediaFiles[0].path);
+    switch (urlType) {
+      case UrlType.spotifyTrack:
+        ExternalMediaImporter.sfyMediaImporter(sharedMediaFiles[0].path)
+            .then((value) async {
+          if (value != null) {
+            await fyrestreamPlayerCubit.fyrestreamPlayer
+                .addQueueItem(value, doPlay: true);
+          }
+        });
+        break;
+      case UrlType.spotifyPlaylist:
+        SnackbarService.showMessage("Import Spotify Playlist from library!");
+        break;
+      case UrlType.youtubePlaylist:
+        SnackbarService.showMessage("Import Youtube Playlist from library!");
+        break;
+      case UrlType.youtubeVideo:
+        ExternalMediaImporter.ytMediaImporter(sharedMediaFiles[0].path)
+            .then((value) async {
+          if (value != null) {
+            await fyrestreamPlayerCubit.fyrestreamPlayer
+                .addQueueItem(value, doPlay: true);
+          }
+        });
+        break;
+      case UrlType.other:
+        if (sharedMediaFiles[0].mimeType == "application/octet-stream") {
+          SnackbarService.showMessage("Processing File...");
+          importItems(
+              Uri.parse(sharedMediaFiles[0].path).toFilePath().toString());
         }
-      });
+      default:
+        log("Invalid URL");
     }
-  } else if (_sharedFiles[0].mimeType == "application/octet-stream") {
-    SnackbarService.showMessage("Processing File...");
-    importItems(Uri.parse(_sharedFiles[0].path).toFilePath().toString());
   }
 }
 
@@ -99,22 +75,18 @@ Future<void> importItems(String path) async {
     }
   }
 }
-
 Future<void> setHighRefreshRate() async {
   if (io.Platform.isAndroid) {
     await FlutterDisplayMode.setHighRefreshRate();
   }
 }
-
 late FyrestreamPlayerCubit fyrestreamPlayerCubit;
 void setupPlayerCubit() {
   fyrestreamPlayerCubit = FyrestreamPlayerCubit();
 }
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   setHighRefreshRate();
-  // FlutterDownloader.initialize(debug: true);
   try {
     dotenv.load(fileName: "assets/.env");
   } on Exception catch (e) {
@@ -124,30 +96,27 @@ void main() {
   setupPlayerCubit();
   runApp(const MyApp());
 }
-
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
-
   @override
   State<MyApp> createState() => _MyAppState();
 }
-
 class _MyAppState extends State<MyApp> {
   // Initialize the player
   // This widget is the root of your application.
   late StreamSubscription _intentSub;
-  final _sharedFiles = <SharedMediaFile>[];
+  final sharedMediaFiles = <SharedMediaFile>[];
   @override
   void initState() {
     super.initState();
 
     // For sharing or opening urls/text coming from outside the app while the app is in the memory
     _intentSub = ReceiveSharingIntent.getMediaStream().listen((event) {
-      _sharedFiles.clear();
-      _sharedFiles.addAll(event);
-      log(_sharedFiles[0].mimeType.toString(), name: "Shared Files");
-      log(_sharedFiles[0].path, name: "Shared Files");
-      processIncomingIntent(_sharedFiles);
+      sharedMediaFiles.clear();
+      sharedMediaFiles.addAll(event);
+      log(sharedMediaFiles[0].mimeType.toString(), name: "Shared Files");
+      log(sharedMediaFiles[0].path, name: "Shared Files");
+      processIncomingIntent(sharedMediaFiles);
 
       // Tell the library that we are done processing the intent.
       ReceiveSharingIntent.reset();
@@ -155,15 +124,15 @@ class _MyAppState extends State<MyApp> {
 
     // For sharing or opening urls/text coming from outside the app while the app is closed
     ReceiveSharingIntent.getInitialMedia().then((event) {
-      _sharedFiles.clear();
-      _sharedFiles.addAll(event);
-      log(_sharedFiles[0].mimeType.toString(), name: "Shared Files Offline");
-      log(_sharedFiles[0].path, name: "Shared Files Offline");
-      processIncomingIntent(_sharedFiles);
+      sharedMediaFiles.clear();
+      sharedMediaFiles.addAll(event);
+      log(sharedMediaFiles[0].mimeType.toString(),
+          name: "Shared Files Offline");
+      log(sharedMediaFiles[0].path, name: "Shared Files Offline");
+      processIncomingIntent(sharedMediaFiles);
       ReceiveSharingIntent.reset();
     });
   }
-
   @override
   void dispose() {
     _intentSub.cancel();
@@ -171,13 +140,18 @@ class _MyAppState extends State<MyApp> {
     fyrestreamPlayerCubit.close();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => fyrestreamPlayerCubit, lazy: false),
-        BlocProvider(create: (context) => FyreStreamDBCubit(), lazy: false),
+        BlocProvider(
+          create: (context) => fyrestreamPlayerCubit,
+          lazy: false,
+        ),
+        BlocProvider(
+          create: (context) => FyreStreamDBCubit(),
+          lazy: false,
+        ),
         BlocProvider(
           create: (context) => SettingsCubit(),
           lazy: false,
@@ -187,8 +161,8 @@ class _MyAppState extends State<MyApp> {
           lazy: false,
         ),
         BlocProvider(
-          create: (context) =>
-              CurrentPlaylistCubit(fyrestreamDBCubit: context.read<FyreStreamDBCubit>()),
+          create: (context) => CurrentPlaylistCubit(
+              fyrestreamDBCubit: context.read<FyreStreamDBCubit>()),
           lazy: false,
         ),
         BlocProvider(
@@ -199,31 +173,26 @@ class _MyAppState extends State<MyApp> {
           create: (context) => AddToPlaylistCubit(),
           lazy: false,
         ),
-        BlocProvider(create: (context) => ImportPlaylistCubit()),
-        BlocProvider(create: (context) => FetchSearchResultsCubit()),
-      ],
-      child: MultiRepositoryProvider(
-        providers: [
-          RepositoryProvider(create: (context) => SaavnRepositoryCubit()),
-          RepositoryProvider(create: (context) => SaavnSearchRepositoryCubit()),
-        ],
-        child: BlocBuilder<FyrestreamPlayerCubit, FyreStreamPlayerState>(
-          builder: (context, state) {
-            if (state is FyreStreamPlayerInitial) {
-              return const SizedBox(
-                width: 50,
-                height: 50,
-                child: CircularProgressIndicator(),
-              );
-            } else {
-              return MaterialApp.router(
-                scaffoldMessengerKey: SnackbarService.messengerKey,
-                routerConfig: GlobalRoutes.globalRouter,
-                theme: Default_Theme().defaultThemeData,
-              );
-            }
-          },
+        BlocProvider(
+          create: (context) => ImportPlaylistCubit(),
         ),
+        BlocProvider(
+          create: (context) => FetchSearchResultsCubit(),
+        ),
+      ],
+      child: BlocBuilder<FyrestreamPlayerCubit, FyreStreamPlayerState>(
+        builder: (context, state) {
+          if (state is FyreStreamPlayerInitial) {
+            return const SizedBox(
+                width: 50, height: 50, child: CircularProgressIndicator());
+          } else {
+            return MaterialApp.router(
+              scaffoldMessengerKey: SnackbarService.messengerKey,
+              routerConfig: GlobalRoutes.globalRouter,
+              theme: Default_Theme().defaultThemeData,
+            );
+          }
+        },
       ),
     );
   }

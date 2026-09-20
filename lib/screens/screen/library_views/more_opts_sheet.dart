@@ -4,7 +4,7 @@ import 'package:fyrestream/model/MediaPlaylistModel.dart';
 import 'package:fyrestream/screens/widgets/snackbar.dart';
 import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/theme_data/default.dart';
-import 'package:fyrestream/utils/file_manager.dart';
+import 'package:fyrestream/services/file_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';

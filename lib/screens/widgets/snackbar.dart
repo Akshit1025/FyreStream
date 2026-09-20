@@ -5,6 +5,7 @@ class SnackbarService {
   static final GlobalKey<ScaffoldMessengerState> messengerKey = GlobalKey<ScaffoldMessengerState>();
 
   static void showMessage(String message, {SnackBarAction? action, Duration duration = const Duration(seconds: 2)}) {
+    messengerKey.currentState!.removeCurrentSnackBar();
     messengerKey.currentState!.showSnackBar(
       SnackBar(
         content: Text(message, style: const TextStyle(
@@ -16,7 +17,7 @@ class SnackbarService {
         closeIconColor: Default_Theme.primaryColor1,
         elevation: 0,
         action: action,
-        backgroundColor: Color.fromARGB(255, 16, 15, 15),
+        backgroundColor: const Color.fromARGB(255, 16, 15, 15),
       ),
     );
   }

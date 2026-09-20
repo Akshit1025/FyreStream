@@ -1,9 +1,5 @@
-import 'package:package_info_plus/package_info_plus.dart';
-import 'package:fyrestream/services/fyrestreamUpdaterTools.dart';
+import 'package:fyrestream/utils/external_list_importer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fyrestream/repository/Saavn/cubit/saavn_repository_cubit.dart';
-import 'package:fyrestream/screens/screen/library_views/cubit/import_playlist_cubit.dart';
 import 'package:fyrestream/theme_data/default.dart';
 
 class TestView extends StatelessWidget {
@@ -28,31 +24,24 @@ class TestView extends StatelessWidget {
       body: Center(
         child: Column(
           children: [
-            StreamBuilder<ImportPlaylistState>(
-              stream: context
-                  .watch<SaavnSearchRepositoryCubit>()
-                  .importFromSpotifyState,
-              builder: (context, snapshot) {
-                print(snapshot.data?.itemName.toString());
-                if (snapshot.hasData) {
-                  return SizedBox(
-                    child: CircularProgressIndicator(
-                      value:
-                          snapshot.data!.currentItem.toDouble() /
-                          snapshot.data!.totalLength.toDouble(),
-                    ),
-                  );
-                } else {
-                  return Text("NO", style: TextStyle(color: Colors.white));
-                }
-              },
+            const Text(
+              "Test View",
+              style: TextStyle(color: Colors.white),
             ),
-            TextButton(
-              onPressed: () {
-                getLatestVersion().then((value) => print(value));
+            ElevatedButton(
+              onPressed: () async {
+                // final data =
+                //     await context.read<SpotifyApiCubit>().getTrackDetails();
+                // log(data['name'].toString());
+
+                ExternalMediaImporter.sfyPlaylistImporter(
+                    url: "", playlistID: "6FOuXCQ9f8D5HDuDhRstEa");
               },
-              child: Text("getSearchSuggestions"),
-            ),
+              child: const Text(
+                "Test API",
+                style: TextStyle(color: Colors.white),
+              ),
+            )
           ],
         ),
       ),

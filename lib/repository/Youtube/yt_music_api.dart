@@ -508,7 +508,7 @@ class YtMusicService {
           details['id'] = 'youtube$id';
           details['artist'] = details['artists']
               .map((e) => e['name'])
-              .join(',')
+              .join(', ')
               .toString();
           details['subtitle'] = subtitle;
           details['views'] = views;

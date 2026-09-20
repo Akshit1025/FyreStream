@@ -62,7 +62,7 @@ class FyreStreamFileManager {
 
   static Future<bool> importPlaylist(String filePath) async {
     //check if file is json or not
-    // if (!filePath.endsWith('.blm')) {
+    // if (!filePath.endsWith('.fsm')) {
     //   log("Invalid file format", name: "FileManager");
     //   return;
     // }
@@ -106,7 +106,7 @@ class FyreStreamFileManager {
   }
 
   static Future<bool> importMediaItem(String filePath) async {
-    // if (!filePath.endsWith('.blm')) {
+    // if (!filePath.endsWith('.fsm')) {
     //   log("Invalid file format", name: "FileManager");
     //   return;
     // }

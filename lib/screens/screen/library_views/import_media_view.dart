@@ -1,8 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:developer';
+import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/screens/widgets/snackbar.dart';
+import 'package:fyrestream/services/db/GlobalDB.dart';
+import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:fyrestream/utils/external_list_importer.dart';
-import 'package:fyrestream/utils/file_manager.dart';
+import 'package:fyrestream/services/file_manager.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -38,14 +41,17 @@ class ImportMediaFromPlatformsView extends StatelessWidget {
             btnName: "Playlist from Spotify",
             btnIcon: FontAwesome.spotify_brand,
             onClickFunc: () {
-              getIdAndShowBottomSheet(context);
+              getIdAndShowBottomSheet(context, hintText: "https://open.spotify.com/playlist/XXXXX", isSpotify: true);
             },
           ),
           ImportFromBtn(
             btnName: "Music from Spotify",
             btnIcon: FontAwesome.spotify_brand,
             onClickFunc: () {
-              log("music from spotify");
+              getIdAndShowBottomSheet(context,
+                  hintText: "https://open.spotify.com/track/XXXXXX",
+                  isSpotify: true,
+                  isSingle: true);
             },
           ),
           ImportFromBtn(
@@ -54,8 +60,8 @@ class ImportMediaFromPlatformsView extends StatelessWidget {
             onClickFunc: () {
               getIdAndShowBottomSheet(
                 context,
-                hintText: "Youtube Playlist ID",
-                isSpotify: false,
+                hintText: "https://www.youtube.com/playlist?list=XXXXXX",
+                isSpotify: false
               );
             },
           ),
@@ -63,7 +69,10 @@ class ImportMediaFromPlatformsView extends StatelessWidget {
             btnName: "Music from Youtube",
             btnIcon: FontAwesome.youtube_brand,
             onClickFunc: () {
-              log("music from youtube");
+              getIdAndShowBottomSheet(context,
+                  hintText: "https://www.youtube.com/watch?v=XXXXXX",
+                  isSpotify: false,
+                  isSingle: true);
             },
           ),
           ImportFromBtn(
@@ -130,10 +139,9 @@ class ImportFromBtn extends StatelessWidget {
 }
 
 Future getIdAndShowBottomSheet(
-  BuildContext context, {
-  String hintText = "Playlist ID",
-  bool isSpotify = true,
-}) {
+  BuildContext context, {String hintText = "Playlist ID",
+      bool isSpotify = true,
+      isSingle = false}) {
   return showMaterialModalBottomSheet(
     context: context,
     backgroundColor: Colors.transparent,
@@ -163,9 +171,9 @@ Future getIdAndShowBottomSheet(
                               textAlignVertical: TextAlignVertical.center,
                               textAlign: TextAlign.center,
                               // focusNode: _focusNode,
-                              cursorHeight: 30,
+                              cursorHeight: 45,
                               showCursor: true,
-                              cursorWidth: 3,
+                              cursorWidth: 5,
                               cursorRadius: const Radius.circular(5),
                               cursorColor: Default_Theme.accentColor2,
                               autofocus: true,
@@ -190,17 +198,66 @@ Future getIdAndShowBottomSheet(
                                 ),
                               ),
                               onSubmitted: (value) {
-                                if (isSpotify) {
-
+                                if (isSingle) {
+                                  if (isSpotify) {
+                                    context.pop(context);
+                                    ExternalMediaImporter.sfyMediaImporter(
+                                        value)
+                                        .then((value) {
+                                      if (value != null) {
+                                        FyreStreamDBService.addMediaItem(
+                                            MediaItem2MediaItemDB(value),
+                                            MediaPlaylistDB(
+                                                playlistName:
+                                                "Spotify Imports"));
+                                        SnackbarService.showMessage(
+                                            "Imported Media: ${value.title}");
+                                      } else {
+                                        log("Failed to import media",
+                                            name: "Import Media");
+                                      }
+                                    });
+                                  } else {
+                                    context.pop();
+                                    ExternalMediaImporter.ytMediaImporter(value)
+                                        .then((value) {
+                                      if (value != null) {
+                                        FyreStreamDBService.addMediaItem(
+                                            MediaItem2MediaItemDB(value),
+                                            MediaPlaylistDB(
+                                                playlistName:
+                                                "Youtube Imports"));
+                                        SnackbarService.showMessage(
+                                            "Imported Media: ${value.title}");
+                                      } else {
+                                        log("Failed to import media from YT",
+                                            name: "Import Media");
+                                      }
+                                    });
+                                  }
                                 } else {
-                                  context.pop(context);
-                                  showDialog(
-                                    context: context,
-                                    barrierDismissible: false,
-                                      builder: (context) => ImporterDialogWidget(
-                                        strm: ExternalMediaImporter.ytPlaylistImporter(value)
-                                      ),
-                                  );
+                                  if (isSpotify) {
+                                    context.pop(context);
+                                    showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (context) =>
+                                          ImporterDialogWidget(
+                                              strm: ExternalMediaImporter
+                                                  .sfyPlaylistImporter(
+                                                  url: value)),
+                                    );
+                                  } else {
+                                    context.pop(context);
+                                    showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (context) =>
+                                          ImporterDialogWidget(
+                                              strm: ExternalMediaImporter
+                                                  .ytPlaylistImporter(value)),
+                                    );
+                                  }
                                 }
 
                                 // context.pop(context);

@@ -7,7 +7,7 @@ import 'package:fyrestream/screens/widgets/song_card_widget.dart';
 import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/theme_data/default.dart';
-import 'package:fyrestream/utils/file_manager.dart';
+import 'package:fyrestream/services/file_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -126,8 +126,8 @@ void showMoreBottomSheet(
                   Navigator.pop(context);
                   context.read<FyreStreamDBCubit>().addMediaItemToPlaylist(
                       song, MediaPlaylistDB(playlistName: "Liked"));
-                  SnackbarService.showMessage("Added to Favorites",
-                      duration: const Duration(seconds: 2));
+                  // SnackbarService.showMessage("Added to Favorites",
+                  //     duration: const Duration(seconds: 2));
                 },
               ),
               ListTile(

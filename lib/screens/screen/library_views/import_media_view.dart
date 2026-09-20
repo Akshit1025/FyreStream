@@ -74,7 +74,7 @@ class ImportMediaFromPlatformsView extends StatelessWidget {
                 if (value != null) {
                   log(value.files[0].path.toString(), name: "Import File");
                   if (value.files[0].path != null) {
-                    if (value.files[0].path!.endsWith('.blm')) {
+                    if (value.files[0].path!.endsWith('.fsm')) {
                       FyreStreamFileManager.importPlaylist(value.files[0].path!);
                       SnackbarService.showMessage(
                           "Started Importing Playlist");

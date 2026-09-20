@@ -199,6 +199,7 @@ class FyreStreamDBService {
           AppSettingsStrDBSchema,
           RecentlyPlayedDBSchema,
           ChartsCacheDBSchema,
+          YtLinkCacheDBSchema,
         ],
         directory: _path,
       );
@@ -373,13 +374,13 @@ class FyreStreamDBService {
     }
   }
 
-  static Future<void> refreshRecentlyPlayed() async {
+  static Future<void> refreshRecentlyPlayed({int days = 7}) async {
     Isar isarDB = await db;
 
     List<RecentlyPlayedDB> _recentlyPlayed =
     isarDB.recentlyPlayedDBs.where().findAllSync();
     for (var element in _recentlyPlayed) {
-      if (DateTime.now().difference(element.lastPlayed).inDays > 7) {
+      if (DateTime.now().difference(element.lastPlayed).inDays > days) {
         removeMediaItemFromPlaylist(element.mediaItem.value!,
             MediaPlaylistDB(playlistName: "recently_played"));
         isarDB.writeTxnSync(
@@ -439,5 +440,17 @@ class FyreStreamDBService {
     } else {
       return null;
     }
+  }
+
+  static Future<void> putYtLinkCache(
+      String id, String lowUrl, String highUrl, int expireAt) async {
+    Isar isarDB = await db;
+    isarDB.writeTxnSync(() => isarDB.ytLinkCacheDBs.putSync(YtLinkCacheDB(
+        videoId: id, lowQURL: lowUrl, highQURL: highUrl, expireAt: expireAt)));
+  }
+
+  static Future<YtLinkCacheDB?> getYtLinkCache(String id) async {
+    Isar isarDB = await db;
+    return isarDB.ytLinkCacheDBs.filter().videoIdEqualTo(id).findFirstSync();
   }
 }

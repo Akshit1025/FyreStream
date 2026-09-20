@@ -31,7 +31,7 @@ class FyreStreamFileManager {
             'mediaItems': playlistItems.map((e) => e.toMap()).toList(),
           };
           final path = await writeToJSON(
-              '${mediaPlaylistDB.playlistName}_FyreStreamPlaylist.blm',
+              '${mediaPlaylistDB.playlistName}_FyreStreamPlaylist.fsm',
               playlistMap);
           log("Playlist exported successfully", name: "FileManager");
           return path;
@@ -50,9 +50,9 @@ class FyreStreamFileManager {
     // export media item to json file
     try {
       final Map<String, dynamic> mediaItemMap = mediaItemDB.toMap();
-      await writeToJSON('${mediaItemDB.title}_FyreStreamSong.blm', mediaItemMap);
+      await writeToJSON('${mediaItemDB.title}_FyreStreamSong.fsm', mediaItemMap);
       log("Media item exported successfully", name: "FileManager");
-      return '${mediaItemDB.title}_FyreStreamSong.blm';
+      return '${mediaItemDB.title}_FyreStreamSong.fsm';
     } catch (e) {
       log("Error exporting media item: $e", name: "FileManager");
       return null;
@@ -61,7 +61,7 @@ class FyreStreamFileManager {
 
   static Future<void> importPlaylist(String filePath) async {
     //check if file is json or not
-    if (!filePath.endsWith('.blm')) {
+    if (!filePath.endsWith('.fsm')) {
       log("Invalid file format", name: "FileManager");
       return;
     }
@@ -101,7 +101,7 @@ class FyreStreamFileManager {
   }
 
   static void importMediaItem(String filePath) async {
-    if (!filePath.endsWith('.blm')) {
+    if (!filePath.endsWith('.fsm')) {
       log("Invalid file format", name: "FileManager");
       return;
     }

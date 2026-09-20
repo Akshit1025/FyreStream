@@ -10,6 +10,7 @@ import 'package:fyrestream/repository/Youtube/youtube_api.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/widgets/snackbar.dart';
 import 'package:fyrestream/theme_data/default.dart';
+import 'package:fyrestream/utils/file_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fyrestream/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
@@ -51,7 +52,7 @@ String? extractVideoId(String url) {
   return null;
 }
 
-void ProcessIncomingIntent(List<SharedMediaFile> _sharedFiles) {
+void processIncomingIntent(List<SharedMediaFile> _sharedFiles) {
   if (Uri.tryParse(_sharedFiles[0].path) != null &&
       isYoutubeLink(_sharedFiles[0].path)) {
     var _tempId = extractVideoId(_sharedFiles[0].path);
@@ -79,6 +80,11 @@ void ProcessIncomingIntent(List<SharedMediaFile> _sharedFiles) {
         }
       });
     }
+  } else if (Uri.parse(_sharedFiles[0].path).toFilePath().toString().contains(".fsm")) {
+    FyreStreamFileManager.importPlaylist(
+      Uri.parse(_sharedFiles[0].path).toFilePath().toString()
+    );
+    SnackbarService.showMessage("Playlist Imported");
   }
 }
 
@@ -129,7 +135,7 @@ class _MyAppState extends State<MyApp> {
       _sharedFiles.addAll(event);
       log(_sharedFiles[0].mimeType.toString(), name: "Shared Files");
       log(_sharedFiles[0].path, name: "Shared Files");
-      ProcessIncomingIntent(_sharedFiles);
+      processIncomingIntent(_sharedFiles);
 
       // Tell the library that we are done processing the intent.
       ReceiveSharingIntent.reset();
@@ -141,7 +147,7 @@ class _MyAppState extends State<MyApp> {
       _sharedFiles.addAll(event);
       log(_sharedFiles[0].mimeType.toString(), name: "Shared Files Offline");
       log(_sharedFiles[0].path, name: "Shared Files Offline");
-      ProcessIncomingIntent(_sharedFiles);
+      processIncomingIntent(_sharedFiles);
       ReceiveSharingIntent.reset();
     });
   }

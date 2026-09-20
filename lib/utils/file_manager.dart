@@ -51,9 +51,9 @@ class FyreStreamFileManager {
     // export media item to json file
     try {
       final Map<String, dynamic> mediaItemMap = mediaItemDB.toMap();
-      await writeToJSON('${mediaItemDB.title}_FyreStreamSong.fsm', mediaItemMap);
+      final path = await writeToJSON('${mediaItemDB.title}_FyreStreamSong.fsm', mediaItemMap);
       log("Media item exported successfully", name: "FileManager");
-      return '${mediaItemDB.title}_FyreStreamSong.fsm';
+      return path;
     } catch (e) {
       log("Error exporting media item: $e", name: "FileManager");
       return null;

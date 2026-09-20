@@ -7,6 +7,7 @@ import 'package:fyrestream/screens/widgets/song_card_widget.dart';
 import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/theme_data/default.dart';
+import 'package:fyrestream/utils/file_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -163,11 +164,11 @@ void showMoreBottomSheet(
                       fontSize: 17,
                       fontWeight: FontWeight.w400),
                 ),
-                onTap: () {
+                onTap: () async {
                   Navigator.pop(context);
-                  Share.share(
-                    "Check out this song on FyreStream\n${song.title} by ${song.artist}\n${song.extras?['perma_url']}",
-                  );
+                  SnackbarService.showMessage("Preparing ${song.title} for sharing");
+                  final tmpPath = await FyreStreamFileManager.exportMediaItem(MediaItem2MediaItemDB(song));
+                  tmpPath != null ? Share.shareXFiles([XFile(tmpPath)]) : null;
                 },
               ),
               ListTile(

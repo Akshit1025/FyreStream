@@ -15,7 +15,6 @@ import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:fyrestream/utils/load_Image.dart';
-
 import '../../../blocs/mediaPlayer/fyrestream_player_cubit.dart';
 import 'dart:ui';
 
@@ -226,9 +225,9 @@ class PlaylistView extends StatelessWidget {
 }
 
 class Playlist extends StatefulWidget {
-  CurrentPlaylistState state;
+  final CurrentPlaylistState state;
 
-  Playlist({super.key, required this.state});
+  const Playlist({super.key, required this.state});
 
   @override
   State<Playlist> createState() => _PlaylistState();
@@ -242,42 +241,15 @@ class _PlaylistState extends State<Playlist> {
       physics: const BouncingScrollPhysics(),
       proxyDecorator: proxyDecorator,
       itemBuilder: (context, index) {
-        return Dismissible(
-          direction: DismissDirection.startToEnd,
-          background: Container(
-            color: Colors.red,
-            child: const Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(left: 20),
-                  child: Icon(
-                    MingCute.delete_3_line,
-                    color: Colors.white,
-                    size: 30,
-                  ),
-                ),
-                Spacer(),
-              ],
-            ),
-          ),
-          onDismissed: (direction) {
-            context.read<FyreStreamDBCubit>().removeMediaFromPlaylist(
-              _state.mediaItems[index],
-              MediaPlaylistDB(playlistName: _state.albumName),
-            );
-            setState(() {
-              _state.mediaItems.removeAt(index);
-            });
-          },
+        return SongCardWidget(
+          song: _state.mediaItems[index],
           key: ValueKey(_state.mediaItems[index].id),
-          child: SongCardWidget(
-            song: _state.mediaItems[index],
             onTap: () {
               if (!listEquals(
-                  context
-                      .read<FyrestreamPlayerCubit>()
-                      .fyrestreamPlayer
-                      .currentPlaylist,
+                context
+                    .read<FyrestreamPlayerCubit>()
+                    .fyrestreamPlayer
+                    .currentPlaylist,
                   _state.mediaItems)) {
                 context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.loadPlaylist(
                     MediaPlaylist(
@@ -299,10 +271,17 @@ class _PlaylistState extends State<Playlist> {
 
               context.push('/MusicPlayer');
             },
-            onOptionsTap: () {
-              showMoreBottomSheet(context, _state.mediaItems[index]);
-            },
-          ),
+          onOptionsTap: () {
+            showMoreBottomSheet(context, _state.mediaItems[index],
+                onDelete: () {
+                  context.read<FyreStreamDBCubit>().removeMediaFromPlaylist(
+                      _state.mediaItems[index],
+                      MediaPlaylistDB(playlistName: _state.albumName));
+                  setState(() {
+                    _state.mediaItems.removeAt(index);
+                  });
+                }, showDelete: true);
+          },
         );
       },
       itemCount: _state.mediaItems.length,
@@ -319,7 +298,6 @@ class _PlaylistState extends State<Playlist> {
             newIndex,
           );
         });
-        print(_state.mediaItems.toList().toString());
       },
     );
   }

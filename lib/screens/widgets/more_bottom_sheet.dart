@@ -4,6 +4,8 @@ import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/widgets/snackbar.dart';
 import 'package:fyrestream/screens/widgets/song_card_widget.dart';
+import 'package:fyrestream/services/db/GlobalDB.dart';
+import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,6 +19,7 @@ void showMoreBottomSheet(
     BuildContext context,
     MediaItemModel song, {
       bool showDelete = false,
+      VoidCallback? onDelete,
     }) {
   showModalBottomSheet(
       context: context,
@@ -102,6 +105,28 @@ void showMoreBottomSheet(
                       .fyrestreamPlayer
                       .addQueueItem(song, atLast: true, doPlay: false);
                   SnackbarService.showMessage("Added to Queue", duration: const Duration(seconds: 2));
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  MingCute.heart_fill,
+                  color: Default_Theme.primaryColor1,
+                  size: 28,
+                ),
+                title: const Text(
+                  'Add to Favorites',
+                  style: TextStyle(
+                      color: Default_Theme.primaryColor1,
+                      fontFamily: "Unageo",
+                      fontSize: 17,
+                      fontWeight: FontWeight.w400),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.read<FyreStreamDBCubit>().addMediaItemToPlaylist(
+                      song, MediaPlaylistDB(playlistName: "Liked"));
+                  SnackbarService.showMessage("Added to Favorites",
+                      duration: const Duration(seconds: 2));
                 },
               ),
               ListTile(
@@ -204,6 +229,7 @@ void showMoreBottomSheet(
                   ),
                   onTap: () {
                     Navigator.pop(context);
+                    if (onDelete != null) onDelete();
                   },
                 ),
               ),

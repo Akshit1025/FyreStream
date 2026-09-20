@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:fyrestream/screens/widgets/snackbar.dart';
 import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:path_provider/path_provider.dart';
@@ -61,63 +62,72 @@ class FyreStreamFileManager {
 
   static Future<void> importPlaylist(String filePath) async {
     //check if file is json or not
-    if (!filePath.endsWith('.fsm')) {
-      log("Invalid file format", name: "FileManager");
-      return;
-    }
+    // if (!filePath.endsWith('.fsm')) {
+    //   log("Invalid file format", name: "FileManager");
+    //   return;
+    // }
     // import playlist from json file
-    await readFromJSON(filePath).then((playlistMap) async {
-      log("Playlist map: $playlistMap", name: "FileManager");
-      if (playlistMap != null && playlistMap.isNotEmpty) {
-        try {
-          bool playlistExists =
-          await isPlaylistExists(playlistMap['playlistName']);
-          int i = 1;
-          String playlistName = playlistMap['playlistName'];
-          while (playlistExists) {
-            playlistName = playlistMap['playlistName'] + "_$i";
-            playlistExists = await isPlaylistExists(playlistName);
-            i++;
+    try {
+      await readFromJSON(filePath).then((playlistMap) async {
+        log("Playlist map: $playlistMap", name: "FileManager");
+        if (playlistMap != null && playlistMap.isNotEmpty) {
+          try {
+            bool playlistExists =
+            await isPlaylistExists(playlistMap['playlistName']);
+            int i = 1;
+            String playlistName = playlistMap['playlistName'];
+            while (playlistExists) {
+              playlistName = playlistMap['playlistName'] + "_$i";
+              playlistExists = await isPlaylistExists(playlistName);
+              i++;
+            }
+            log("Playlist name: $playlistName", name: "FileManager");
+
+            final mediaPlaylistDB = MediaPlaylistDB(
+              playlistName: playlistName,
+            );
+
+            for (final mediaItemMap in playlistMap['mediaItems']) {
+              final mediaItemDB = MediaItemDB.fromMap(mediaItemMap);
+              await FyreStreamDBService.addMediaItem(mediaItemDB, mediaPlaylistDB);
+              log("Media item imported successfully - ${mediaItemDB.title}",
+                  name: "FileManager");
+            }
+
+            log("Playlist imported successfully");
+          } catch (e) {
+            log("Error importing playlist: $e");
           }
-          log("Playlist name: $playlistName", name: "FileManager");
-
-          final mediaPlaylistDB = MediaPlaylistDB(
-            playlistName: playlistName,
-          );
-
-          for (final mediaItemMap in playlistMap['mediaItems']) {
-            final mediaItemDB = MediaItemDB.fromMap(mediaItemMap);
-            await FyreStreamDBService.addMediaItem(mediaItemDB, mediaPlaylistDB);
-            log("Media item imported successfully - ${mediaItemDB.title}",
-                name: "FileManager");
-          }
-
-          log("Playlist imported successfully");
-        } catch (e) {
-          log("Error importing playlist: $e");
         }
-      }
-    });
+      });
+    } catch (e) {
+      log("Invalid file format");
+      SnackbarService.showMessage("Invalid file format");
+    }
   }
 
   static void importMediaItem(String filePath) async {
-    if (!filePath.endsWith('.fsm')) {
-      log("Invalid file format", name: "FileManager");
-      return;
-    }
+    // if (!filePath.endsWith('.fsm')) {
+    //   log("Invalid file format", name: "FileManager");
+    //   return;
+    // }
     // import media item from json file
-    await readFromJSON(filePath).then((mediaItemMap) {
-      if (mediaItemMap != null && mediaItemMap.isNotEmpty) {
-        try {
-          final mediaItemDB = MediaItemDB.fromMap(mediaItemMap);
-          FyreStreamDBService.addMediaItem(
-              mediaItemDB, MediaPlaylistDB(playlistName: "Imported"));
-          log("Media item imported successfully");
-        } catch (e) {
-          log("Error importing media item: $e");
+    try {
+      await readFromJSON(filePath).then((mediaItemMap) {
+        if (mediaItemMap != null && mediaItemMap.isNotEmpty) {
+          try {
+            final mediaItemDB = MediaItemDB.fromMap(mediaItemMap);
+            FyreStreamDBService.addMediaItem(
+                mediaItemDB, MediaPlaylistDB(playlistName: "Imported"));
+            log("Media item imported successfully");
+          } catch (e) {
+            log("Error importing media item: $e");
+          }
         }
-      }
-    });
+      });
+    } catch (e) {
+      log("Invalid file format");
+    }
   }
 
   static Future<String?> writeToJSON(

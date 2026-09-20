@@ -80,7 +80,7 @@ void processIncomingIntent(List<SharedMediaFile> _sharedFiles) {
         }
       });
     }
-  } else if (Uri.parse(_sharedFiles[0].path).toFilePath().toString().contains(".fsm")) {
+  } else if (_sharedFiles[0].mimeType == "application/octet-stream") {
     FyreStreamFileManager.importPlaylist(
       Uri.parse(_sharedFiles[0].path).toFilePath().toString()
     );

@@ -57,6 +57,16 @@ class ImportMediaFromPlatformsView extends StatelessWidget {
             },
           ),
           ImportFromBtn(
+            btnName: "Album from Spotify",
+            btnIcon: FontAwesome.spotify_brand,
+            onClickFunc: () {
+              getIdAndShowBottomSheet(context,
+                  hintText: "https://open.spotify.com/album/XXXXXX",
+                  isSpotify: true,
+                  isAlbum: true);
+            }
+          ),
+          ImportFromBtn(
             btnName: "Playlist from Youtube",
             btnIcon: FontAwesome.youtube_brand,
             onClickFunc: () {
@@ -141,6 +151,7 @@ class ImportFromBtn extends StatelessWidget {
 Future getIdAndShowBottomSheet(
   BuildContext context, {String hintText = "Playlist ID",
       bool isSpotify = true,
+      bool isAlbum = false,
       isSingle = false}) {
   return showMaterialModalBottomSheet(
     context: context,
@@ -236,7 +247,7 @@ Future getIdAndShowBottomSheet(
                                     });
                                   }
                                 } else {
-                                  if (isSpotify) {
+                                  if (isSpotify && !isAlbum) {
                                     context.pop(context);
                                     showDialog(
                                       context: context,
@@ -246,6 +257,17 @@ Future getIdAndShowBottomSheet(
                                               strm: ExternalMediaImporter
                                                   .sfyPlaylistImporter(
                                                   url: value)),
+                                    );
+                                  } else if (isSpotify && isAlbum) {
+                                    context.pop(context);
+                                    showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (context) => ImporterDialogWidget(
+                                        strm: ExternalMediaImporter.sfyAlbumImporter(
+                                          url: value
+                                        ),
+                                      )
                                     );
                                   } else {
                                     context.pop(context);

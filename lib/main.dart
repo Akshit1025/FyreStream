@@ -3,10 +3,12 @@ import 'dart:developer';
 import 'dart:io' as io;
 import 'package:fyrestream/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
 import 'package:fyrestream/blocs/settings_cubit/cubit/settings_cubit.dart';
+import 'package:fyrestream/blocs/timer/timer_bloc.dart';
 import 'package:fyrestream/screens/widgets/snackbar.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:fyrestream/services/file_manager.dart';
 import 'package:fyrestream/utils/external_list_importer.dart';
+import 'package:fyrestream/utils/ticker.dart';
 import 'package:fyrestream/utils/url_checker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,6 +42,9 @@ void processIncomingIntent(List<SharedMediaFile> sharedMediaFiles) {
         break;
       case UrlType.youtubePlaylist:
         SnackbarService.showMessage("Import Youtube Playlist from library!");
+        break;
+      case UrlType.spotifyAlbum:
+        SnackbarService.showMessage("Import Spotify Album from Library!");
         break;
       case UrlType.youtubeVideo:
         ExternalMediaImporter.ytMediaImporter(sharedMediaFiles[0].path)
@@ -155,6 +160,11 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(
           create: (context) => SettingsCubit(),
           lazy: false,
+        ),
+        BlocProvider(
+          create: (context) => TimerBloc(
+            ticker: const Ticker(), fyrestreamPlayer: fyrestreamPlayerCubit
+          )
         ),
         BlocProvider(
           create: (context) => ConnectivityCubit(),

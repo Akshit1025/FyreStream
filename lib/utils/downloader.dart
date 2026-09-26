@@ -215,4 +215,24 @@ class FyreStreamDownloader {
       return null;
     }
   }
+
+  static Future<String> getValidFileName(
+      String fileName, String filePath) async {
+    final File file = File('$filePath/$fileName');
+    final bool fileExists = file.existsSync();
+    if (!fileExists) {
+      return fileName;
+    } else {
+      log('File already exists: $fileName', name: "FyreStreamDownloader");
+      try {
+        fileName = fileName
+            .replaceAll(".mp4", "(1).mp4")
+            .replaceAll(".m4a", "(1).m4a");
+        return getValidFileName(fileName, filePath);
+      } catch (e) {
+        log('Failed to get valid file for $fileName');
+      }
+    }
+    return fileName;
+  }
 }

@@ -121,17 +121,17 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
       } else {
         log("Link found in cache for vidId: $id", name: "fyrestreamPlayer");
         String kurl = vidInfo.lowQURL!;
-        await FyreStreamDBService.getSettingStr(GlobalStrConsts.ytStrmQuality)
-            .then((value) {
-          log("Play quality: $value", name: "fyrestreamPlayer");
-          if (value != null) {
-            if (value == "High") {
-              kurl = vidInfo.highQURL;
-            } else {
-              kurl = vidInfo.lowQURL!;
-            }
-          }
-        });
+        // await FyreStreamDBService.getSettingStr(GlobalStrConsts.ytStrmQuality)
+        //     .then((value) {
+        //   log("Play quality: $value", name: "fyrestreamPlayer");
+        //   if (value != null) {
+        //     if (value == "High") {
+        //       kurl = vidInfo.highQURL;
+        //     } else {
+        //       kurl = vidInfo.lowQURL!;
+        //     }
+        //   }
+        // });
         return kurl;
       }
     } else {
@@ -153,7 +153,7 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
         }
       }
     });
-    final vidMap = await YouTubeServices().refreshLink(id, quality: quality);
+    final vidMap = await YouTubeServices().refreshLink(id, quality: "Low");
     if (vidMap != null) {
       return vidMap["url"] as String;
     } else {

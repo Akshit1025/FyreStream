@@ -1,7 +1,9 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:fyrestream/model/saavnModel.dart';
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/repository/Youtube/youtube_api.dart';
+import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/widgets/snackbar.dart';
 import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:flutter/foundation.dart';
@@ -96,6 +98,7 @@ class FyreStreamDownloader {
           kURL = await latestYtLink(song.id.replaceAll("youtube", ""));
         } else {
           kURL = song.extras!['url'];
+          kURL = await getJsQualityURL(kURL!, isStreaming: false);
         }
         taskId = await FlutterDownloader.enqueue(
           url: kURL!,
@@ -174,7 +177,18 @@ class FyreStreamDownloader {
         return await refreshYtLink(id);
       } else {
         log("Link found in cache for vidId: $id", name: "FyreStreamDownloader");
-        return vidInfo.lowQURL;
+        String kurl = vidInfo.lowQURL!;
+        await FyreStreamDBService.getSettingStr(GlobalStrConsts.ytDownQuality)
+            .then((value) {
+          if (value != null) {
+            if (value == "High") {
+              kurl = vidInfo.highQURL;
+            } else {
+              kurl = vidInfo.lowQURL!;
+            }
+          }
+        });
+        return kurl;
       }
     } else {
       log("No cache found for vidId: $id", name: "FyreStreamDownloader");
@@ -183,7 +197,18 @@ class FyreStreamDownloader {
   }
 
   static Future<String?> refreshYtLink(String id) async {
-    final vidMap = await YouTubeServices().refreshLink(id);
+    String quality = "Low";
+    await FyreStreamDBService.getSettingStr(GlobalStrConsts.ytDownQuality)
+        .then((value) {
+      if (value != null) {
+        if (value == "High") {
+          quality = "High";
+        } else {
+          quality = "Low";
+        }
+      }
+    });
+    final vidMap = await YouTubeServices().refreshLink(id, quality: quality);
     if (vidMap != null) {
       return vidMap["url"] as String;
     } else {

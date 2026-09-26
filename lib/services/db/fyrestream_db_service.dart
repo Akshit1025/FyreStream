@@ -14,6 +14,105 @@ class FyreStreamDBService {
     db = openDB();
   }
 
+  static Future<Isar> openDB() async {
+    if (Isar.instanceNames.isEmpty) {
+      String _path = (await getApplicationDocumentsDirectory()).path;
+      log(_path, name: "DB");
+      return await Isar.open(
+        [
+          MediaPlaylistDBSchema,
+          MediaItemDBSchema,
+          AppSettingsBoolDBSchema,
+          AppSettingsStrDBSchema,
+          RecentlyPlayedDBSchema,
+          ChartsCacheDBSchema,
+          YtLinkCacheDBSchema,
+          DownloadDBSchema,
+        ],
+        directory: _path,
+      );
+    }
+    return Future.value(Isar.getInstance());
+  }
+
+  static Future<bool> createBackUp() async {
+    try {
+      final isar = await db;
+      String? backUpDir;
+      try {
+        backUpDir = await getSettingStr(GlobalStrConsts.backupPath);
+      } catch (e) {
+        log(e.toString(), name: "DB");
+        backUpDir = (await getApplicationSupportDirectory()).path;
+      }
+
+      final File backUpFile = File('$backUpDir/fyrestream_backup_db.isar');
+      if (await backUpFile.exists()) {
+        await backUpFile.delete();
+      }
+
+      await isar.copyToFile('$backUpDir/fyrestream_backup_db.isar');
+
+      log("Backup created successfully ${backUpFile.path}",
+          name: "FyreStreamDBService");
+      return true;
+    } catch (e) {
+      log("Failed to create backup", error: e, name: "FyreStreamDBService");
+    }
+    return false;
+  }
+
+  static Future<bool> backupExists() async {
+    try {
+      String? backUpDir;
+      try {
+        backUpDir = await getSettingStr(GlobalStrConsts.backupPath);
+      } catch (e) {
+        log(e.toString(), name: "DB");
+        backUpDir = (await getApplicationSupportDirectory()).path;
+      }
+
+      final dbFile = File('$backUpDir/fyrestream_backup_db.isar');
+      if (dbFile.existsSync()) {
+        return true;
+      }
+    } catch (e) {
+      log("No backup exists", error: e, name: "FyreStreamDBService");
+    }
+    return false;
+  }
+
+  static Future<bool> restoreDB() async {
+    try {
+      final isar = await db;
+      final dbDirectory = await getApplicationDocumentsDirectory();
+
+      String? backUpDir;
+      try {
+        backUpDir = await getSettingStr(GlobalStrConsts.backupPath);
+      } catch (e) {
+        log(e.toString(), name: "DB");
+        backUpDir = (await getApplicationSupportDirectory()).path;
+      }
+
+      await isar.close();
+
+      final dbFile = File('$backUpDir/fyrestream_backup_db.isar');
+      final dbPath = File('${dbDirectory.path}/default.isar');
+
+      if (await dbFile.exists()) {
+        await dbFile.copy(dbPath.path);
+        log("Successfully restored", name: "FyreStreamDBService");
+        FyreStreamDBService();
+        return true;
+      }
+    } catch (e) {
+      log("Restoring DB failed", error: e, name: "FyreStreamDBService");
+    }
+    FyreStreamDBService();
+    return false;
+  }
+
   static Future<int?> addMediaItem(
       MediaItemDB mediaItemDB, MediaPlaylistDB mediaPlaylistDB) async {
     int? _id;
@@ -189,26 +288,7 @@ class FyreStreamDBService {
       return false;
     }
   }
-  static Future<Isar> openDB() async {
-    if (Isar.instanceNames.isEmpty) {
-      String _path = (await getApplicationDocumentsDirectory()).path;
-      log(_path, name: "DB");
-      return await Isar.open(
-        [
-          MediaPlaylistDBSchema,
-          MediaItemDBSchema,
-          AppSettingsBoolDBSchema,
-          AppSettingsStrDBSchema,
-          RecentlyPlayedDBSchema,
-          ChartsCacheDBSchema,
-          YtLinkCacheDBSchema,
-          DownloadDBSchema,
-        ],
-        directory: _path,
-      );
-    }
-    return Future.value(Isar.getInstance());
-  }
+
   static Future<Stream> getStream4MediaList(
       MediaPlaylistDB mediaPlaylistDB) async {
     Isar isarDB = await db;

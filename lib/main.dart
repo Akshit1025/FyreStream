@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:io' as io;
+import 'package:fyrestream/blocs/downloader/cubit/downloader_cubit.dart';
 import 'package:fyrestream/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
 import 'package:fyrestream/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:fyrestream/blocs/timer/timer_bloc.dart';
@@ -20,6 +21,7 @@ import 'package:fyrestream/screens/screen/library_views/cubit/current_playlist_c
 import 'package:fyrestream/screens/screen/library_views/cubit/import_playlist_cubit.dart';
 import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:metadata_god/metadata_god.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'blocs/mediaPlayer/fyrestream_player_cubit.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
@@ -89,9 +91,10 @@ late FyrestreamPlayerCubit fyrestreamPlayerCubit;
 void setupPlayerCubit() {
   fyrestreamPlayerCubit = FyrestreamPlayerCubit();
 }
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   setHighRefreshRate();
+  MetadataGod.initialize();
   try {
     dotenv.load(fileName: "assets/.env");
   } on Exception catch (e) {
@@ -190,19 +193,23 @@ class _MyAppState extends State<MyApp> {
           create: (context) => FetchSearchResultsCubit(),
         ),
       ],
-      child: BlocBuilder<FyrestreamPlayerCubit, FyreStreamPlayerState>(
-        builder: (context, state) {
-          if (state is FyreStreamPlayerInitial) {
-            return const SizedBox(
-                width: 50, height: 50, child: CircularProgressIndicator());
-          } else {
-            return MaterialApp.router(
-              scaffoldMessengerKey: SnackbarService.messengerKey,
-              routerConfig: GlobalRoutes.globalRouter,
-              theme: Default_Theme().defaultThemeData,
-            );
-          }
-        },
+      child: RepositoryProvider(
+        create: (context) => DownloaderCubit(),
+        lazy: false,
+        child: BlocBuilder<FyrestreamPlayerCubit, FyreStreamPlayerState>(
+          builder: (context, state) {
+            if (state is FyreStreamPlayerInitial) {
+              return const SizedBox(
+                  width: 50, height: 50, child: CircularProgressIndicator());
+            } else {
+              return MaterialApp.router(
+                scaffoldMessengerKey: SnackbarService.messengerKey,
+                routerConfig: GlobalRoutes.globalRouter,
+                theme: Default_Theme().defaultThemeData,
+              );
+            }
+          },
+        ),
       ),
     );
   }

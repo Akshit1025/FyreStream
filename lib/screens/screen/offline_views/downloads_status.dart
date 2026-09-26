@@ -1,5 +1,7 @@
+import 'package:fyrestream/screens/widgets/sign_board_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:fyrestream/theme_data/default.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 class DownloadsView extends StatelessWidget {
   const DownloadsView({super.key});
@@ -20,7 +22,10 @@ class DownloadsView extends StatelessWidget {
           ).merge(Default_Theme.secondoryTextStyle),
         ),
       ),
-      body: const Center(child: Text('FyreStream Downloads View')),
+      body: const Center(
+        child: SignBoardWidget(
+            message: "No Downloads Yet", icon: MingCute.download_2_fill),
+      ),
     );
   }
 }

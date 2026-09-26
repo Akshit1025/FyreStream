@@ -1,6 +1,8 @@
+import 'package:fyrestream/screens/widgets/sign_board_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fyrestream/theme_data/default.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 class NotificationView extends StatelessWidget {
   const NotificationView({super.key});
@@ -21,7 +23,12 @@ class NotificationView extends StatelessWidget {
           ).merge(Default_Theme.secondoryTextStyle),
         ),
       ),
-      body: const Center(child: Text('FyreStream Notifications View')),
+      body: const Center(
+        child: SignBoardWidget(
+          message: "No Notifications yet!",
+          icon: MingCute.notification_off_line,
+        ),
+      ),
     );
   }
 }

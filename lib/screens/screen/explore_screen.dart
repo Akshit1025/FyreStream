@@ -1,3 +1,4 @@
+import 'package:fyrestream/blocs/downloader/cubit/downloader_cubit.dart';
 import 'package:fyrestream/blocs/explore/cubit/explore_cubits.dart';
 import 'package:fyrestream/blocs/mediaPlayer/fyrestream_player_cubit.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
@@ -88,6 +89,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                         .read<FyrestreamPlayerCubit>()
                                         .fyrestreamPlayer
                                         .addQueueItem(e);
+                                      // context
+                                      //   .read<DownloaderCubit>()
+                                      //   .downloadSong(e);
                                   },
                                   onOptionsTap: () =>
                                       showMoreBottomSheet(context, e),

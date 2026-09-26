@@ -1,10 +1,12 @@
 import 'package:fyrestream/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
+import 'package:fyrestream/blocs/downloader/cubit/downloader_cubit.dart';
 import 'package:fyrestream/blocs/mediaPlayer/fyrestream_player_cubit.dart';
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/widgets/snackbar.dart';
 import 'package:fyrestream/screens/widgets/song_card_widget.dart';
 import 'package:fyrestream/services/db/GlobalDB.dart';
+import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:fyrestream/services/file_manager.dart';
@@ -22,6 +24,14 @@ void showMoreBottomSheet(
       bool showDelete = false,
       VoidCallback? onDelete,
     }) {
+  bool? isDownloaded;
+  FyreStreamDBService.getDownloadDB(song).then((value) {
+    if (value != null) {
+      isDownloaded = true;
+    } else {
+      isDownloaded = false;
+    }
+  });
   showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -191,6 +201,45 @@ void showMoreBottomSheet(
                       ClipboardData(text: "${song.title} by ${song.artist}"));
                   SnackbarService.showMessage("Copied to clipboard",
                       duration: const Duration(seconds: 2));
+                },
+              ),
+              (isDownloaded != null && isDownloaded == true)
+                  ? ListTile(
+                leading: const Icon(
+                  MingCute.check_circle_line,
+                  color: Default_Theme.primaryColor1,
+                  size: 28,
+                ),
+                title: const Text(
+                  'Already Downloaded!',
+                  style: TextStyle(
+                      color: Default_Theme.primaryColor1,
+                      fontFamily: "Unageo",
+                      fontSize: 17,
+                      fontWeight: FontWeight.w400),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  // context.read<DownloaderCubit>().downloadSong(song);
+                },
+              )
+                  : ListTile(
+                leading: const Icon(
+                  MingCute.download_2_fill,
+                  color: Default_Theme.primaryColor1,
+                  size: 28,
+                ),
+                title: const Text(
+                  'Download',
+                  style: TextStyle(
+                      color: Default_Theme.primaryColor1,
+                      fontFamily: "Unageo",
+                      fontSize: 17,
+                      fontWeight: FontWeight.w400),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  context.read<DownloaderCubit>().downloadSong(song);
                 },
               ),
               ListTile(

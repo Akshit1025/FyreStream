@@ -1,7 +1,7 @@
-import 'package:fyrestream/blocs/downloader/cubit/downloader_cubit.dart';
 import 'package:fyrestream/blocs/explore/cubit/explore_cubits.dart';
 import 'package:fyrestream/blocs/mediaPlayer/fyrestream_player_cubit.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
+import 'package:fyrestream/screens/screen/home_views/recents_view.dart';
 import 'package:fyrestream/screens/widgets/chart_list_tile.dart';
 import 'package:fyrestream/screens/widgets/more_bottom_sheet.dart';
 import 'package:fyrestream/screens/widgets/song_card_widget.dart';
@@ -79,26 +79,38 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                   )),
                             )
                                 : ((state.mediaPlaylist.mediaItems.isNotEmpty)
-                                ? TabSongListWidget(
-                              list: state.mediaPlaylist.mediaItems
-                                  .map((e) {
-                                return SongCardWidget(
-                                  song: e,
-                                  onTap: () {
-                                    context
-                                        .read<FyrestreamPlayerCubit>()
-                                        .fyrestreamPlayer
-                                        .addQueueItem(e);
+                                ? InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                        const HistoryView()));
+                              },
+                              child: TabSongListWidget(
+                                list: state.mediaPlaylist.mediaItems
+                                    .map((e) {
+                                  return SongCardWidget(
+                                    song: e,
+                                    onTap: () {
+                                      context
+                                          .read<FyrestreamPlayerCubit>()
+                                          .fyrestreamPlayer
+                                          .addQueueItem(
+                                        e,
+                                      );
                                       // context
-                                      //   .read<DownloaderCubit>()
-                                      //   .downloadSong(e);
-                                  },
-                                  onOptionsTap: () =>
-                                      showMoreBottomSheet(context, e),
-                                );
-                              }).toList(),
-                              category: "Recently",
-                              columnSize: 3,
+                                      //     .read<DownloaderCubit>()
+                                      //     .downloadSong(e);
+                                    },
+                                    onOptionsTap: () =>
+                                        showMoreBottomSheet(
+                                            context, e),
+                                  );
+                                }).toList(),
+                                category: "Recently",
+                                columnSize: 3,
+                              ),
                             )
                                 : const SizedBox()),
                           );
@@ -123,15 +135,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                   )),
                             )
                                 : TabSongListWidget(
-                              list:
-                              state.ytCharts![0].chartItems!.map((e) {
-                                return ChartListTile(
-                                  title: e.name ?? "",
-                                  subtitle: e.subtitle ?? "",
-                                  imgUrl: e.imageUrl ?? "",
-                                  rectangularImage: true,
-                                );
-                              }).toList(),
+                              list: state.ytCharts![0].chartItems!
+                                  .map((e) => ChartListTile(
+                                title: e.name ?? "",
+                                subtitle: e.subtitle ?? "",
+                                imgUrl: e.imageUrl ?? "",
+                                rectangularImage: true,
+                              )).toList(),
                               category: "Trending",
                               columnSize: 4,
                             ),

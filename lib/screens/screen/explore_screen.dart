@@ -1,8 +1,10 @@
 import 'package:fyrestream/blocs/explore/cubit/explore_cubits.dart';
+import 'package:fyrestream/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
 import 'package:fyrestream/blocs/mediaPlayer/fyrestream_player_cubit.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/screen/home_views/recents_view.dart';
 import 'package:fyrestream/screens/widgets/more_bottom_sheet.dart';
+import 'package:fyrestream/screens/widgets/sign_board_widget.dart';
 import 'package:fyrestream/screens/widgets/song_tile.dart';
 import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/utils/app_updater.dart';
@@ -126,13 +128,29 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       ),
                     ),
                   ),
-                  BlocBuilder<YTMusicCubit, YTMusicCubitState>(
+                  BlocBuilder<ConnectivityCubit, ConnectivityState>(
                     builder: (context, state) {
                       return AnimatedSwitcher(
                         duration: const Duration(milliseconds: 400),
-                        child: state is YTMusicCubitInitial
-                            ? const SizedBox()
-                            : ytSection(state.ytmData),
+                        child: switch (state) {
+                          ConnectivityState.connected =>
+                              BlocBuilder<YTMusicCubit, YTMusicCubitState>(
+                                builder: (context, state) {
+                                  return AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 400),
+                                    child: state is YTMusicCubitInitial
+                                        ? const SizedBox()
+                                        : ytSection(state.ytmData),
+                                  );
+                                },
+                              ),
+                          ConnectivityState.disconnected =>
+                          const SignBoardWidget(
+                            message: "No Internet Connection",
+                            icon: MingCute.wifi_off_line,
+                          ),
+                          _ => const SizedBox()
+                        },
                       );
                     },
                   ),

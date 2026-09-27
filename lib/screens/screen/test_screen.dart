@@ -1,4 +1,7 @@
-import 'package:fyrestream/utils/external_list_importer.dart';
+import 'dart:convert';
+import 'dart:developer';
+
+import 'package:fyrestream/repository/Youtube/yt_music_api.dart';
 import 'package:flutter/material.dart';
 import 'package:fyrestream/theme_data/default.dart';
 
@@ -30,12 +33,9 @@ class TestView extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () async {
-                // final data =
-                //     await context.read<SpotifyApiCubit>().getTrackDetails();
-                // log(data['name'].toString());
-
-                ExternalMediaImporter.sfyPlaylistImporter(
-                    url: "", playlistID: "6FOuXCQ9f8D5HDuDhRstEa");
+                YtMusicService().getMusicHome().then((value) {
+                  log("Test API: ${jsonEncode(value)}");
+                });
               },
               child: const Text(
                 "Test API",

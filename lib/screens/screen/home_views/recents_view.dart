@@ -2,7 +2,7 @@
 import 'package:fyrestream/blocs/history/cubit/history_cubit.dart';
 import 'package:fyrestream/blocs/mediaPlayer/fyrestream_player_cubit.dart';
 import 'package:fyrestream/screens/widgets/more_bottom_sheet.dart';
-import 'package:fyrestream/screens/widgets/song_card_widget.dart';
+import 'package:fyrestream/screens/widgets/song_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

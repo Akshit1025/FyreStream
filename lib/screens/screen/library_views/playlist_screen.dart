@@ -1,7 +1,7 @@
 import 'package:fyrestream/model/MediaPlaylistModel.dart';
 import 'package:fyrestream/screens/widgets/more_bottom_sheet.dart';
 import 'package:fyrestream/screens/widgets/sign_board_widget.dart';
-import 'package:fyrestream/screens/widgets/song_card_widget.dart';
+import 'package:fyrestream/screens/widgets/song_tile.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

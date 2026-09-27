@@ -1,7 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:isolate';
+import 'package:fyrestream/repository/Youtube/yt_music_api.dart';
 import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:bloc/bloc.dart';
 import 'package:fyrestream/model/MediaPlaylistModel.dart';
@@ -10,6 +12,8 @@ import 'package:fyrestream/plugins/chart_defines.dart';
 import 'package:fyrestream/repository/Youtube/yt_charts_home.dart';
 import 'package:fyrestream/screens/screen/chart/show_charts.dart';
 import 'package:fyrestream/services/db/fyrestream_db_service.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:isar/isar.dart';
@@ -162,5 +166,31 @@ class FetchChartCubit extends Cubit<FetchChartState> {
     if (chartList.isNotEmpty) {
       emit(state.copyWith(isFetched: true));
     }
+  }
+}
+
+class YTMusicCubit extends Cubit<YTMusicCubitState> {
+  YTMusicCubit() : super(YTMusicCubitInitial()) {
+    fetchYTMusicDB();
+    fetchYTMusic();
+  }
+
+  void fetchYTMusicDB() async {
+    final data = await FyreStreamDBService.getAPICache("YTMusic");
+    if (data != null) {
+      final ytmData = await compute(parseYTMusicData, data);
+      emit(state.copyWith(ytmData: ytmData));
+    }
+  }
+
+  Map<String, List<dynamic>> parseYTMusicData(String source) {
+    return jsonDecode(source);
+  }
+
+  void fetchYTMusic() async {
+    final ytCharts = await YtMusicService().getMusicHome();
+    emit(state.copyWith(ytmData: ytCharts));
+    final ytChartsJson = jsonEncode(ytCharts);
+    FyreStreamDBService.putAPICache("YTMusic", ytChartsJson);
   }
 }

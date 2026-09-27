@@ -4,7 +4,7 @@ import 'package:fyrestream/blocs/mediaPlayer/fyrestream_player_cubit.dart';
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/widgets/snackbar.dart';
-import 'package:fyrestream/screens/widgets/song_card_widget.dart';
+import 'package:fyrestream/screens/widgets/song_tile.dart';
 import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';

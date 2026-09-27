@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:fyrestream/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/screens/widgets/createPlaylist_bottomsheet.dart';
-import 'package:fyrestream/screens/widgets/smallPlaylistCard_widget.dart';
+import 'package:fyrestream/screens/widgets/playlist_tile.dart';
 import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:fyrestream/routes_and_consts/global_consts.dart';
@@ -54,11 +54,12 @@ class _AddToPlaylistScreenState extends State<AddToPlaylistScreen> {
       appBar: AppBar(
         backgroundColor: Default_Theme.themeColor,
         foregroundColor: Default_Theme.primaryColor1,
+        centerTitle: true,
         title: Text(
           'Add to Playlist',
           style: const TextStyle(
             color: Default_Theme.primaryColor1,
-            fontSize: 25,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
           ).merge(Default_Theme.secondoryTextStyle),
         ),

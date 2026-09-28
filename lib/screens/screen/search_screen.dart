@@ -16,8 +16,8 @@ import 'package:fyrestream/screens/screen/search_views/search_page.dart';
 import 'package:fyrestream/theme_data/default.dart';
 
 class SearchScreen extends StatefulWidget {
-  String searchQuery = "";
-  SearchScreen({Key? key, this.searchQuery = ""}) : super(key: key);
+  final String searchQuery;
+  const SearchScreen({Key? key, this.searchQuery = ""}) : super(key: key);
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -224,7 +224,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                       context
                                           .read<FyrestreamPlayerCubit>()
                                           .fyrestreamPlayer
-                                          .currentPlaylist,
+                                          .queue
+                                          .value,
                                       state.mediaItems)) {
                                     context
                                         .read<FyrestreamPlayerCubit>()

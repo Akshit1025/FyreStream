@@ -2,9 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/model/youtube_vid_model.dart';
-import 'package:fyrestream/model/yt_music_model.dart';
 import 'package:fyrestream/repository/Youtube/youtube_api.dart';
-import 'package:fyrestream/screens/screen/library_views/playlist_screen.dart';
 import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 

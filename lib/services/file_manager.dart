@@ -102,7 +102,6 @@ class FyreStreamFileManager {
       // SnackbarService.showMessage("Invalid file format");
       return false;
     }
-    return false;
   }
 
   static Future<bool> importMediaItem(String filePath) async {

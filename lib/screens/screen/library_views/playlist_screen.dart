@@ -249,7 +249,8 @@ class _PlaylistState extends State<Playlist> {
                 context
                     .read<FyrestreamPlayerCubit>()
                     .fyrestreamPlayer
-                    .currentPlaylist,
+                    .queue
+                    .value,
                   _state.mediaItems)) {
                 context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.loadPlaylist(
                     MediaPlaylist(

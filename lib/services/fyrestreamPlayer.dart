@@ -13,17 +13,21 @@ import 'package:rxdart/subjects.dart';
 
 import '../model/MediaPlaylistModel.dart';
 
+List<int> generateRandomIndices(int length) {
+  List<int> indices = List<int>.generate(length, (i) => i);
+  indices.shuffle();
+  return indices;
+}
+
 class FyreStreamMusicPlayer extends BaseAudioHandler
     with SeekHandler, QueueHandler {
   late AudioPlayer audioPlayer;
-
-  List<MediaItemModel> currentPlaylist = [];
-  int currentQueueIdx = 0;
-  int currentPlaylistIdx = 0;
   BehaviorSubject<bool> fromPlaylist = BehaviorSubject<bool>.seeded(false);
   BehaviorSubject<bool> isOffline = BehaviorSubject<bool>.seeded(false);
   BehaviorSubject<bool> isLinkProcessing = BehaviorSubject<bool>.seeded(false);
   int currentPlayingIdx = 0;
+  int shuffleIdx = 0;
+  List<int> shuffleList = [];
   bool isPaused = false;
 
   CancelableOperation<AudioSource?> getLinkOperation =
@@ -36,6 +40,7 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
     );
     audioPlayer.setVolume(1);
     audioPlayer.playbackEventStream.listen(_broadcastPlayerEvent);
+    audioPlayer.setShuffleModeEnabled(false);
   }
 
   void _broadcastPlayerEvent(PlaybackEvent event) {
@@ -95,12 +100,25 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
     super.mediaItem.add(mediaItem);
   }
 
+  Future<void> shuffle(bool shuffle) async {
+    audioPlayer.setShuffleModeEnabled(shuffle);
+    if (shuffle) {
+      shuffleIdx = 0;
+      shuffleList = generateRandomIndices(queue.value.length);
+    }
+  }
+
   Future<void> loadPlaylist(MediaPlaylist mediaList,
-      {int idx = 0, bool doPlay = false}) async {
+      {int idx = 0, bool doPlay = false, bool shuffling = false}) async {
     fromPlaylist.add(true);
     queue.add(mediaList.mediaItems);
     queueTitle.add(mediaList.albumName);
-    await prepare4play(idx: idx, doPlay: doPlay);
+    shuffle(shuffling);
+    if (shuffling) {
+      await prepare4play(idx: shuffleList[shuffleIdx], doPlay: doPlay);
+    } else {
+      await prepare4play(idx: idx, doPlay: doPlay);
+    }
     // if (doPlay) play();
   }
 
@@ -240,10 +258,19 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
 
   @override
   Future<void> skipToNext() async {
-    if (currentPlayingIdx < (queue.value.length - 1)) {
-      currentPlayingIdx++;
-      prepare4play(idx: currentPlayingIdx);
-      // log("skippingNext-------", name: "fyrestreamPlayer");
+    if (!audioPlayer.shuffleModeEnabled) {
+      if (currentPlayingIdx < (queue.value.length - 1)) {
+        currentPlayingIdx++;
+        prepare4play(idx: currentPlayingIdx);
+      }
+    } else {
+      if (shuffleIdx < (queue.value.length - 1)) {
+        shuffleIdx++;
+        if (shuffleIdx >= shuffleList.length) {
+          shuffleIdx = 0;
+        }
+        prepare4play(idx: shuffleList[shuffleIdx]);
+      }
     }
   }
 
@@ -256,9 +283,16 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
 
   @override
   Future<void> skipToPrevious() async {
-    if (currentPlayingIdx > 0) {
-      currentPlayingIdx--;
-      prepare4play(idx: currentPlayingIdx);
+    if (!audioPlayer.shuffleModeEnabled) {
+      if (currentPlayingIdx > 0) {
+        currentPlayingIdx--;
+        prepare4play(idx: currentPlayingIdx);
+      }
+    } else {
+      if (shuffleIdx > 0) {
+        shuffleIdx--;
+        prepare4play(idx: shuffleList[shuffleIdx]);
+      }
     }
   }
 
@@ -321,6 +355,7 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
           await prepare4play(idx: currentPlayingIdx + 1, doPlay: true);
         }
       }
+      shuffle(audioPlayer.shuffleModeEnabled);
     }
     queueTitle.add("Queue");
   }

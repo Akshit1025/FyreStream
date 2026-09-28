@@ -1,3 +1,4 @@
+import 'package:fyrestream/screens/screen/home_views/timer_view.dart';
 import 'package:fyrestream/screens/widgets/more_bottom_sheet.dart';
 import 'package:fyrestream/services/fyrestreamPlayer.dart';
 import 'package:audio_service/audio_service.dart';
@@ -314,20 +315,29 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                     Padding(
                       padding: const EdgeInsets.only(top: 25),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          IconButton(
-                            padding: const EdgeInsets.all(5),
-                            constraints: const BoxConstraints(),
-                            style: const ButtonStyle(
-                              tapTargetSize: MaterialTapTargetSize
-                                  .shrinkWrap, // the '2023' part
-                            ),
-                            onPressed: () => musicPlayer.rewind(),
-                            icon: const Icon(
-                              MingCute.refresh_4_line,
-                              color: Default_Theme.primaryColor1,
-                              size: 40,
+                          Tooltip(
+                            message: "Timer",
+                            child: IconButton(
+                              padding: const EdgeInsets.all(5),
+                              constraints: const BoxConstraints(),
+                              style: const ButtonStyle(
+                                tapTargetSize: MaterialTapTargetSize
+                                    .shrinkWrap, // the '2023' part
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                        const TimerView()));
+                              },
+                              icon: const Icon(
+                                MingCute.alarm_1_line,
+                                color: Default_Theme.primaryColor1,
+                                size: 30,
+                              ),
                             ),
                           ),
                           IconButton(
@@ -341,7 +351,7 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                             icon: const Icon(
                               MingCute.skip_previous_fill,
                               color: Default_Theme.primaryColor1,
-                              size: 40,
+                              size: 30,
                             ),
                           ),
                           StreamBuilder(
@@ -401,10 +411,71 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                             icon: const Icon(
                               MingCute.skip_forward_fill,
                               color: Default_Theme.primaryColor1,
-                              size: 40,
+                              size: 30,
                             ),
                           ),
-                          IconButton(
+                          StreamBuilder<bool>(
+                            stream: context
+                                .watch<FyrestreamPlayerCubit>()
+                                .fyrestreamPlayer
+                                .audioPlayer
+                                .shuffleModeEnabledStream,
+                            builder: (context, snapshot) {
+                              return Tooltip(
+                                message: "Shuffle",
+                                child: IconButton(
+                                  padding: const EdgeInsets.all(5),
+                                  constraints: const BoxConstraints(),
+                                  style: const ButtonStyle(
+                                    tapTargetSize: MaterialTapTargetSize
+                                        .shrinkWrap, // the '2023' part
+                                  ),
+                                  icon: Icon(
+                                    MingCute.shuffle_2_fill,
+                                    color: (snapshot.data ?? false)
+                                        ? Default_Theme.accentColor1
+                                        : Default_Theme.primaryColor1,
+                                    size: 30,
+                                  ),
+                                  onPressed: () {
+                                    context
+                                        .read<FyrestreamPlayerCubit>()
+                                        .fyrestreamPlayer
+                                        .shuffle((snapshot.data ?? false)
+                                        ? false
+                                        : true
+                                    );
+                                  },
+                                ),
+                              );
+                            }
+                          )
+                        ],
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Tooltip(
+                          message: "Replay",
+                          child: IconButton(
+                            padding: const EdgeInsets.all(5),
+                            constraints: const BoxConstraints(),
+                            style: const ButtonStyle(
+                              tapTargetSize: MaterialTapTargetSize
+                                .shrinkWrap, // the '2023' part
+                            ),
+                            icon: const Icon(
+                              MingCute.refresh_anticlockwise_1_line,
+                              color: Default_Theme.primaryColor1,
+                              size: 30,
+                            ),
+                            onPressed: () => musicPlayer.rewind(),
+                          ),
+                        ),
+                        Tooltip(
+                          message: "Open Original Link",
+                          child: IconButton(
                             padding: const EdgeInsets.all(5),
                             constraints: const BoxConstraints(),
                             style: const ButtonStyle(
@@ -414,7 +485,7 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                             icon: const Icon(
                               MingCute.external_link_line,
                               color: Default_Theme.primaryColor1,
-                              size: 40,
+                              size: 30,
                             ),
                             onPressed: () {
                               launchUrlString(context
@@ -423,9 +494,9 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                                   .currentMedia
                                   .extras?['perma_url']);
                             },
-                          )
-                        ],
-                      ),
+                          ),
+                        )
+                      ],
                     ),
                   ],
                 ),

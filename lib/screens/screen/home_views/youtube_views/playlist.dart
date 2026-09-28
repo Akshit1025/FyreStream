@@ -99,7 +99,7 @@ class _YoutubePlaylistState extends State<YoutubePlaylist> {
                         : snapshot.hasError
                         ? const Center(
                       child: SignBoardWidget(
-                        message: "Error loading data",
+                        message: "Got Error while loading data",
                         icon: MingCute.loading_line,
                       ),
                     )

@@ -12,6 +12,9 @@ class FyreStreamDBService {
   static late Future<Isar> db;
   FyreStreamDBService() {
     db = openDB();
+    Future.delayed(const Duration(seconds: 30), () {
+      refreshRecentlyPlayed();
+    });
   }
 
   static Future<Isar> openDB() async {
@@ -27,6 +30,7 @@ class FyreStreamDBService {
           RecentlyPlayedDBSchema,
           ChartsCacheDBSchema,
           YtLinkCacheDBSchema,
+          NotificationDBSchema,
           DownloadDBSchema,
         ],
         directory: _path,
@@ -494,19 +498,29 @@ class FyreStreamDBService {
     }
   }
 
-  static Future<void> refreshRecentlyPlayed({int days = 7}) async {
+  static Future<void> refreshRecentlyPlayed() async {
     Isar isarDB = await db;
+    List<int> ids = List.empty(growable: true);
+
+    int days = int.parse((await getSettingStr(GlobalStrConsts.historyClearTime,
+        defaultValue: "7"))!);
 
     List<RecentlyPlayedDB> _recentlyPlayed =
     isarDB.recentlyPlayedDBs.where().findAllSync();
     for (var element in _recentlyPlayed) {
       if (DateTime.now().difference(element.lastPlayed).inDays > days) {
-        removeMediaItemFromPlaylist(element.mediaItem.value!,
-            MediaPlaylistDB(playlistName: "recently_played"));
-        isarDB.writeTxnSync(
-                () => isarDB.recentlyPlayedDBs.deleteSync(element.id!));
+        await element.mediaItem.load();
+        if (element.mediaItem.value != null) {
+          log("Removing ${element.mediaItem.value!.title}", name: "DB");
+          removeMediaItemFromPlaylist(element.mediaItem.value!,
+              MediaPlaylistDB(playlistName: "recently_played"));
+          ids.add(element.id!);
+        } else {
+          ids.add(element.id!);
+        }
       }
     }
+    isarDB.writeTxnSync(() => isarDB.recentlyPlayedDBs.deleteAllSync(ids));
   }
 
   static Future<MediaPlaylist> getRecentlyPlayed({int limit = 0}) async {
@@ -698,5 +712,53 @@ class FyreStreamDBService {
       }
     }
     return _mediaItems;
+  }
+
+  static Future<void> putNotification({
+    required String title,
+    required String body,
+    required String type,
+    String? url,
+    String? payload,
+    bool unique = false,
+  }) async {
+    Isar isarDB = await db;
+
+    if (unique) {
+      final _notification =
+      isarDB.notificationDBs.filter().typeEqualTo(type).findFirstSync();
+      if (_notification != null) {
+        isarDB.writeTxnSync(
+                () => isarDB.notificationDBs.deleteSync(_notification.id!));
+      }
+    }
+
+    isarDB.writeTxnSync(
+          () => isarDB.notificationDBs.putSync(
+        NotificationDB(
+          title: title,
+          body: body,
+          time: DateTime.now(),
+          type: type,
+          url: url,
+          payload: payload,
+        ),
+      ),
+    );
+  }
+
+  static Future<List<NotificationDB>> getNotifications() async {
+    Isar isarDB = await db;
+    return isarDB.notificationDBs.where().sortByTimeDesc().findAllSync();
+  }
+
+  static Future<void> clearNotifications() async {
+    Isar isarDB = await db;
+    isarDB.writeTxnSync(() => isarDB.notificationDBs.where().deleteAllSync());
+  }
+
+  static Future<Stream<void>> watchNotification() async {
+    Isar isarDB = await db;
+    return isarDB.notificationDBs.watchLazy();
   }
 }

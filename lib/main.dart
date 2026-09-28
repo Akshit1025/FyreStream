@@ -4,6 +4,7 @@ import 'dart:io' as io;
 import 'package:fyrestream/blocs/downloader/cubit/downloader_cubit.dart';
 import 'package:fyrestream/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
 import 'package:fyrestream/blocs/mini_player/mini_player_bloc.dart';
+import 'package:fyrestream/blocs/notification/notification_cubit.dart';
 import 'package:fyrestream/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:fyrestream/blocs/timer/timer_bloc.dart';
 import 'package:fyrestream/screens/widgets/snackbar.dart';
@@ -170,6 +171,7 @@ class _MyAppState extends State<MyApp> {
           create: (context) => SettingsCubit(),
           lazy: false,
         ),
+        BlocProvider(create: (context) => NotificationCubit(), lazy: false),
         BlocProvider(
           create: (context) => TimerBloc(
             ticker: const Ticker(), fyrestreamPlayer: fyrestreamPlayerCubit

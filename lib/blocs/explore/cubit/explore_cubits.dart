@@ -60,7 +60,7 @@ class RecentlyCubit extends Cubit<RecentlyCubitState> {
   }
 
   Future<void> watchRecentlyPlayed() async {
-    (await FyreStreamDBService.watchRecentlyPlayed()).listen((event) {
+    watcher = (await FyreStreamDBService.watchRecentlyPlayed()).listen((event) {
       getRecentlyPlayed();
       log("Recently Played Updated");
     });

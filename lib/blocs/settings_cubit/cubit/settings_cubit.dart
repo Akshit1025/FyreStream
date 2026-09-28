@@ -52,7 +52,17 @@ class SettingsCubit extends Cubit<SettingsState> {
     });
 
     FyreStreamDBService.getSettingStr(GlobalStrConsts.ytStrmQuality).then((value) {
-      emit(state.copyWith(ytStrmQuality: value ?? "Low"));
+      if (value == "High" || value == "Low") {
+        emit(state.copyWith(ytStrmQuality: value ?? "Low"));
+      } else {
+        FyreStreamDBService.putSettingStr(GlobalStrConsts.ytStrmQuality, "Low");
+        emit(state.copyWith(ytStrmQuality: "Low"));
+      }
+    });
+
+    FyreStreamDBService.getSettingStr(GlobalStrConsts.historyClearTime)
+        .then((value) {
+      emit(state.copyWith(historyClearTime: value ?? "30"));
     });
 
     FyreStreamDBService.getSettingStr(GlobalStrConsts.backupPath)
@@ -123,6 +133,11 @@ class SettingsCubit extends Cubit<SettingsState> {
   void setAutoBackup(bool value) {
     FyreStreamDBService.putSettingBool(GlobalStrConsts.autoBackup, value);
     emit(state.copyWith(autoBackup: value));
+  }
+
+  void setHistoryClearTime(String value) {
+    FyreStreamDBService.putSettingStr(GlobalStrConsts.historyClearTime, value);
+    emit(state.copyWith(historyClearTime: value));
   }
 
   Future<void> resetDownPath() async {

@@ -4,7 +4,6 @@ import 'package:fyrestream/theme_data/default.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:rxdart/rxdart.dart';
 import 'package:fyrestream/model/MediaPlaylistModel.dart';
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/services/db/GlobalDB.dart';

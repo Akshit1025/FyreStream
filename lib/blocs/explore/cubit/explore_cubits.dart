@@ -208,10 +208,10 @@ class YTMusicCubit extends Cubit<YTMusicCubitState> {
   }
 
   void fetchYTMusic() async {
-    final ytCharts = await YtMusicService().getMusicHome();
+    final ytCharts = await Isolate.run(() => YtMusicService().getMusicHome());
     if (ytCharts.isNotEmpty) {
       emit(state.copyWith(ytmData: ytCharts));
-      final ytChartsJson = jsonEncode(ytCharts);
+      final ytChartsJson = await compute(jsonEncode, ytCharts);
       FyreStreamDBService.putAPICache("YTMusic", ytChartsJson);
     }
   }

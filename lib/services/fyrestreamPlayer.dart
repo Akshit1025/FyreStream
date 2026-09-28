@@ -141,17 +141,17 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
   }
 
   Future<String?> refreshYtLink(String id) async {
-    String quality = "Low";
+    // String quality = "Low";
     await FyreStreamDBService.getSettingStr(GlobalStrConsts.ytStrmQuality)
         .then((value) {
       log('Play quality: $value', name: "fyrestreamPlayer");
-      if (value != null) {
-        if (value == "High") {
-          quality = "High";
-        } else {
-          quality = "Low";
-        }
-      }
+      // if (value != null) {
+      //   if (value == "High") {
+      //     quality = "High";
+      //   } else {
+      //     quality = "Low";
+      //   }
+      // }
     });
     final vidMap = await YouTubeServices().refreshLink(id, quality: "Low");
     if (vidMap != null) {
@@ -306,7 +306,6 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
         queue.add([mediaItem]);
         await prepare4play(idx: 0, doPlay: doPlay);
       }
-      queueTitle.add("Queue");
     } else {
       if (atLast) {
         queue.add(queue.value..add(mediaItem));
@@ -326,6 +325,7 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
         }
       }
     }
+    queueTitle.add("Queue");
   }
 
   @override

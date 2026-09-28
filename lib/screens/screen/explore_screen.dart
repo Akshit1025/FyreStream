@@ -7,8 +7,6 @@ import 'package:fyrestream/screens/screen/home_views/recents_view.dart';
 import 'package:fyrestream/screens/widgets/more_bottom_sheet.dart';
 import 'package:fyrestream/screens/widgets/sign_board_widget.dart';
 import 'package:fyrestream/screens/widgets/song_tile.dart';
-import 'package:fyrestream/services/fyrestreamUpdaterTools.dart';
-import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/utils/app_updater.dart';
 import 'package:flutter/material.dart';
@@ -36,24 +34,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!isUpdateChecked) {
-        getLatestVersion().then((value) {
-          if (value["results"]) {
-            if (int.parse(value["currBuild"]) < int.parse(value["newBuild"])) {
-              FyreStreamDBService.putNotification(
-                title: "Update Available",
-                body:
-                "New Version of FyreStream🔥 is now available!! Version: ${value["newVer"]} + ${value["newBuild"]}",
-                type: "app_update",
-                unique: true,
-              ).then((_) {
-                setState(() {
-                  isUpdateChecked = true;
-                });
-              });
-            }
-          }
-        });
-
         if (await context
             .read<FyreStreamDBCubit>()
             .getSettingBool(GlobalStrConsts.autoUpdateNotify) ??

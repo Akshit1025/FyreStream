@@ -188,10 +188,7 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
 
   @override
   Future<void> playMediaItem(MediaItem mediaItem, {bool doPlay = true}) async {
-    // log(mediaItem.extras?["url"], name: "fyrestreamPlayer");
     updateMediaItem(mediaItem);
-    // removed code
-    // removed code
 
     isLinkProcessing.add(true);
     audioPlayer.pause();
@@ -213,7 +210,7 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
         try {
           await audioPlayer.setAudioSource(value).then((value) {
             isLinkProcessing.add(false);
-            if (!isPaused) play();
+            if (!isPaused || doPlay) play();
           });
         } catch (e) {
           isLinkProcessing.add(false);

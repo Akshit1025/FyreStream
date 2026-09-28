@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:fyrestream/services/fyrestreamUpdaterTools.dart';
 import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:bloc/bloc.dart';
@@ -11,6 +12,19 @@ part 'notification_state.dart';
 class NotificationCubit extends Cubit<NotificationState> {
   StreamSubscription? _subscription;
   NotificationCubit() : super(NotificationInitial()) {
+    getLatestVersion().then((value) {
+      if (value["results"]) {
+        if (int.parse(value["currBuild"]) < int.parse(value["newBuild"])) {
+          FyreStreamDBService.putNotification(
+            title: "Update Available",
+            body:
+            "New Version of FyreStream🔥 is now available!! Version: ${value["newVer"]} + ${value["newBuild"]}",
+            type: "app_update",
+            unique: true,
+          );
+        }
+      }
+    });
     getNotification();
   }
   void getNotification() async {

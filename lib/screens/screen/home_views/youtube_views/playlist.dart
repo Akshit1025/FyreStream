@@ -3,23 +3,27 @@ import 'dart:core';
 import 'dart:developer';
 import 'package:fyrestream/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
 import 'package:fyrestream/blocs/mediaPlayer/fyrestream_player_cubit.dart';
-import 'package:fyrestream/screens/widgets/import_playlist.dart';
-import 'package:fyrestream/screens/widgets/more_bottom_sheet.dart';
+import 'package:fyrestream/model/MediaPlaylistModel.dart';
+import 'package:fyrestream/model/yt_music_model.dart';
+import 'package:fyrestream/screens/widgets/playPause_widget.dart';
 import 'package:fyrestream/screens/widgets/snackbar.dart';
-import 'package:fyrestream/utils/external_list_importer.dart';
-import 'package:async/async.dart';
+import 'package:fyrestream/screens/widgets/song_tile.dart';
+import 'package:fyrestream/services/db/GlobalDB.dart';
+import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/model/youtube_vid_model.dart';
 import 'package:fyrestream/repository/Youtube/youtube_api.dart';
 import 'package:fyrestream/repository/Youtube/yt_music_api.dart';
-import 'package:fyrestream/screens/screen/home_views/youtube_views/yt_song_tile.dart';
 import 'package:fyrestream/screens/widgets/sign_board_widget.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:fyrestream/utils/load_Image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:share_plus/share_plus.dart';
+
 class YoutubePlaylist extends StatefulWidget {
   final String imgPath;
   final String title;
@@ -34,19 +38,25 @@ class YoutubePlaylist extends StatefulWidget {
     required this.type,
     required this.id,
   }) : super(key: key);
+
   @override
   State<YoutubePlaylist> createState() => _YoutubePlaylistState();
 }
+
 class _YoutubePlaylistState extends State<YoutubePlaylist> {
   late Future<Map<dynamic, dynamic>> data;
   late List<Map<dynamic, dynamic>> items;
-  Map<int, MediaItemModel> songList = {};
-  CancelableOperation<MediaItemModel?> getMediaOps =
-  CancelableOperation.fromFuture(Future.value());
+  late List<MediaItemModel> mediaitems;
+
   Future<void> _loadData() async {
     final res = await data;
     items = res["songs"] as List<Map<dynamic, dynamic>>;
+    mediaitems = fromYtSongMapList2MediaItemList(items);
+    // for (var i = 0; i < items.length; i++) {
+    //   mediaitems[i].artUri = Uri.parse((items[i]["image"] as String));
+    // }
   }
+
   Future<MediaItemModel?> fetchSong(String id, String imgUrl) async {
     log("Fetching: $id", name: "YoutubePlaylist");
     final song = await YouTubeServices()
@@ -56,15 +66,16 @@ class _YoutubePlaylistState extends State<YoutubePlaylist> {
     }
     return null;
   }
+
   @override
   void initState() {
     data = YtMusicService()
         .getPlaylistDetails(widget.id.replaceAll("youtube", ""));
     super.initState();
   }
+
   @override
   void dispose() {
-    getMediaOps.cancel();
     super.dispose();
   }
 
@@ -88,8 +99,8 @@ class _YoutubePlaylistState extends State<YoutubePlaylist> {
                 builder: (context, snapshot) {
                   return AnimatedSwitcher(
                     duration: const Duration(milliseconds: 700),
-                    child: snapshot.connectionState ==
-                        ConnectionState.waiting
+                    child:
+                    snapshot.connectionState == ConnectionState.waiting
                         ? const Center(
                       child: SizedBox(
                           height: 40,
@@ -99,13 +110,34 @@ class _YoutubePlaylistState extends State<YoutubePlaylist> {
                         : snapshot.hasError
                         ? const Center(
                       child: SignBoardWidget(
-                        message: "Got Error while loading data",
+                        message:
+                        "Got Error while loading data",
                         icon: MingCute.loading_line,
                       ),
                     )
                         : CustomScrollView(
                       slivers: [
                         SliverAppBar(
+                          actions: [
+                            IconButton(
+                              onPressed: () {
+                                Share.share(
+                                    "${widget.title} - ${widget.subtitle} \nhttps://youtube.com/playlist?list=${widget.id.replaceAll("youtube", "")}",
+                                    subject:
+                                    "Youtube Playlist");
+                              },
+                              padding:
+                              const EdgeInsets.all(2),
+                              constraints:
+                              const BoxConstraints(),
+                              icon: const Icon(
+                                MingCute.share_forward_line,
+                                color: Default_Theme
+                                    .primaryColor1,
+                                size: 25,
+                              ),
+                            ),
+                          ],
                           backgroundColor:
                           Default_Theme.themeColor,
                           surfaceTintColor:
@@ -122,24 +154,25 @@ class _YoutubePlaylistState extends State<YoutubePlaylist> {
                                 Row(
                                   mainAxisAlignment:
                                   MainAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisSize:
+                                  MainAxisSize.min,
                                   children: [
                                     Padding(
                                       padding:
-                                      const EdgeInsets.only(
+                                      const EdgeInsets
+                                          .only(
                                           left: 16.0,
                                           right: 8.0),
                                       child: ClipRRect(
                                         borderRadius:
-                                        BorderRadius.circular(
-                                            15),
+                                        BorderRadius
+                                            .circular(15),
                                         child: Stack(
                                           children: [
                                             SizedBox(
                                               height: 180,
                                               width: 180,
-                                              child:
-                                              loadImageCached(
+                                              child: loadImageCached(
                                                   widget
                                                       .imgPath),
                                             ),
@@ -150,7 +183,8 @@ class _YoutubePlaylistState extends State<YoutubePlaylist> {
                                     Expanded(
                                       child: Padding(
                                         padding:
-                                        const EdgeInsets.only(
+                                        const EdgeInsets
+                                            .only(
                                             left: 8.0,
                                             right: 8.0),
                                         child: Column(
@@ -161,7 +195,8 @@ class _YoutubePlaylistState extends State<YoutubePlaylist> {
                                           CrossAxisAlignment
                                               .start,
                                           mainAxisSize:
-                                          MainAxisSize.min,
+                                          MainAxisSize
+                                              .min,
                                           children: [
                                             Text(
                                               widget.title,
@@ -186,7 +221,8 @@ class _YoutubePlaylistState extends State<YoutubePlaylist> {
                                               overflow:
                                               TextOverflow
                                                   .ellipsis,
-                                              style: TextStyle(
+                                              style:
+                                              TextStyle(
                                                 fontSize: 13,
                                                 fontWeight:
                                                 FontWeight
@@ -204,7 +240,8 @@ class _YoutubePlaylistState extends State<YoutubePlaylist> {
                                               overflow:
                                               TextOverflow
                                                   .ellipsis,
-                                              style: TextStyle(
+                                              style:
+                                              TextStyle(
                                                 fontSize: 13,
                                                 fontWeight:
                                                 FontWeight
@@ -220,8 +257,10 @@ class _YoutubePlaylistState extends State<YoutubePlaylist> {
                                               padding:
                                               const EdgeInsets
                                                   .only(
-                                                  top: 8.0,
-                                                  right: 10),
+                                                  top:
+                                                  8.0,
+                                                  right:
+                                                  10),
                                               child: Row(
                                                 mainAxisSize:
                                                 MainAxisSize
@@ -230,93 +269,120 @@ class _YoutubePlaylistState extends State<YoutubePlaylist> {
                                                 MainAxisAlignment
                                                     .start,
                                                 children: [
-                                                  ElevatedButton(
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      padding: const EdgeInsets
-                                                          .symmetric(
-                                                          horizontal:
-                                                          18,
-                                                          vertical:
-                                                          5),
-                                                      backgroundColor:
-                                                      Default_Theme
-                                                          .accentColor2,
-                                                    ),
-                                                    onPressed:
-                                                        () {
-                                                      showDialog(
-                                                        context:
-                                                        context,
-                                                        barrierDismissible:
-                                                        false,
-                                                        builder: (context) =>
-                                                            ImporterDialogWidget(
-                                                                strm: ExternalMediaImporter.ytPlaylistImporter(
-                                                                  "https://youtube.com/playlist?list=${widget.id.replaceAll("youtube", "")}",
-                                                                )),
-                                                      );
-                                                    },
-                                                    child: Row(
-                                                      mainAxisSize:
-                                                      MainAxisSize
-                                                          .min,
-                                                      mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .center,
-                                                      crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .center,
-                                                      children: [
-                                                        const Padding(
-                                                          padding:
-                                                          EdgeInsets.only(right: 6),
-                                                          child:
-                                                          Icon(
-                                                            size:
-                                                            20,
-                                                            MingCute
-                                                                .bookmark_fill,
-                                                            color:
-                                                            Default_Theme.primaryColor2,
-                                                          ),
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                        .all(
+                                                        8.0),
+                                                    child:
+                                                    Tooltip(
+                                                      message:
+                                                      "Shuffle & Play All",
+                                                      child:
+                                                      IconButton(
+                                                        onPressed:
+                                                            () {
+                                                          SnackbarService.showMessage("Shuffling & Playing All",
+                                                              duration: const Duration(seconds: 2));
+                                                          mediaitems.shuffle();
+                                                          context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.loadPlaylist(MediaPlaylist(mediaItems: mediaitems, albumName: "${widget.title} - Youtube"),
+                                                              doPlay: true);
+                                                        },
+                                                        padding: const EdgeInsets
+                                                            .all(
+                                                            5),
+                                                        constraints:
+                                                        const BoxConstraints(),
+                                                        icon:
+                                                        const Icon(
+                                                          MingCute.shuffle_fill,
+                                                          color:
+                                                          Default_Theme.primaryColor1,
+                                                          size:
+                                                          25,
                                                         ),
-                                                        Text(
-                                                          "Save",
-                                                          style:
-                                                          const TextStyle(
-                                                            fontSize:
-                                                            15,
-                                                            fontWeight:
-                                                            FontWeight.bold,
-                                                            color:
-                                                            Default_Theme.primaryColor2,
-                                                          ).merge(Default_Theme.secondoryTextStyle),
-                                                        ),
-                                                      ],
+                                                      ),
                                                     ),
                                                   ),
-                                                  IconButton(
-                                                    onPressed:
-                                                        () {
-                                                      Share.share(
-                                                          "${widget.title} - ${widget.subtitle} \nhttps://youtube.com/playlist?list=${widget.id.replaceAll("youtube", "")}",
-                                                          subject:
-                                                          "Youtube Playlist");
-                                                    },
-                                                    padding:
-                                                    const EdgeInsets
+                                                  Tooltip(
+                                                    message:
+                                                    "Play All",
+                                                    child: StreamBuilder<
+                                                        String>(
+                                                        stream: context
+                                                            .watch<
+                                                            FyrestreamPlayerCubit>()
+                                                            .fyrestreamPlayer
+                                                            .queueTitle,
+                                                        builder:
+                                                            (context, snapshot) {
+                                                          if (snapshot.hasData &&
+                                                              snapshot.data == "${widget.title} - Youtube") {
+                                                            return StreamBuilder<PlayerState>(
+                                                                stream: context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.audioPlayer.playerStateStream,
+                                                                builder: (context, snapshot2) {
+                                                                  if (snapshot2.hasData && (snapshot2.data?.playing ?? false)) {
+                                                                    return PlayPauseButton(
+                                                                      onPause: () => context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.pause(),
+                                                                      onPlay: () => context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.play(),
+                                                                      isPlaying: true,
+                                                                      size: 45,
+                                                                    );
+                                                                  } else {
+                                                                    return PlayPauseButton(
+                                                                      onPause: () => context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.pause(),
+                                                                      onPlay: () => context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.play(),
+                                                                      isPlaying: false,
+                                                                      size: 45,
+                                                                    );
+                                                                  }
+                                                                });
+                                                          } else {
+                                                            return PlayPauseButton(
+                                                              onPause: () => context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.pause(),
+                                                              onPlay: () {
+                                                                context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.loadPlaylist(MediaPlaylist(mediaItems: mediaitems, albumName: "${widget.title} - Youtube"));
+                                                                context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.play();
+                                                              },
+                                                              size: 45,
+                                                            );
+                                                          }
+                                                        }),
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets
                                                         .all(
-                                                        2),
-                                                    constraints:
-                                                    const BoxConstraints(),
-                                                    icon:
-                                                    const Icon(
-                                                      MingCute
-                                                          .share_forward_line,
-                                                      color: Default_Theme
-                                                          .primaryColor1,
-                                                      size: 30,
+                                                        8.0),
+                                                    child:
+                                                    Tooltip(
+                                                      message:
+                                                      "Add to Library",
+                                                      child:
+                                                      IconButton(
+                                                        onPressed:
+                                                            () async {
+                                                          SnackbarService.showMessage("Adding to Library",
+                                                              duration: const Duration(seconds: 2));
+                                                          await Future.forEach(mediaitems,
+                                                                  (element) {
+                                                                FyreStreamDBService.addMediaItem(MediaItem2MediaItemDB(element), MediaPlaylistDB(playlistName: "${widget.title} - Youtube"));
+                                                              });
+                                                          SnackbarService.showMessage("Added to Library",
+                                                              duration: const Duration(seconds: 2));
+                                                        },
+                                                        padding: const EdgeInsets
+                                                            .all(
+                                                            2),
+                                                        constraints:
+                                                        const BoxConstraints(),
+                                                        icon:
+                                                        const Icon(
+                                                          FontAwesome.square_plus,
+                                                          color:
+                                                          Default_Theme.primaryColor1,
+                                                          size:
+                                                          25,
+                                                        ),
+                                                      ),
                                                     ),
                                                   )
                                                 ],
@@ -332,117 +398,46 @@ class _YoutubePlaylistState extends State<YoutubePlaylist> {
                             ),
                           ),
                         ),
-                        SliverList.list(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 16, top: 20, bottom: 5),
-                              child: Text("Songs",
-                                  style: Default_Theme
-                                      .secondoryTextStyle
-                                      .merge(const TextStyle(
-                                      color: Default_Theme
-                                          .accentColor2,
-                                      fontSize: 20,
-                                      fontWeight:
-                                      FontWeight.bold,
-                                      letterSpacing: 1.5,
-                                      height: 1.5))),
-                            ),
-                          ],
-                        ),
                         SliverList(
-                          delegate: SliverChildBuilderDelegate(
+                          delegate:
+                          SliverChildBuilderDelegate(
                                 (context, index) {
-                              return YtSongTile(
-                                rectangularImage: true,
-                                title: items[index]["title"]!,
-                                subtitle: items[index]
-                                ["subtitle"]!,
-                                imgUrl: (items[index]["image"]!
-                                as String)
-                                    .replaceAll(
-                                    "w400-h400", "w100-h100"),
-                                id: items[index]["id"]!,
-                                permalink: items[index]
-                                ["perma_url"]!,
-                                onOpts: () {
-                                  SnackbarService.showMessage(
-                                      "Getting song information...",
-                                      loading: true);
-                                  fetchSong(items[index]["id"]!,
-                                      items[index]["image"]!)
-                                      .then((value) {
-                                    SnackbarService.showMessage(
-                                      "Song information ready!",
-                                    );
-                                    if (value != null) {
-                                      showMoreBottomSheet(
-                                          context, value);
-                                    }
-                                  }).onError((error, stackTrace) {
-                                    log("Error: $error",
-                                        name: "YoutubePlaylist");
-                                    SnackbarService.showMessage(
-                                        "Error getting song information.");
-                                  });
-                                },
-                                onTap: () async {
-                                  SnackbarService.showMessage(
-                                      "Loading song...",
-                                      loading: true);
-                                  await getMediaOps.cancel();
-
-                                  if (songList[index] == null) {
-                                    getMediaOps =
-                                        CancelableOperation
-                                            .fromFuture(
-                                          fetchSong(
-                                              items[index]["id"]!,
-                                              items[index]["image"]!),
-                                          onCancel: () {
-                                            log("skipping....",
-                                                name:
-                                                "YoutubePlaylist");
-                                            return;
-                                          },
-                                        );
-                                    getMediaOps.value.then(
-                                          (value) {
-                                        SnackbarService
-                                            .showMessage(
-                                          "Song is ready!",
-                                        );
-                                        if (value != null) {
-                                          log("Added: ${value.title}",
-                                              name:
-                                              "YoutubePlaylist");
-                                          songList[index] = value;
-                                          context
-                                              .read<
-                                              FyrestreamPlayerCubit>()
-                                              .fyrestreamPlayer
-                                              .addQueueItem(value,
-                                              doPlay: true);
-                                        }
-                                      },
-                                    ).onError(
-                                            (error, stackTrace) {
-                                          log("Skipped:",
-                                              error: error.toString(),
-                                              name:
-                                              "YoutubePlaylist");
-                                        });
-                                  } else {
-                                    SnackbarService.showMessage(
-                                      "Playing song.",
-                                    );
+                              return SongCardWidget(
+                                song: mediaitems[index],
+                                isWide: true,
+                                onTap: () {
+                                  if (!listEquals(
+                                      context
+                                          .read<
+                                          FyrestreamPlayerCubit>()
+                                          .fyrestreamPlayer
+                                          .currentPlaylist,
+                                      mediaitems)) {
                                     context
                                         .read<
                                         FyrestreamPlayerCubit>()
                                         .fyrestreamPlayer
-                                        .addQueueItem(
-                                        songList[index]!,
+                                        .loadPlaylist(
+                                        MediaPlaylist(
+                                            mediaItems:
+                                            mediaitems,
+                                            albumName:
+                                            "${widget.title} - Youtube"),
+                                        idx: index,
+                                        doPlay: true);
+                                    // context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.play();
+                                  } else if (context
+                                      .read<
+                                      FyrestreamPlayerCubit>()
+                                      .fyrestreamPlayer
+                                      .currentMedia !=
+                                      mediaitems[index]) {
+                                    context
+                                        .read<
+                                        FyrestreamPlayerCubit>()
+                                        .fyrestreamPlayer
+                                        .prepare4play(
+                                        idx: index,
                                         doPlay: true);
                                   }
                                 },

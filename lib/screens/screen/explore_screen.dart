@@ -128,29 +128,25 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       ),
                     ),
                   ),
-                  BlocBuilder<ConnectivityCubit, ConnectivityState>(
+                  BlocBuilder<YTMusicCubit, YTMusicCubitState>(
                     builder: (context, state) {
                       return AnimatedSwitcher(
                         duration: const Duration(milliseconds: 400),
-                        child: switch (state) {
-                          ConnectivityState.connected =>
-                              BlocBuilder<YTMusicCubit, YTMusicCubitState>(
-                                builder: (context, state) {
-                                  return AnimatedSwitcher(
-                                    duration: const Duration(milliseconds: 400),
-                                    child: state is YTMusicCubitInitial
-                                        ? const SizedBox()
-                                        : ytSection(state.ytmData),
-                                  );
-                                },
-                              ),
-                          ConnectivityState.disconnected =>
-                          const SignBoardWidget(
-                            message: "No Internet Connection",
-                            icon: MingCute.wifi_off_line,
-                          ),
-                          _ => const SizedBox()
-                        },
+                        child: state is YTMusicCubitInitial
+                            ? BlocBuilder<ConnectivityCubit, ConnectivityState>(
+                          builder: (context, state2) {
+                            if ((state2 ==
+                                ConnectivityState.disconnected)) {
+                              return const SignBoardWidget(
+                                message: "No Internet Connection!",
+                                icon: MingCute.wifi_off_line,
+                              );
+                            } else {
+                              return const SizedBox();
+                            }
+                          },
+                        )
+                            : ytSection(state.ytmData),
                       );
                     },
                   ),

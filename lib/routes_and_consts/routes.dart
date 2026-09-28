@@ -1,3 +1,4 @@
+import 'package:fyrestream/screens/widgets/global_footer.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
@@ -9,7 +10,6 @@ import 'package:fyrestream/screens/screen/library_views/import_media_view.dart';
 import 'package:fyrestream/screens/screen/library_views/playlist_screen.dart';
 import 'package:fyrestream/screens/screen/offline_screen.dart';
 import 'package:fyrestream/screens/screen/search_screen.dart';
-import 'package:fyrestream/screens/widgets/global_navbar.dart';
 import 'package:fyrestream/screens/screen/chart/chart_view.dart';
 
 class GlobalRoutes {
@@ -63,7 +63,7 @@ class GlobalRoutes {
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
-            ScaffholdWithNavbar(navigationShell: navigationShell),
+            GlobalFooter(navigationShell: navigationShell),
         branches: [
           // StatefulShellBranch(
           //   routes: [

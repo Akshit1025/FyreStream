@@ -109,7 +109,7 @@ class _AddToPlaylistScreenState extends State<AddToPlaylistScreen> {
                                       const TextStyle(
                                         color: Default_Theme.primaryColor2,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 20,
+                                        fontSize: 17,
                                       ),
                                     ),
                                   ),
@@ -124,7 +124,7 @@ class _AddToPlaylistScreenState extends State<AddToPlaylistScreen> {
                                       color: Default_Theme.primaryColor2
                                           .withOpacity(0.5),
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 18,
+                                      fontSize: 15,
                                     ),
                                   ),
                                 ),
@@ -230,6 +230,9 @@ class _AddToPlaylistScreenState extends State<AddToPlaylistScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(50),
+        ),
         icon: const Icon(
           MingCute.add_fill,
           size: 25,
@@ -238,7 +241,13 @@ class _AddToPlaylistScreenState extends State<AddToPlaylistScreen> {
         onPressed: () {
           createPlaylistBottomSheet(context);
         },
-        label: const Text("Create New Playlist"),
+        label: Text(
+          "Create New Playlist",
+          style: Default_Theme.secondoryTextStyle.merge(const TextStyle(
+              color: Default_Theme.primaryColor1,
+              fontWeight: FontWeight.bold,
+              fontSize: 15)),
+        ),
       ),
     );
   }

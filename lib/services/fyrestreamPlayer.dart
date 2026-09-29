@@ -25,6 +25,7 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
   BehaviorSubject<bool> fromPlaylist = BehaviorSubject<bool>.seeded(false);
   BehaviorSubject<bool> isOffline = BehaviorSubject<bool>.seeded(false);
   BehaviorSubject<bool> isLinkProcessing = BehaviorSubject<bool>.seeded(false);
+  BehaviorSubject<LoopMode> loopMode = BehaviorSubject<LoopMode>.seeded(LoopMode.off);
   int currentPlayingIdx = 0;
   int shuffleIdx = 0;
   List<int> shuffleList = [];
@@ -41,6 +42,7 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
     audioPlayer.setVolume(1);
     audioPlayer.playbackEventStream.listen(_broadcastPlayerEvent);
     audioPlayer.setShuffleModeEnabled(false);
+    audioPlayer.setLoopMode(LoopMode.off);
   }
 
   void _broadcastPlayerEvent(PlaybackEvent event) {
@@ -98,6 +100,15 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
   @override
   Future<void> updateMediaItem(MediaItem mediaItem) async {
     super.mediaItem.add(mediaItem);
+  }
+
+  void setLoopMode(LoopMode loopMode) {
+    if (loopMode == LoopMode.one) {
+      audioPlayer.setLoopMode(LoopMode.one);
+    } else {
+      audioPlayer.setLoopMode(LoopMode.off);
+    }
+    this.loopMode.add(loopMode);
   }
 
   Future<void> shuffle(bool shuffle) async {
@@ -262,6 +273,9 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
       if (currentPlayingIdx < (queue.value.length - 1)) {
         currentPlayingIdx++;
         prepare4play(idx: currentPlayingIdx);
+      } else if (loopMode.value == LoopMode.all) {
+        currentPlayingIdx = 0;
+        prepare4play(idx: currentPlayingIdx);
       }
     } else {
       if (shuffleIdx < (queue.value.length - 1)) {
@@ -269,6 +283,9 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
         if (shuffleIdx >= shuffleList.length) {
           shuffleIdx = 0;
         }
+        prepare4play(idx: shuffleList[shuffleIdx]);
+      } else if (loopMode.value == LoopMode.all) {
+        shuffleIdx = 0;
         prepare4play(idx: shuffleList[shuffleIdx]);
       }
     }

@@ -26,9 +26,8 @@ class AudioPlayerView extends StatefulWidget {
 class _AudioPlayerViewState extends State<AudioPlayerView> {
   @override
   Widget build(BuildContext context) {
-    FyreStreamMusicPlayer musicPlayer = context
-        .read<FyrestreamPlayerCubit>()
-        .fyrestreamPlayer;
+    FyreStreamMusicPlayer musicPlayer =
+        context.read<FyrestreamPlayerCubit>().fyrestreamPlayer;
     return Scaffold(
       backgroundColor: Default_Theme.themeColor,
       extendBodyBehindAppBar: true,
@@ -39,21 +38,16 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {
-              showMoreBottomSheet(
-                context,
-                context
-                  .read<FyrestreamPlayerCubit>()
-                  .fyrestreamPlayer
-                  .currentMedia
-              );
-            },
-            icon: const Icon(
-              MingCute.more_2_fill,
-              size: 25,
-              color: Default_Theme.primaryColor1
-            )
-          )
+              onPressed: () {
+                showMoreBottomSheet(
+                    context,
+                    context
+                        .read<FyrestreamPlayerCubit>()
+                        .fyrestreamPlayer
+                        .currentMedia);
+              },
+              icon: const Icon(MingCute.more_2_fill,
+                  size: 25, color: Default_Theme.primaryColor1))
         ],
         title: Column(
           children: [
@@ -61,35 +55,35 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
               'Enjoying From',
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: Default_Theme.primaryColor1,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
-              ).merge(Default_Theme.secondoryTextStyle),
+                  color: Default_Theme.primaryColor1,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold)
+                  .merge(Default_Theme.secondoryTextStyle),
             ),
             StreamBuilder<String>(
-              stream: context
-                  .watch<FyrestreamPlayerCubit>()
-                  .fyrestreamPlayer
-                  .queueTitle,
-              builder: (context, snapshot) {
-                return InkWell(
-                  onTap: () {
-                    // context.pop();
-                    // context.pushNamed(GlobalStrConsts.playlistView, pathParameters: {
-                    //   "playlistName": snapshot.data ?? "Liked"
-                    // });
-                  },
-                  child: Text(
-                    snapshot.data ?? "Unknown",
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Default_Theme.primaryColor2,
-                      fontSize: 12,
-                    ).merge(Default_Theme.secondoryTextStyle),
-                  ),
-                );
-              },
-            ),
+                stream: context
+                    .watch<FyrestreamPlayerCubit>()
+                    .fyrestreamPlayer
+                    .queueTitle,
+                builder: (context, snapshot) {
+                  return InkWell(
+                    onTap: () {
+                      // context.pop();
+                      // context.pushNamed(GlobalStrConsts.playlistView,
+                      //     pathParameters: {
+                      //       "playlistName": snapshot.data ?? "Liked"
+                      //     });
+                    },
+                    child: Text(
+                      snapshot.data ?? "Unknown",
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Default_Theme.primaryColor2,
+                        fontSize: 12,
+                      ).merge(Default_Theme.secondoryTextStyle),
+                    ),
+                  );
+                }),
           ],
         ),
       ),
@@ -99,8 +93,7 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
         child: Stack(
           children: [
             Positioned(
-              top:
-                  (MediaQuery.of(context).size.height * 0.5) -
+              top: (MediaQuery.of(context).size.height * 0.5) -
                   (MediaQuery.of(context).size.width * 0.70),
               left: MediaQuery.of(context).size.width * 0.08 * 0.5,
               child: Opacity(
@@ -109,20 +102,17 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                   width: MediaQuery.of(context).size.width * 0.92,
                   height: MediaQuery.of(context).size.height * 0.50,
                   child: StreamBuilder<MediaItem?>(
-                    stream: musicPlayer.mediaItem,
-                    builder: (context, snapshot) {
-                      return AnimatedSwitcher(
-                        duration: const Duration(seconds: 3),
-                        child: _getAmbientShadowWidget(context, snapshot),
-                      );
-                    },
-                  ),
+                      stream: musicPlayer.mediaItem,
+                      builder: (context, snapshot) {
+                        return AnimatedSwitcher(
+                            duration: const Duration(seconds: 3),
+                            child: _getAmbientShadowWidget(context, snapshot));
+                      }),
                 ),
               ),
             ),
             Positioned(
-              top:
-                  (MediaQuery.of(context).size.height * 0.5) -
+              top: (MediaQuery.of(context).size.height * 0.5) -
                   (MediaQuery.of(context).size.width * 0.60),
               left: MediaQuery.of(context).size.width * 0.08 * 0.5,
               child: SizedBox(
@@ -131,23 +121,20 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(25),
                   child: StreamBuilder<MediaItem?>(
-                    stream: context
-                        .watch<FyrestreamPlayerCubit>()
-                        .fyrestreamPlayer
-                        .mediaItem,
-                    builder: (context, snapshot) {
-                      return loadImageCached(
-                        (snapshot.data?.artUri ?? "").toString(),
-                        fit: BoxFit.fitWidth
-                      );
-                    },
-                  ),
+                      stream: context
+                          .watch<FyrestreamPlayerCubit>()
+                          .fyrestreamPlayer
+                          .mediaItem,
+                      builder: (context, snapshot) {
+                        return loadImageCached(
+                            (snapshot.data?.artUri ?? "").toString(),
+                            fit: BoxFit.fitWidth);
+                      }),
                 ),
               ),
             ),
             Positioned(
-              top:
-                  (MediaQuery.of(context).size.height * 0.5) +
+              top: (MediaQuery.of(context).size.height * 0.5) +
                   (MediaQuery.of(context).size.width * 0.40),
               left: MediaQuery.of(context).size.width * 0.08 * 0.5,
               child: SizedBox(
@@ -161,93 +148,87 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                         Expanded(
                           flex: 7,
                           child: StreamBuilder<MediaItem?>(
-                            stream: context
-                                .watch<FyrestreamPlayerCubit>()
-                                .fyrestreamPlayer
-                                .mediaItem,
-                            builder: (context, snapshot) {
-                              return Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    clipBehavior: Clip.antiAlias,
-                                    child: SelectableText(
-                                      snapshot.data?.title ?? "Unknown",
-                                      textAlign: TextAlign.start,
-                                      // overflow: TextOverflow.ellipsis,
-                                      style: Default_Theme.secondoryTextStyle
-                                          .merge(const TextStyle(
-                                        fontSize: 24,
-                                        overflow: TextOverflow.ellipsis,
-                                        fontWeight: FontWeight.bold,
-                                        color: Default_Theme.primaryColor1
-                                      )),
+                              stream: context
+                                  .watch<FyrestreamPlayerCubit>()
+                                  .fyrestreamPlayer
+                                  .mediaItem,
+                              builder: (context, snapshot) {
+                                return Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      clipBehavior: Clip.antiAlias,
+                                      child: SelectableText(
+                                        snapshot.data?.title ?? "Unknown",
+                                        textAlign: TextAlign.start,
+                                        // overflow: TextOverflow.ellipsis,
+                                        style: Default_Theme.secondoryTextStyle
+                                            .merge(const TextStyle(
+                                            fontSize: 24,
+                                            overflow: TextOverflow.ellipsis,
+                                            fontWeight: FontWeight.bold,
+                                            color: Default_Theme
+                                                .primaryColor1)),
+                                      ),
                                     ),
-                                  ),
-                                  SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: SelectableText(
-                                      snapshot.data?.artist ?? "Unknown",
-                                      textAlign: TextAlign.start,
-                                      // overflow: TextOverflow.ellipsis,
-                                      style: Default_Theme.secondoryTextStyle
-                                          .merge(TextStyle(
-                                        fontSize: 15,
-                                        overflow: TextOverflow.ellipsis,
-                                        color: Default_Theme.primaryColor1.withOpacity(0.7)
-                                      )),
-                                    ),
-                                  )
-                                ],
-                              );
-                            },
-                          ),
+                                    SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: SelectableText(
+                                        snapshot.data?.artist ?? "Unknown",
+                                        textAlign: TextAlign.start,
+                                        // overflow: TextOverflow.ellipsis,
+                                        style: Default_Theme.secondoryTextStyle
+                                            .merge(TextStyle(
+                                            fontSize: 15,
+                                            overflow: TextOverflow.ellipsis,
+                                            color: Default_Theme
+                                                .primaryColor1
+                                                .withOpacity(0.7))),
+                                      ),
+                                    )
+                                  ],
+                                );
+                              }),
                         ),
                         const Spacer(),
                         FutureBuilder(
-                          future: context.read<FyreStreamDBCubit>().isLiked(
-                            context
-                                .read<FyrestreamPlayerCubit>()
-                                .fyrestreamPlayer
-                                .currentMedia,
-                          ),
+                          future: context.read<FyreStreamDBCubit>().isLiked(context
+                              .read<FyrestreamPlayerCubit>()
+                              .fyrestreamPlayer
+                              .currentMedia),
                           builder: (context, snapshot) {
                             if (snapshot.hasData && snapshot.data != null) {
                               return Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 8.0,
-                                  bottom: 3,
-                                ),
+                                padding:
+                                const EdgeInsets.only(left: 8.0, bottom: 3),
                                 child: LikeBtnWidget(
                                   isPlaying: true,
                                   isLiked: snapshot.data ?? false,
                                   iconSize: 35,
-                                  onLiked: () =>
-                                      context.read<FyreStreamDBCubit>().setLike(
-                                        context
-                                            .read<FyrestreamPlayerCubit>()
-                                            .fyrestreamPlayer
-                                            .currentMedia,
-                                        isLiked: true,
-                                      ),
-                                  onDisliked: () =>
-                                      context.read<FyreStreamDBCubit>().setLike(
-                                        context
-                                            .read<FyrestreamPlayerCubit>()
-                                            .fyrestreamPlayer
-                                            .currentMedia,
-                                        isLiked: false,
-                                      ),
+                                  onLiked: () => context
+                                      .read<FyreStreamDBCubit>()
+                                      .setLike(
+                                      context
+                                          .read<FyrestreamPlayerCubit>()
+                                          .fyrestreamPlayer
+                                          .currentMedia,
+                                      isLiked: true),
+                                  onDisliked: () => context
+                                      .read<FyreStreamDBCubit>()
+                                      .setLike(
+                                      context
+                                          .read<FyrestreamPlayerCubit>()
+                                          .fyrestreamPlayer
+                                          .currentMedia,
+                                      isLiked: false),
                                 ),
                               );
                             } else {
                               return Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 8.0,
-                                  bottom: 3,
-                                ),
+                                padding:
+                                const EdgeInsets.only(left: 8.0, bottom: 3),
                                 child: LikeBtnWidget(
                                   isLiked: false,
                                   isPlaying: true,
@@ -258,67 +239,328 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                               );
                             }
                           },
-                        ),
+                        )
                       ],
                     ),
                     Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: StreamBuilder<ProgressBarStreams>(
-                        stream: context
-                            .watch<FyrestreamPlayerCubit>()
-                            .progressStreams,
-                        builder: (context, snapshot) {
-                          return ProgressBar(
-                            progress:
-                                snapshot.data?.currentPos ?? Duration.zero,
-                            total:
-                                snapshot.data?.currentPlaybackState.duration ??
-                                Duration.zero,
-                            buffered:
-                                snapshot
-                                    .data
-                                    ?.currentPlaybackState
-                                    .bufferedPosition ??
-                                Duration.zero,
-                            onSeek: (value) {
-                              musicPlayer.seek(value);
-                            },
-                            timeLabelPadding: 5,
-                            timeLabelTextStyle: Default_Theme.secondoryTextStyle
-                                .merge(
-                                  TextStyle(
-                                    fontSize: 15,
-                                    color: Default_Theme.primaryColor1
-                                        .withOpacity(0.7),
-                                  ),
+                          stream: context
+                              .watch<FyrestreamPlayerCubit>()
+                              .progressStreams,
+                          builder: (context, snapshot) {
+                            return ProgressBar(
+                              progress:
+                              snapshot.data?.currentPos ?? Duration.zero,
+                              total: snapshot
+                                  .data?.currentPlaybackState.duration ??
+                                  Duration.zero,
+                              buffered: snapshot.data?.currentPlaybackState
+                                  .bufferedPosition ??
+                                  Duration.zero,
+                              onSeek: (value) {
+                                musicPlayer.seek(value);
+                              },
+                              timeLabelPadding: 5,
+                              timeLabelTextStyle: Default_Theme
+                                  .secondoryTextStyle
+                                  .merge(TextStyle(
+                                  fontSize: 15,
+                                  color: Default_Theme.primaryColor1
+                                      .withOpacity(0.7))),
+                              timeLabelLocation: TimeLabelLocation.above,
+                              baseBarColor:
+                              Default_Theme.primaryColor2.withOpacity(0.1),
+                              progressBarColor:
+                              snapshot.data?.currentPlayerState.playing ??
+                                  false
+                                  ? Default_Theme.accentColor1
+                                  : Default_Theme.accentColor2,
+                              thumbRadius: 5,
+                              thumbColor:
+                              snapshot.data?.currentPlayerState.playing ??
+                                  false
+                                  ? Default_Theme.accentColor1
+                                  : Default_Theme.accentColor2,
+                              bufferedBarColor: snapshot
+                                  .data?.currentPlayerState.playing ??
+                                  false
+                                  ? Default_Theme.accentColor1.withOpacity(0.2)
+                                  : Default_Theme.accentColor2.withOpacity(0.2),
+                              barHeight: 4,
+                            );
+                          }),
+                    ),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 350),
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 25),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Tooltip(
+                              message: "Timer",
+                              child: IconButton(
+                                padding: const EdgeInsets.all(5),
+                                constraints: const BoxConstraints(),
+                                style: const ButtonStyle(
+                                  tapTargetSize: MaterialTapTargetSize
+                                      .shrinkWrap, // the '2023' part
                                 ),
-                            timeLabelLocation: TimeLabelLocation.above,
-                            baseBarColor: Default_Theme.primaryColor2
-                                .withOpacity(0.1),
-                            progressBarColor:
-                                snapshot.data?.currentPlayerState.playing ??
-                                    false
-                                ? Default_Theme.accentColor1
-                                : Default_Theme.accentColor2,
-                            thumbRadius: 5,
-                            thumbColor:
-                            snapshot.data?.currentPlayerState.playing ??
-                                false
-                                ? Default_Theme.accentColor1
-                                : Default_Theme.accentColor2,
-                            bufferedBarColor: snapshot.data?.currentPlayerState.playing ?? false ? Default_Theme.accentColor1.withOpacity(0.2) : Default_Theme.accentColor2.withOpacity(0.2),
-                            barHeight: 4,
-                          );
-                        },
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                          const TimerView()));
+                                },
+                                icon: const Icon(
+                                  MingCute.alarm_1_line,
+                                  color: Default_Theme.primaryColor1,
+                                  size: 30,
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              padding: const EdgeInsets.all(5),
+                              constraints: const BoxConstraints(),
+                              style: const ButtonStyle(
+                                tapTargetSize: MaterialTapTargetSize
+                                    .shrinkWrap, // the '2023' part
+                              ),
+                              onPressed: () => musicPlayer.skipToPrevious(),
+                              icon: const Icon(
+                                MingCute.skip_previous_fill,
+                                color: Default_Theme.primaryColor1,
+                                size: 30,
+                              ),
+                            ),
+                            StreamBuilder(
+                                stream: context
+                                    .watch<FyrestreamPlayerCubit>()
+                                    .fyrestreamPlayer
+                                    .isLinkProcessing,
+                                builder: (context, snapshot2) {
+                                  return snapshot2.hasData &&
+                                      snapshot2.data == true
+                                      ? Container(
+                                      decoration: const BoxDecoration(
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: Default_Theme
+                                                  .accentColor2,
+                                              spreadRadius: 1,
+                                              blurRadius: 20)
+                                        ],
+                                        shape: BoxShape.circle,
+                                        color: Default_Theme.accentColor2,
+                                      ),
+                                      width: 75,
+                                      height: 75,
+                                      child: const Center(
+                                        child: SizedBox(
+                                          width: 35,
+                                          height: 35,
+                                          child: CircularProgressIndicator(
+                                            color:
+                                            Default_Theme.primaryColor1,
+                                          ),
+                                        ),
+                                      ))
+                                      : StreamBuilder<PlayerState>(
+                                      stream: context
+                                          .watch<FyrestreamPlayerCubit>()
+                                          .fyrestreamPlayer
+                                          .audioPlayer
+                                          .playerStateStream,
+                                      builder: (context, snapshot) {
+                                        return PlayPauseButton(
+                                          size: 75,
+                                          onPause: () =>
+                                              musicPlayer.pause(),
+                                          onPlay: () => musicPlayer.play(),
+                                          isPlaying:
+                                          snapshot.data?.playing ??
+                                              false,
+                                        );
+                                      });
+                                }),
+                            IconButton(
+                              padding: const EdgeInsets.all(5),
+                              constraints: const BoxConstraints(),
+                              style: const ButtonStyle(
+                                tapTargetSize: MaterialTapTargetSize
+                                    .shrinkWrap, // the '2023' part
+                              ),
+                              onPressed: () => musicPlayer.skipToNext(),
+                              icon: const Icon(
+                                MingCute.skip_forward_fill,
+                                color: Default_Theme.primaryColor1,
+                                size: 30,
+                              ),
+                            ),
+                            StreamBuilder<bool>(
+                                stream: context
+                                    .watch<FyrestreamPlayerCubit>()
+                                    .fyrestreamPlayer
+                                    .audioPlayer
+                                    .shuffleModeEnabledStream,
+                                builder: (context, snapshot) {
+                                  return Tooltip(
+                                    message: "Shuffle",
+                                    child: IconButton(
+                                      padding: const EdgeInsets.all(5),
+                                      constraints: const BoxConstraints(),
+                                      style: const ButtonStyle(
+                                        tapTargetSize: MaterialTapTargetSize
+                                            .shrinkWrap, // the '2023' part
+                                      ),
+                                      icon: Icon(
+                                        MingCute.shuffle_2_fill,
+                                        color: (snapshot.data ?? false)
+                                            ? Default_Theme.accentColor1
+                                            : Default_Theme.primaryColor1,
+                                        size: 30,
+                                      ),
+                                      onPressed: () {
+                                        context
+                                            .read<FyrestreamPlayerCubit>()
+                                            .fyrestreamPlayer
+                                            .shuffle((snapshot.data ?? false)
+                                            ? false
+                                            : true);
+                                      },
+                                    ),
+                                  );
+                                })
+                          ],
+                        ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 25),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 350),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Tooltip(
-                            message: "Timer",
+                            message: "Loop",
+                            child: PopupMenuButton(
+                              color: const Color.fromARGB(255, 17, 17, 17),
+                              surfaceTintColor:
+                              const Color.fromARGB(255, 19, 19, 19),
+                              padding: const EdgeInsets.all(5),
+                              itemBuilder: (BuildContext context) => [
+                                PopupMenuItem(
+                                  value: 0,
+                                  child: Text(
+                                    "Off",
+                                    style:
+                                    Default_Theme.secondoryTextStyle.merge(
+                                      const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Default_Theme.primaryColor1,
+                                          fontSize: 14),
+                                    ),
+                                  ),
+                                ),
+                                PopupMenuItem(
+                                  value: 1,
+                                  child: Text(
+                                    "Loop One",
+                                    style:
+                                    Default_Theme.secondoryTextStyle.merge(
+                                      const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Default_Theme.primaryColor1,
+                                          fontSize: 14),
+                                    ),
+                                  ),
+                                ),
+                                PopupMenuItem(
+                                  value: 2,
+                                  child: Text(
+                                    "Loop All",
+                                    style:
+                                    Default_Theme.secondoryTextStyle.merge(
+                                      const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Default_Theme.primaryColor1,
+                                          fontSize: 14),
+                                    ),
+                                  ),
+                                )
+                              ],
+                              child: Padding(
+                                padding: const EdgeInsets.all(5.0),
+                                child: StreamBuilder<LoopMode>(
+                                    stream: context
+                                        .watch<FyrestreamPlayerCubit>()
+                                        .fyrestreamPlayer
+                                        .loopMode,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        switch (snapshot.data) {
+                                          case LoopMode.off:
+                                            return const Icon(
+                                              MingCute.repeat_line,
+                                              color:
+                                              Default_Theme.primaryColor1,
+                                              size: 30,
+                                            );
+                                          case LoopMode.one:
+                                            return const Icon(
+                                              MingCute.repeat_one_line,
+                                              color: Default_Theme.accentColor1,
+                                              size: 30,
+                                            );
+                                          case LoopMode.all:
+                                            return const Icon(
+                                              MingCute.repeat_fill,
+                                              color: Default_Theme.accentColor1,
+                                              size: 30,
+                                            );
+                                          case null:
+                                            return const Icon(
+                                              MingCute.repeat_line,
+                                              color:
+                                              Default_Theme.primaryColor1,
+                                              size: 30,
+                                            );
+                                        }
+                                      }
+                                      return const Icon(
+                                        MingCute.repeat_line,
+                                        color: Default_Theme.primaryColor1,
+                                        size: 30,
+                                      );
+                                    }),
+                              ),
+                              onSelected: (value) {
+                                switch (value) {
+                                  case 0:
+                                    context
+                                        .read<FyrestreamPlayerCubit>()
+                                        .fyrestreamPlayer
+                                        .setLoopMode(LoopMode.off);
+                                    break;
+                                  case 1:
+                                    context
+                                        .read<FyrestreamPlayerCubit>()
+                                        .fyrestreamPlayer
+                                        .setLoopMode(LoopMode.one);
+                                    break;
+                                  case 2:
+                                    context
+                                        .read<FyrestreamPlayerCubit>()
+                                        .fyrestreamPlayer
+                                        .setLoopMode(LoopMode.all);
+                                    break;
+                                }
+                              },
+                            ),
+                          ),
+                          Tooltip(
+                            message: "Open Original Link",
                             child: IconButton(
                               padding: const EdgeInsets.all(5),
                               constraints: const BoxConstraints(),
@@ -326,182 +568,27 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                                 tapTargetSize: MaterialTapTargetSize
                                     .shrinkWrap, // the '2023' part
                               ),
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                        const TimerView()));
-                              },
                               icon: const Icon(
-                                MingCute.alarm_1_line,
+                                MingCute.external_link_line,
                                 color: Default_Theme.primaryColor1,
                                 size: 30,
                               ),
-                            ),
-                          ),
-                          IconButton(
-                            padding: const EdgeInsets.all(5),
-                            constraints: const BoxConstraints(),
-                            style: const ButtonStyle(
-                              tapTargetSize: MaterialTapTargetSize
-                                  .shrinkWrap, // the '2023' part
-                            ),
-                            onPressed: () => musicPlayer.skipToPrevious(),
-                            icon: const Icon(
-                              MingCute.skip_previous_fill,
-                              color: Default_Theme.primaryColor1,
-                              size: 30,
-                            ),
-                          ),
-                          StreamBuilder(
-                            stream: context
-                                .watch<FyrestreamPlayerCubit>()
-                                .fyrestreamPlayer
-                                .isLinkProcessing,
-                            builder: (context, snapshot2) {
-                              return snapshot2.hasData && snapshot2.data == true ?  Container(
-                                decoration: const BoxDecoration(
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Default_Theme.accentColor2,
-                                      spreadRadius: 1,
-                                      blurRadius: 20
-                                    )
-                                  ],
-                                  shape: BoxShape.circle,
-                                  color: Default_Theme.accentColor2,
-                                ),
-                                width: 75,
-                                height: 75,
-                                child: const Center(
-                                  child: SizedBox(
-                                    width: 35,
-                                    height: 35,
-                                    child: CircularProgressIndicator(
-                                      color: Default_Theme.primaryColor1,
-                                    ),
-                                  ),
-                                )
-                              ) : StreamBuilder<PlayerState>(
-                                stream: context
-                                    .watch<FyrestreamPlayerCubit>()
+                              onPressed: () {
+                                launchUrlString(context
+                                    .read<FyrestreamPlayerCubit>()
                                     .fyrestreamPlayer
-                                    .audioPlayer
-                                    .playerStateStream,
-                                builder: (context, snapshot) {
-                                  return PlayPauseButton(
-                                    size: 75,
-                                    onPause: () => musicPlayer.pause(),
-                                    onPlay: () => musicPlayer.play(),
-                                    isPlaying: snapshot.data?.playing ?? false,
-                                  );
-                                }
-                              );
-                            }
-                          ),
-                          IconButton(
-                            padding: const EdgeInsets.all(5),
-                            constraints: const BoxConstraints(),
-                            style: const ButtonStyle(
-                              tapTargetSize: MaterialTapTargetSize
-                                  .shrinkWrap, // the '2023' part
+                                    .currentMedia
+                                    .extras?['perma_url']);
+                              },
                             ),
-                            onPressed: () => musicPlayer.skipToNext(),
-                            icon: const Icon(
-                              MingCute.skip_forward_fill,
-                              color: Default_Theme.primaryColor1,
-                              size: 30,
-                            ),
-                          ),
-                          StreamBuilder<bool>(
-                            stream: context
-                                .watch<FyrestreamPlayerCubit>()
-                                .fyrestreamPlayer
-                                .audioPlayer
-                                .shuffleModeEnabledStream,
-                            builder: (context, snapshot) {
-                              return Tooltip(
-                                message: "Shuffle",
-                                child: IconButton(
-                                  padding: const EdgeInsets.all(5),
-                                  constraints: const BoxConstraints(),
-                                  style: const ButtonStyle(
-                                    tapTargetSize: MaterialTapTargetSize
-                                        .shrinkWrap, // the '2023' part
-                                  ),
-                                  icon: Icon(
-                                    MingCute.shuffle_2_fill,
-                                    color: (snapshot.data ?? false)
-                                        ? Default_Theme.accentColor1
-                                        : Default_Theme.primaryColor1,
-                                    size: 30,
-                                  ),
-                                  onPressed: () {
-                                    context
-                                        .read<FyrestreamPlayerCubit>()
-                                        .fyrestreamPlayer
-                                        .shuffle((snapshot.data ?? false)
-                                        ? false
-                                        : true
-                                    );
-                                  },
-                                ),
-                              );
-                            }
                           )
                         ],
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Tooltip(
-                          message: "Replay",
-                          child: IconButton(
-                            padding: const EdgeInsets.all(5),
-                            constraints: const BoxConstraints(),
-                            style: const ButtonStyle(
-                              tapTargetSize: MaterialTapTargetSize
-                                .shrinkWrap, // the '2023' part
-                            ),
-                            icon: const Icon(
-                              MingCute.refresh_anticlockwise_1_line,
-                              color: Default_Theme.primaryColor1,
-                              size: 30,
-                            ),
-                            onPressed: () => musicPlayer.rewind(),
-                          ),
-                        ),
-                        Tooltip(
-                          message: "Open Original Link",
-                          child: IconButton(
-                            padding: const EdgeInsets.all(5),
-                            constraints: const BoxConstraints(),
-                            style: const ButtonStyle(
-                              tapTargetSize: MaterialTapTargetSize
-                                  .shrinkWrap, // the '2023' part
-                            ),
-                            icon: const Icon(
-                              MingCute.external_link_line,
-                              color: Default_Theme.primaryColor1,
-                              size: 30,
-                            ),
-                            onPressed: () {
-                              launchUrlString(context
-                                  .read<FyrestreamPlayerCubit>()
-                                  .fyrestreamPlayer
-                                  .currentMedia
-                                  .extras?['perma_url']);
-                            },
-                          ),
-                        )
-                      ],
-                    ),
                   ],
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),
@@ -510,63 +597,47 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
 }
 
 Widget _getAmbientShadowWidget(
-  BuildContext context,
-  AsyncSnapshot<MediaItem?> snapshot,
-) {
+    BuildContext context, AsyncSnapshot<MediaItem?> snapshot) {
   if (snapshot.hasData) {
     return FutureBuilder(
-      future: getPalleteFromImage(
-        context
-            .read<FyrestreamPlayerCubit>()
-            .fyrestreamPlayer
-            .currentMedia
-            .artUri
-            .toString(),
-      ),
+      future: getPalleteFromImage(context
+          .read<FyrestreamPlayerCubit>()
+          .fyrestreamPlayer
+          .currentMedia
+          .artUri
+          .toString()),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           return Container(
-            decoration: BoxDecoration(
-              color: Colors.transparent,
-              boxShadow: [
-                BoxShadow(
-                  color:
-                      snapshot.data?.dominantColor?.color ??
+            decoration: BoxDecoration(color: Colors.transparent, boxShadow: [
+              BoxShadow(
+                  color: snapshot.data?.dominantColor?.color ??
                       const Color.fromARGB(255, 68, 252, 255),
                   blurRadius: 120,
-                  spreadRadius: 30,
-                ),
-              ],
-            ),
+                  spreadRadius: 30)
+            ]),
           );
         } else {
           return Container(
-            decoration: const BoxDecoration(
-              color: Colors.transparent,
-              boxShadow: [
-                BoxShadow(
+            decoration:
+            const BoxDecoration(color: Colors.transparent, boxShadow: [
+              BoxShadow(
                   color: Color.fromARGB(39, 68, 252, 255),
                   blurRadius: 120,
-                  spreadRadius: 30,
-                ),
-              ],
-            ),
+                  spreadRadius: 30)
+            ]),
           );
         }
       },
     );
   } else {
     return Container(
-      decoration: const BoxDecoration(
-        color: Colors.transparent,
-        boxShadow: [
-          BoxShadow(
+      decoration: const BoxDecoration(color: Colors.transparent, boxShadow: [
+        BoxShadow(
             color: Color.fromARGB(255, 68, 252, 255),
             blurRadius: 120,
-            spreadRadius: 30,
-          ),
-        ],
-      ),
+            spreadRadius: 30)
+      ]),
     );
   }
 }

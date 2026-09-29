@@ -36,7 +36,7 @@ class FyrestreamPlayerCubit extends Cubit<FyreStreamPlayerState> {
     );
 
     fyrestreamPlayer.audioPlayer.playerStateStream.listen((event) {
-      if (event.processingState == ProcessingState.completed) {
+      if (event.processingState == ProcessingState.completed && fyrestreamPlayer.loopMode.value != LoopMode.one) {
         //Temp solution(Debouncing) to prevent from subsequent gapless 'completed' event
         EasyThrottle.throttle(
           'skipNext',

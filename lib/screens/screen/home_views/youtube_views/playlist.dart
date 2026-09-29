@@ -5,6 +5,7 @@ import 'package:fyrestream/blocs/internet_connectivity/cubit/connectivity_cubit.
 import 'package:fyrestream/blocs/mediaPlayer/fyrestream_player_cubit.dart';
 import 'package:fyrestream/model/MediaPlaylistModel.dart';
 import 'package:fyrestream/model/yt_music_model.dart';
+import 'package:fyrestream/screens/widgets/more_bottom_sheet.dart';
 import 'package:fyrestream/screens/widgets/playPause_widget.dart';
 import 'package:fyrestream/screens/widgets/snackbar.dart';
 import 'package:fyrestream/screens/widgets/song_tile.dart';
@@ -410,6 +411,9 @@ class _YoutubePlaylistState extends State<YoutubePlaylist> {
                               return SongCardWidget(
                                 song: mediaitems[index],
                                 isWide: true,
+                                onOptionsTap: () {
+                                  showMoreBottomSheet(context, mediaitems[index]);
+                                },
                                 onTap: () {
                                   if (!listEquals(
                                       context

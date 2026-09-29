@@ -407,6 +407,7 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
       shuffle(audioPlayer.shuffleModeEnabled);
     }
     queueTitle.add("Queue");
+    updateUpNext();
   }
 
   @override

@@ -3,10 +3,10 @@ part of 'library_items_cubit.dart';
 
 class PlaylistItemProperties extends Equatable {
   final String playlistName;
-  String? coverImgUrl;
-  String? subTitle;
+  final String? coverImgUrl;
+  final String? subTitle;
 
-  PlaylistItemProperties({
+  const PlaylistItemProperties({
     required this.playlistName,
     required this.coverImgUrl,
     required this.subTitle,
@@ -17,9 +17,9 @@ class PlaylistItemProperties extends Equatable {
 }
 
 class LibraryItemsState extends Equatable {
-  List<PlaylistItemProperties> playlists;
+  final List<PlaylistItemProperties> playlists;
 
-  LibraryItemsState({required this.playlists});
+  const LibraryItemsState({required this.playlists});
 
   LibraryItemsState copyWith({List<PlaylistItemProperties>? playlists}) {
     return LibraryItemsState(playlists: playlists ?? this.playlists);

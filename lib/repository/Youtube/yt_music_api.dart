@@ -249,10 +249,10 @@ class YtMusicService {
     context!['context']['client']['gl'] = 'IN';
   }
 
-  Future<Map<String, List>> getMusicHome() async {
+  Future<Map<String, List>> getMusicHome({String countryCode = 'IN'}) async {
     final Uri link = Uri.https('www.youtube.com', '/music', {
       'hl': 'en',
-      'gl': 'IN',
+      'gl': countryCode,
     });
     try {
       final Response response = await get(link);

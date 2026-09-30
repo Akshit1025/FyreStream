@@ -1,13 +1,13 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:async';
 import 'dart:developer';
-import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/screens/widgets/snackbar.dart';
 import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 part 'library_items_state.dart';
 
 class LibraryItemsCubit extends Cubit<LibraryItemsState> {
@@ -80,8 +80,7 @@ class LibraryItemsCubit extends Cubit<LibraryItemsState> {
   Future<void> addToPlaylist(
       MediaItemModel mediaItem, MediaPlaylistDB mediaPlaylistDB) async {
     if (mediaPlaylistDB.playlistName != "Null") {
-      final _tempID = await fyrestreamDBCubit.addMediaItemToPlaylist(
-          mediaItem, mediaPlaylistDB);
+      await fyrestreamDBCubit.addMediaItemToPlaylist(mediaItem, mediaPlaylistDB);
       getAndEmitPlaylists();
       // log("Added to playlist - ${mediaPlaylistDB.playlistName} - $_tempID",
       //     name: "libItemCubit");

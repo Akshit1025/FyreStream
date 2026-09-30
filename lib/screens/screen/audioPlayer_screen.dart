@@ -3,6 +3,7 @@ import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/screens/screen/home_views/timer_view.dart';
 import 'package:fyrestream/screens/widgets/more_bottom_sheet.dart';
 import 'package:fyrestream/screens/widgets/song_tile.dart';
+import 'package:fyrestream/screens/widgets/volume_slider.dart';
 import 'package:fyrestream/services/fyrestreamPlayer.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
@@ -231,16 +232,18 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                   // height: MediaQuery.of(context).size.width * 0.92,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(25),
-                    child: StreamBuilder<MediaItem?>(
-                        stream: context
-                            .watch<FyrestreamPlayerCubit>()
-                            .fyrestreamPlayer
-                            .mediaItem,
-                        builder: (context, snapshot) {
-                          return loadImageCached(
-                              (snapshot.data?.artUri ?? "").toString(),
-                              fit: BoxFit.fitWidth);
-                        }),
+                    child: VolumeDragController(
+                      child: StreamBuilder<MediaItem?>(
+                          stream: context
+                              .watch<FyrestreamPlayerCubit>()
+                              .fyrestreamPlayer
+                              .mediaItem,
+                          builder: (context, snapshot) {
+                            return loadImageCached(
+                                (snapshot.data?.artUri ?? "").toString(),
+                                fit: BoxFit.fitWidth);
+                          }),
+                    ),
                   ),
                 ),
               ),

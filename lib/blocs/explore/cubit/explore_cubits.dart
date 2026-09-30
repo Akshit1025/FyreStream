@@ -6,7 +6,6 @@ import 'dart:isolate';
 import 'package:fyrestream/repository/Youtube/yt_music_api.dart';
 import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/utils/country_info.dart';
-import 'package:bloc/bloc.dart';
 import 'package:fyrestream/model/MediaPlaylistModel.dart';
 import 'package:fyrestream/model/chart_model.dart';
 import 'package:fyrestream/plugins/chart_defines.dart';
@@ -19,7 +18,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
-
 part 'explore_states.dart';
 
 class TrendingCubit extends Cubit<TrendingCubitState> {
@@ -208,13 +206,14 @@ class YTMusicCubit extends Cubit<YTMusicCubitState> {
     return jsonDecode(source);
   }
 
-  void fetchYTMusic() async {
+  Future<void> fetchYTMusic() async {
     String countryCode = await getCountry();
     final ytCharts = await Isolate.run(() => YtMusicService().getMusicHome(countryCode: countryCode));
     if (ytCharts.isNotEmpty) {
-      emit(state.copyWith(ytmData: ytCharts));
+      emit(state.copyWith(ytmData: Map<String, List<dynamic>>.from(ytCharts)));
       final ytChartsJson = await compute(jsonEncode, ytCharts);
       FyreStreamDBService.putAPICache("YTMusic", ytChartsJson);
+      log("YTMusic Fetched", name: "YTMusic");
     }
   }
 }

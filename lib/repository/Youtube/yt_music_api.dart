@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer' as dev;
+import 'package:fyrestream/utils/country_info.dart';
 import 'package:http/http.dart';
 import 'package:logging/logging.dart';
 import 'package:fyrestream/utils/extentions.dart';
@@ -246,7 +247,14 @@ class YtMusicService {
 
   initLanguage() async {
     context!['context']['client']['hl'] = 'en';
-    context!['context']['client']['gl'] = 'IN';
+    try {
+      getCountry().then((value) {
+        context!['context']['client']['gl'] = value;
+      });
+    } catch (e) {
+      dev.log('Error in initLanguage: $e', name: "YTM");
+      context!['context']['client']['gl'] = 'IN';
+    }
   }
 
   Future<Map<String, List>> getMusicHome({String countryCode = 'IN'}) async {
@@ -915,7 +923,7 @@ class YtMusicService {
       //   final ctx = element['musicCarouselShelfRenderer'] ??
       //       element['musicImmersiveCarouselShelfRenderer'];
       //   ctx['contents'].forEach((item) {
-      //     // pprint(item);
+      //     // print(item);
       //   });
       // });
 
@@ -937,7 +945,7 @@ class YtMusicService {
     body['browseId'] = "FEmusic_home";
 
     Map params = {'ctoken': cToken, 'continuation': cToken, 'itct': itct};
-    // pprint(cToken);
+    // print(cToken);
     final response = await sendRequest(endpoint, body, headers, params: params);
     // print(response);
   }
@@ -1253,7 +1261,7 @@ class YtMusicService {
             '';
         item['longBylineText']['runs'].forEach((e) {
           Map? browseEndpoint = e?['navigationEndpoint']?['browseEndpoint'];
-          // pprint(browseEndpoint);
+          // print(browseEndpoint);
           String? pageType =
               browseEndpoint?['browseEndpointContextSupportedConfigs']?['browseEndpointContextMusicConfig']?['pageType'];
           if (pageType == "MUSIC_PAGE_TYPE_ARTIST") {

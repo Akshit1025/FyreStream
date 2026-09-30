@@ -2,6 +2,7 @@
 import 'package:fyrestream/screens/screen/home_views/setting_views/about.dart';
 import 'package:fyrestream/screens/screen/home_views/setting_views/appui_setting.dart';
 import 'package:fyrestream/screens/screen/home_views/setting_views/backup_setting.dart';
+import 'package:fyrestream/screens/screen/home_views/setting_views/country_setting.dart';
 import 'package:fyrestream/screens/screen/home_views/setting_views/download_setting.dart';
 import 'package:fyrestream/screens/screen/home_views/setting_views/stream_setting.dart';
 import 'package:fyrestream/screens/screen/home_views/setting_views/updates_setting.dart';
@@ -92,6 +93,19 @@ class SettingsView extends StatelessWidget {
                   ),
                 );
               }),
+          settingListTile(
+              title: "Language & Country",
+              subtitle: "Select your language & country.",
+              icon: MingCute.globe_fill,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CountrySettings(),
+                  ),
+                );
+              }
+          ),
           settingListTile(
               title: "About",
               subtitle: "About the app, version, developer, etc.",

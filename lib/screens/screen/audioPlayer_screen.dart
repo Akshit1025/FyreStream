@@ -102,7 +102,7 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                 filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 28, 17, 24).withOpacity(0.70),
+                    color: const Color.fromARGB(255, 28, 17, 24).withOpacity(0.60),
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(25),
                       topRight: Radius.circular(25),
@@ -239,9 +239,13 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                               .fyrestreamPlayer
                               .mediaItem,
                           builder: (context, snapshot) {
-                            return loadImageCached(
-                                (snapshot.data?.artUri ?? "").toString(),
-                                fit: BoxFit.fitWidth);
+                            return SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.92,
+                              height: MediaQuery.of(context).size.width * 0.92,
+                              child: loadImageCached(
+                                  (snapshot.data?.artUri ?? "").toString(),
+                                  fit: BoxFit.fitWidth),
+                            );
                           }),
                     ),
                   ),

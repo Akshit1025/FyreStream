@@ -37,7 +37,6 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
 
   FyreStreamMusicPlayer() {
     audioPlayer = AudioPlayer(
-      androidOffloadSchedulingEnabled: true,
       handleInterruptions: true,
     );
     audioPlayer.setVolume(1);

@@ -262,136 +262,126 @@ class _YoutubePlaylistState extends State<YoutubePlaylist> {
                                                   8.0,
                                                   right:
                                                   10),
-                                              child: Row(
-                                                mainAxisSize:
-                                                MainAxisSize
-                                                    .min,
-                                                mainAxisAlignment:
-                                                MainAxisAlignment
-                                                    .start,
-                                                children: [
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                        .all(
-                                                        8.0),
-                                                    child:
-                                                    Tooltip(
-                                                      message:
-                                                      "Shuffle & Play All",
+                                              child: SizedBox(
+                                                height: 45,
+                                                width: 180,
+                                                child: Row(
+                                                  mainAxisSize:
+                                                  MainAxisSize
+                                                      .min,
+                                                  mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .start,
+                                                  crossAxisAlignment:
+                                                  CrossAxisAlignment
+                                                      .center,
+                                                  children: [
+                                                    Padding(
+                                                      padding: const EdgeInsets
+                                                          .all(
+                                                          8.0),
                                                       child:
-                                                      IconButton(
-                                                        onPressed:
-                                                            () {
-                                                          SnackbarService.showMessage("Shuffling & Playing All",
-                                                              duration: const Duration(seconds: 2));
-                                                          context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.loadPlaylist(
-                                                            MediaPlaylist(
-                                                              mediaItems: mediaitems,
-                                                              albumName: "${widget.title} - Youtube",
-                                                            ),
-                                                            doPlay: true,
-                                                            shuffling: true,
-                                                          );
-                                                        },
-                                                        padding: const EdgeInsets
-                                                            .all(
-                                                            5),
-                                                        constraints:
-                                                        const BoxConstraints(),
-                                                        icon:
-                                                        const Icon(
-                                                          MingCute.shuffle_fill,
-                                                          color:
-                                                          Default_Theme.primaryColor1,
-                                                          size:
-                                                          25,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Tooltip(
-                                                    message:
-                                                    "Play All",
-                                                    child: StreamBuilder<
-                                                        String>(
-                                                        stream: context
-                                                            .watch<
-                                                            FyrestreamPlayerCubit>()
-                                                            .fyrestreamPlayer
-                                                            .queueTitle,
-                                                        builder:
-                                                            (context, snapshot) {
-                                                          if (snapshot.hasData &&
-                                                              snapshot.data == "${widget.title} - Youtube") {
-                                                            return StreamBuilder<PlayerState>(
-                                                                stream: context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.audioPlayer.playerStateStream,
-                                                                builder: (context, snapshot2) {
-                                                                  if (snapshot2.hasData && (snapshot2.data?.playing ?? false)) {
-                                                                    return PlayPauseButton(
-                                                                      onPause: () => context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.pause(),
-                                                                      onPlay: () => context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.play(),
-                                                                      isPlaying: true,
-                                                                      size: 45,
-                                                                    );
-                                                                  } else {
-                                                                    return PlayPauseButton(
-                                                                      onPause: () => context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.pause(),
-                                                                      onPlay: () => context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.play(),
-                                                                      isPlaying: false,
-                                                                      size: 45,
-                                                                    );
-                                                                  }
-                                                                });
-                                                          } else {
-                                                            return PlayPauseButton(
-                                                              onPause: () => context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.pause(),
-                                                              onPlay: () {
-                                                                context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.loadPlaylist(MediaPlaylist(mediaItems: mediaitems, albumName: "${widget.title} - Youtube"));
-                                                                context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.play();
-                                                              },
-                                                              size: 45,
+                                                      Tooltip(
+                                                        message:
+                                                        "Shuffle & Play All",
+                                                        child:
+                                                        IconButton(
+                                                          onPressed:
+                                                              () {
+                                                            SnackbarService.showMessage("Shuffling & Playing All", duration: const Duration(seconds: 2));
+                                                            context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.loadPlaylist(
+                                                              MediaPlaylist(
+                                                                mediaItems: mediaitems,
+                                                                albumName: "${widget.title} - Youtube",
+                                                              ),
+                                                              doPlay: true,
+                                                              shuffling: true,
                                                             );
-                                                          }
-                                                        }),
-                                                  ),
-                                                  Padding(
-                                                    padding: const EdgeInsets
-                                                        .all(
-                                                        8.0),
-                                                    child:
-                                                    Tooltip(
-                                                      message:
-                                                      "Add to Library",
-                                                      child:
-                                                      IconButton(
-                                                        onPressed:
-                                                            () async {
-                                                          SnackbarService.showMessage("Adding to Library",
-                                                              duration: const Duration(seconds: 2));
-                                                          await Future.forEach(mediaitems,
-                                                                  (element) {
-                                                                FyreStreamDBService.addMediaItem(MediaItem2MediaItemDB(element), MediaPlaylistDB(playlistName: "${widget.title} - Youtube"));
-                                                              });
-                                                          SnackbarService.showMessage("Added to Library",
-                                                              duration: const Duration(seconds: 2));
-                                                        },
-                                                        padding: const EdgeInsets
-                                                            .all(
-                                                            2),
-                                                        constraints:
-                                                        const BoxConstraints(),
-                                                        icon:
-                                                        const Icon(
-                                                          FontAwesome.square_plus,
-                                                          color:
-                                                          Default_Theme.primaryColor1,
-                                                          size:
-                                                          25,
+                                                          },
+                                                          padding:
+                                                          const EdgeInsets.all(5),
+                                                          constraints:
+                                                          const BoxConstraints(),
+                                                          icon:
+                                                          const Icon(
+                                                            MingCute.shuffle_fill,
+                                                            color: Default_Theme.primaryColor1,
+                                                          ),
                                                         ),
                                                       ),
                                                     ),
-                                                  )
-                                                ],
+                                                    Tooltip(
+                                                      message:
+                                                      "Play All",
+                                                      child: StreamBuilder<
+                                                          String>(
+                                                          stream:
+                                                          context.watch<FyrestreamPlayerCubit>().fyrestreamPlayer.queueTitle,
+                                                          builder: (context, snapshot) {
+                                                            if (snapshot.hasData && snapshot.data == "${widget.title} - Youtube") {
+                                                              return StreamBuilder<PlayerState>(
+                                                                  stream: context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.audioPlayer.playerStateStream,
+                                                                  builder: (context, snapshot2) {
+                                                                    if (snapshot2.hasData && (snapshot2.data?.playing ?? false)) {
+                                                                      return PlayPauseButton(
+                                                                        onPause: () => context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.pause(),
+                                                                        onPlay: () => context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.play(),
+                                                                        isPlaying: true,
+                                                                        size: 45,
+                                                                      );
+                                                                    } else {
+                                                                      return PlayPauseButton(
+                                                                        onPause: () => context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.pause(),
+                                                                        onPlay: () => context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.play(),
+                                                                        isPlaying: false,
+                                                                        size: 45,
+                                                                      );
+                                                                    }
+                                                                  });
+                                                            } else {
+                                                              return PlayPauseButton(
+                                                                onPause: () => context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.pause(),
+                                                                onPlay: () {
+                                                                  context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.loadPlaylist(MediaPlaylist(mediaItems: mediaitems, albumName: "${widget.title} - Youtube"));
+                                                                  context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.play();
+                                                                },
+                                                                size: 45,
+                                                              );
+                                                            }
+                                                          }),
+                                                    ),
+                                                    Padding(
+                                                      padding: const EdgeInsets
+                                                          .all(
+                                                          8.0),
+                                                      child:
+                                                      Tooltip(
+                                                        message:
+                                                        "Add to Library",
+                                                        child:
+                                                        IconButton(
+                                                          onPressed:
+                                                              () async {
+                                                            SnackbarService.showMessage("Adding to Library", duration: const Duration(seconds: 2));
+                                                            await Future.forEach(mediaitems, (element) {
+                                                              FyreStreamDBService.addMediaItem(MediaItem2MediaItemDB(element), MediaPlaylistDB(playlistName: "${widget.title} - Youtube"));
+                                                            });
+                                                            SnackbarService.showMessage("Added to Library", duration: const Duration(seconds: 2));
+                                                          },
+                                                          padding:
+                                                          const EdgeInsets.all(2),
+                                                          constraints:
+                                                          const BoxConstraints(),
+                                                          icon:
+                                                          const Icon(
+                                                            FontAwesome.square_plus,
+                                                            color: Default_Theme.primaryColor1,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ],
@@ -404,56 +394,62 @@ class _YoutubePlaylistState extends State<YoutubePlaylist> {
                             ),
                           ),
                         ),
-                        SliverList(
-                          delegate:
-                          SliverChildBuilderDelegate(
-                                (context, index) {
-                              return SongCardWidget(
-                                song: mediaitems[index],
-                                isWide: true,
-                                onOptionsTap: () {
-                                  showMoreBottomSheet(context, mediaitems[index]);
-                                },
-                                onTap: () {
-                                  if (!listEquals(
+                        SliverPadding(
+                          padding: const EdgeInsets.only(
+                              top: 10, left: 3),
+                          sliver: SliverList(
+                            delegate:
+                            SliverChildBuilderDelegate(
+                                  (context, index) {
+                                return SongCardWidget(
+                                  song: mediaitems[index],
+                                  isWide: true,
+                                  onOptionsTap: () {
+                                    showMoreBottomSheet(
+                                        context,
+                                        mediaitems[index]);
+                                  },
+                                  onTap: () {
+                                    if (!listEquals(
+                                        context
+                                            .read<
+                                            FyrestreamPlayerCubit>()
+                                            .fyrestreamPlayer
+                                            .queue
+                                            .value,
+                                        mediaitems)) {
                                       context
                                           .read<
                                           FyrestreamPlayerCubit>()
                                           .fyrestreamPlayer
-                                          .queue
-                                          .value,
-                                      mediaitems)) {
-                                    context
+                                          .loadPlaylist(
+                                          MediaPlaylist(
+                                              mediaItems:
+                                              mediaitems,
+                                              albumName:
+                                              "${widget.title} - Youtube"),
+                                          idx: index,
+                                          doPlay: true);
+                                      // context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.play();
+                                    } else if (context
                                         .read<
                                         FyrestreamPlayerCubit>()
                                         .fyrestreamPlayer
-                                        .loadPlaylist(
-                                        MediaPlaylist(
-                                            mediaItems:
-                                            mediaitems,
-                                            albumName:
-                                            "${widget.title} - Youtube"),
-                                        idx: index,
-                                        doPlay: true);
-                                    // context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.play();
-                                  } else if (context
-                                      .read<
-                                      FyrestreamPlayerCubit>()
-                                      .fyrestreamPlayer
-                                      .currentMedia !=
-                                      mediaitems[index]) {
-                                    context
-                                        .read<
-                                        FyrestreamPlayerCubit>()
-                                        .fyrestreamPlayer
-                                        .prepare4play(
-                                        idx: index,
-                                        doPlay: true);
-                                  }
-                                },
-                              );
-                            },
-                            childCount: items.length,
+                                        .currentMedia !=
+                                        mediaitems[index]) {
+                                      context
+                                          .read<
+                                          FyrestreamPlayerCubit>()
+                                          .fyrestreamPlayer
+                                          .prepare4play(
+                                          idx: index,
+                                          doPlay: true);
+                                    }
+                                  },
+                                );
+                              },
+                              childCount: items.length,
+                            ),
                           ),
                         ),
                       ],

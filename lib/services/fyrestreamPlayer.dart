@@ -85,6 +85,7 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
   Future<void> play() async {
     if (isLinkProcessing.value == false) {
       await audioPlayer.play();
+      log("Playing:", name: "fyrestreamPlayer");
       isPaused = false;
     } else {
       log("Link is in process...", name: "fyrestreamPlayer");

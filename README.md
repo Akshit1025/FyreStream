@@ -21,7 +21,7 @@ FyreStream is my Flutter project, An Open Source Music app designed to bring you
 - [x] 🔓 Open Source
 - [x] ⏲️ Sleep Timer
 - [x] 🌐 Daily Updated Global Charts
-- [ ] 🖥️ Support for Windows
+- [x] 🖥️ Support for Windows
 - [ ] 🐧 Support for Linux
 - [ ] 🍏 Support for iOS
 - [ ] 📝 Lyrics Support

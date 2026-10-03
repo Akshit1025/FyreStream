@@ -47,7 +47,7 @@ String? extractVideoId(String url) {
       return uri.queryParameters['v'];
     }
   } catch (e) {
-    log(e.toString());
+    log(e.toString(), name: 'extractSpotifyTrackId');
   }
 
   return null;

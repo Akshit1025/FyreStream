@@ -13,6 +13,7 @@ import 'package:fyrestream/services/file_manager.dart';
 import 'package:fyrestream/utils/external_list_importer.dart';
 import 'package:fyrestream/utils/ticker.dart';
 import 'package:fyrestream/utils/url_checker.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fyrestream/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
@@ -225,6 +226,7 @@ class _MyAppState extends State<MyApp> {
                 scaffoldMessengerKey: SnackbarService.messengerKey,
                 routerConfig: GlobalRoutes.globalRouter,
                 theme: Default_Theme().defaultThemeData,
+                scrollBehavior: CustomScrollBehavior(),
               );
             }
           },
@@ -232,4 +234,14 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+}
+
+class CustomScrollBehavior extends MaterialScrollBehavior {
+  // Override behavior methods and getters like dragDevices
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    // etc.
+  };
 }

@@ -25,6 +25,7 @@ import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:metadata_god/metadata_god.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import 'blocs/mediaPlayer/fyrestream_player_cubit.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 
@@ -211,6 +212,16 @@ class _MyAppState extends State<MyApp> {
                   width: 50, height: 50, child: CircularProgressIndicator());
             } else {
               return MaterialApp.router(
+                builder: (context, child) => ResponsiveBreakpoints.builder(
+                  child: child!,
+                  breakpoints: [
+                    const Breakpoint(start: 0, end: 450, name: MOBILE),
+                    const Breakpoint(start: 451, end: 800, name: TABLET),
+                    const Breakpoint(start: 801, end: 1920, name: DESKTOP),
+                    const Breakpoint(
+                        start: 1921, end: double.infinity, name: '4K'),
+                  ],
+                ),
                 scaffoldMessengerKey: SnackbarService.messengerKey,
                 routerConfig: GlobalRoutes.globalRouter,
                 theme: Default_Theme().defaultThemeData,

@@ -31,9 +31,11 @@ FyreStream is my Flutter project, An Open Source Music app designed to bring you
 
 
 <center>
-<a href="https://github.com/Akshit1025/FyreStream/releases/latest/">
-        <img width="220" alt="APK download" src="https://user-images.githubusercontent.com/114044633/223920025-83687de0-e463-4c5d-8122-e06e4bb7d40c.png">
-      </a></center>
+<br>
+<h3>Download for Android and Windows 😍</h3>
+<a href="https://github.com/Akshit1025/FyreStream/releases/latest">
+  <img alt="Download FyreStream" src="https://img.shields.io/badge/Download-FyreStream-2ea44f?style=for-the-badge&logo=github&logoColor=white" height="40" />
+</a></center>
 </br>
 
 ### **Contribute to FyreStream! 🎶**

@@ -32,8 +32,11 @@ jobs:
       - name: Build App files
         run: flutter build windows --release --build-number ${{github.run_number}}
 
-      - name: Rename files
-        run: Rename-Item -Path "build/windows/x64/runner/Release/fyrestream.exe" -NewName "build/windows/x64/runner/Release/FyreStream.exe"
+      - name: Rename files 1
+        run: Rename-Item -Path "build/windows/x64/runner/Release/fyrestream.exe" -NewName "build/windows/x64/runner/Release/temp_fyrestream.exe"
+
+      - name: Rename files 2
+        run: Rename-Item -Path "build/windows/x64/runner/Release/temp_fyrestream.exe" -NewName "build/windows/x64/runner/Release/FyreStream.exe"
 
       - name: ZIP build
         run: Compress-Archive -Path build/windows/x64/runner/Release/* -Destination  build/windows/x64/fyrestream_windows_x64_v2.8.0+${{github.run_number}}.zip

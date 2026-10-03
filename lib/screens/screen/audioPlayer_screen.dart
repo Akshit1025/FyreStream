@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ui';
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/screens/screen/home_views/timer_view.dart';
@@ -372,6 +373,7 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                                 .watch<FyrestreamPlayerCubit>()
                                 .progressStreams,
                             builder: (context, snapshot) {
+                              log((snapshot.data?.currentPos).toString(), name: "Duration");
                               return ProgressBar(
                                 progress:
                                 snapshot.data?.currentPos ?? Duration.zero,
@@ -749,6 +751,9 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
         ),
       ),
     );
+  }
+  Widget desktopViewPlayer(BuildContext context, FyreStreamMusicPlayer musicPlayer) {
+    return Text("Desktop View");
   }
 }
 

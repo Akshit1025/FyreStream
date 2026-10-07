@@ -9,9 +9,40 @@ import 'package:fyrestream/theme_data/default.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 
 class BackupSettings extends StatelessWidget {
   const BackupSettings({super.key});
+
+  Future<bool> storagePermission() async {
+    final DeviceInfoPlugin info =
+    DeviceInfoPlugin();
+    final AndroidDeviceInfo androidInfo = await info.androidInfo;
+    debugPrint('releaseVersion : ${androidInfo.version.release}');
+    final int androidVersion = int.parse(androidInfo.version.release);
+    bool havePermission = false;
+
+    if (androidVersion >= 13) {
+      final request = await [
+        Permission.videos,
+        Permission.photos,
+        //..... as needed
+      ].request();
+
+      havePermission =
+          request.values.every((status) => status == PermissionStatus.granted);
+    } else {
+      final status = await Permission.storage.request();
+      havePermission = status.isGranted;
+    }
+
+    if (!havePermission) {
+      // if no permission then open app-setting
+      await openAppSettings();
+    }
+
+    return havePermission;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +108,7 @@ class BackupSettings extends StatelessWidget {
                 title: "Backup location",
                 subtitle: state.backupPath,
                 onTap: () async {
-                  final hasStorageAccess = Platform.isAndroid
+                  /*final hasStorageAccess = Platform.isAndroid
                       ? await Permission.storage.isGranted
                       : true;
                   if (!hasStorageAccess) {
@@ -87,6 +118,10 @@ class BackupSettings extends StatelessWidget {
                       return;
                     }
                   }
+                  }
+                   */
+                  final permission = await storagePermission();
+                  debugPrint('permission : $permission');
                   FilePicker.platform.getDirectoryPath().then((value) {
                     if (value != null) {
                       context.read<SettingsCubit>().setBackupPath(value);

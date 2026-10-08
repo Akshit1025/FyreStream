@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:fyrestream/model/source_engines.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -89,6 +90,14 @@ class SettingsCubit extends Cubit<SettingsState> {
     FyreStreamDBService.getSettingStr(GlobalStrConsts.countryCode).then((value) {
       emit(state.copyWith(countryCode: value ?? "IN"));
     });
+
+    SourceEngine.values.map((e) {
+      FyreStreamDBService.getSettingBool(e.value).then((value) {
+        List<bool> switches = List.from(state.sourceEngineSwitches);
+        switches[SourceEngine.values.indexOf(e)] = value ?? true;
+        emit(state.copyWith(sourceEngineSwitches: switches));
+      });
+    });
   }
 
   void autoUpdate() {
@@ -157,6 +166,13 @@ class SettingsCubit extends Cubit<SettingsState> {
   void setHistoryClearTime(String value) {
     FyreStreamDBService.putSettingStr(GlobalStrConsts.historyClearTime, value);
     emit(state.copyWith(historyClearTime: value));
+  }
+
+  void setSourceEngineSwitches(int index, bool value) {
+    List<bool> switches = List.from(state.sourceEngineSwitches);
+    switches[index] = value;
+    FyreStreamDBService.putSettingBool(SourceEngine.values[index].value, value);
+    emit(state.copyWith(sourceEngineSwitches: switches));
   }
 
   Future<void> resetDownPath() async {

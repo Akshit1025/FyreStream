@@ -1,7 +1,5 @@
-import 'dart:io';
 import 'package:fyrestream/blocs/settings_cubit/cubit/settings_cubit.dart';
 import 'package:fyrestream/screens/widgets/setting_tile.dart';
-import 'package:fyrestream/screens/widgets/snackbar.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fyrestream/theme_data/default.dart';

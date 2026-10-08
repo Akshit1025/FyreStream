@@ -70,8 +70,8 @@ class SettingsView extends StatelessWidget {
                 );
               }),
           settingListTile(
-              title: "App UI Elements",
-              subtitle: "Auto slide, etc.",
+              title: "UI Elements & Services",
+              subtitle: "Auto slide, Source Engines etc.",
               icon: MingCute.display_fill,
               onTap: () {
                 Navigator.push(
@@ -131,19 +131,19 @@ class SettingsView extends StatelessWidget {
     return ListTile(
       leading: Icon(
         icon,
-        size: 30,
+        size: 27,
         color: Default_Theme.primaryColor1,
       ),
       title: Text(
         title,
-        style: const TextStyle(color: Default_Theme.primaryColor1, fontSize: 17)
+        style: const TextStyle(color: Default_Theme.primaryColor1, fontSize: 16)
             .merge(Default_Theme.secondoryTextStyleMedium),
       ),
       subtitle: Text(
         subtitle,
         style: TextStyle(
             color: Default_Theme.primaryColor1.withOpacity(0.5),
-            fontSize: 12.5)
+            fontSize: 12)
             .merge(Default_Theme.secondoryTextStyleMedium),
       ),
       onTap: () {

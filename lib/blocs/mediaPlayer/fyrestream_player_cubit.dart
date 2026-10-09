@@ -18,6 +18,11 @@ class FyrestreamPlayerCubit extends Cubit<FyreStreamPlayerState> {
     setupPlayer().then((value) => emit(FyreStreamPlayerState(isReady: true)));
   }
 
+  void switchShowLyrics({bool? value}) {
+    emit(FyreStreamPlayerState(
+        isReady: true, showLyrics: value ?? !state.showLyrics));
+  }
+
   Future<void> setupPlayer() async {
     fyrestreamPlayer = await PlayerInitializer().getFyreStreamMusicPlayer();
 

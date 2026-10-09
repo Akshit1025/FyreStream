@@ -8,7 +8,7 @@ import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/utils/country_info.dart';
 import 'package:fyrestream/model/MediaPlaylistModel.dart';
 import 'package:fyrestream/model/chart_model.dart';
-import 'package:fyrestream/plugins/chart_defines.dart';
+import 'package:fyrestream/plugins/ext_charts/chart_defines.dart';
 import 'package:fyrestream/repository/Youtube/yt_charts_home.dart';
 import 'package:fyrestream/screens/screen/chart/show_charts.dart';
 import 'package:fyrestream/services/db/fyrestream_db_service.dart';

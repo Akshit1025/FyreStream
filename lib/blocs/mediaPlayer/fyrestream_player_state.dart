@@ -2,9 +2,9 @@
 part of 'fyrestream_player_cubit.dart';
 
 class FyreStreamPlayerState {
-  late bool isReady;
-
-  FyreStreamPlayerState({required this.isReady});
+  bool isReady;
+  bool showLyrics;
+  FyreStreamPlayerState({required this.isReady, this.showLyrics = false});
 }
 
 final class FyreStreamPlayerInitial extends FyreStreamPlayerState {

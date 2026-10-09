@@ -1,6 +1,14 @@
 ![FyreStream](./assets/icons/FyreStream_Logo_cover.png)
 **<h1 align=center>FyreStream🔥</h1>**
 
+<p align="center"><img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/Akshit1025/FyreStream/total?style=for-the-badge" >
+<img alt="GitHub Release" src="https://img.shields.io/github/v/release/Akshit1025/FyreStream?display_name=release&style=for-the-badge&color=f01d7c" >
+<img alt="GitHub License" src="https://img.shields.io/github/license/Akshit1025/FyreStream?style=for-the-badge&color=1881cc" > <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/Akshit1025/FyreStream/checkout.yml?style=for-the-badge" > <img src=https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white /><br><img src=https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white > <img src=https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white />
+
+
+</p>
+<br>
+
 FyreStream is my Flutter project, An Open Source Music app designed to bring you Ad-free tunes from various sources. Dive into a world of limitless music from platforms like YouTube and Jio Saavn, with more sources firing soon! 🔥🎵
 
 ### **Why FyreStream?**
@@ -22,9 +30,9 @@ FyreStream is my Flutter project, An Open Source Music app designed to bring you
 - [x] ⏲️ Sleep Timer
 - [x] 🌐 Daily Updated Global Charts
 - [x] 🖥️ Support for Windows
+- [x] 📝 Lyrics Support
 - [ ] 🐧 Support for Linux
 - [ ] 🍏 Support for iOS
-- [ ] 📝 Lyrics Support
 - [ ] 🎼 AI-Generated Playlist
 - [ ] 💡 AI-Based Recommendations
 - [ ] 🆎 Multi-Language support
@@ -58,9 +66,17 @@ FyreStream is my Flutter project, An Open Source Music app designed to bring you
 
 </br>
 
-**Connect to me at:**
-<center>
+<h4 align=center>Get in touch with me at :-</h4>
+<p align=center>
 <a href=https://www.linkedin.com/in/akshitgupta2206/>
-<img src=https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white/>
+<img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white"/>
+</a> <a href=https://instagram.com/akshitthecoder/>
+<img src="https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white"/>
 </a>
-</center>
+<a href=https://x.com/workbyakshit/>
+<img src="https://img.shields.io/badge/X-000000?style=for-the-badge&logo=x&logoColor=white"/>
+</a>
+<a href=mailto:akshitthecoder@proton.me/>
+<img src="https://img.shields.io/badge/proton%20mail-6D4AFF?style=for-the-badge&logo=protonmail&logoColor=white"/>
+</a>
+</p>

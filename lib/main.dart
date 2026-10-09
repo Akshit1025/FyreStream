@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io' as io;
 import 'package:fyrestream/blocs/downloader/cubit/downloader_cubit.dart';
 import 'package:fyrestream/blocs/internet_connectivity/cubit/connectivity_cubit.dart';
+import 'package:fyrestream/blocs/lyrics/lyrics_cubit.dart';
 import 'package:fyrestream/blocs/mini_player/mini_player_bloc.dart';
 import 'package:fyrestream/blocs/notification/notification_cubit.dart';
 import 'package:fyrestream/blocs/settings_cubit/cubit/settings_cubit.dart';
@@ -202,6 +203,9 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(
           create: (context) => FetchSearchResultsCubit(),
         ),
+        BlocProvider(
+          create: (context) => LyricsCubit(fyrestreamPlayerCubit),
+        )
       ],
       child: RepositoryProvider(
         create: (context) => DownloaderCubit(connectivityCubit: context.read<ConnectivityCubit>()),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/screen/add_to_playlist_screen.dart';
-import 'package:fyrestream/screens/screen/audioPlayer_screen.dart';
+import 'package:fyrestream/screens/screen/player_screen.dart';
 import 'package:fyrestream/screens/screen/explore_screen.dart';
 import 'package:fyrestream/screens/screen/library_screen.dart';
 import 'package:fyrestream/screens/screen/library_views/import_media_view.dart';

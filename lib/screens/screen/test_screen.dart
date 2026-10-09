@@ -1,7 +1,7 @@
-import 'dart:convert';
 import 'dart:developer';
-
-import 'package:fyrestream/repository/Youtube/yt_music_api.dart';
+import 'package:fyrestream/model/lyrics_models.dart';
+import 'package:fyrestream/repository/Lyrics/lrcnet_api.dart';
+import 'package:fyrestream/repository/Lyrics/lyrics.dart';
 import 'package:flutter/material.dart';
 import 'package:fyrestream/theme_data/default.dart';
 
@@ -33,8 +33,12 @@ class TestView extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () async {
-                YtMusicService().getMusicHome().then((value) {
-                  log("Test API: ${jsonEncode(value)}");
+                LyricsRepository.getLyrics("bliss", "milet",
+                    album: "anytime anywhere",
+                    duration: Duration(seconds: 260),
+                    provider: LyricsProvider.lrcnet)
+                    .then((value) {
+                  log(value.toString());
                 });
               },
               child: const Text(

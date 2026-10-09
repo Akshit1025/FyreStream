@@ -7,7 +7,9 @@ import 'package:fyrestream/screens/widgets/volume_slider.dart';
 import 'package:fyrestream/services/fyrestreamPlayer.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:icons_plus/icons_plus.dart';
 import 'package:just_audio/just_audio.dart';
@@ -21,6 +23,7 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import '../../blocs/mediaPlayer/fyrestream_player_cubit.dart';
+import 'player_views/lyrics_widget.dart';
 
 class AudioPlayerView extends StatefulWidget {
   const AudioPlayerView({super.key});
@@ -29,99 +32,197 @@ class AudioPlayerView extends StatefulWidget {
   State<AudioPlayerView> createState() => _AudioPlayerViewState();
 }
 
-class _AudioPlayerViewState extends State<AudioPlayerView> {
+class _AudioPlayerViewState extends State<AudioPlayerView>
+    with SingleTickerProviderStateMixin {
   final PanelController _panelController = PanelController();
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    _tabController = TabController(length: 2, vsync: this);
+    super.initState();
+    // set value switchLyrics if tab is changed
+    _tabController.addListener(() {
+      if (_tabController.index == 1) {
+        context.read<FyrestreamPlayerCubit>().switchShowLyrics(value: true);
+      } else {
+        context.read<FyrestreamPlayerCubit>().switchShowLyrics(value: false);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     FyreStreamMusicPlayer musicPlayer =
         context.read<FyrestreamPlayerCubit>().fyrestreamPlayer;
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 12, 4, 9),
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        foregroundColor: Default_Theme.primaryColor1,
-        centerTitle: true,
-        actions: [
-          IconButton(
-              onPressed: () {
-                showMoreBottomSheet(
-                    context,
-                    context
-                        .read<FyrestreamPlayerCubit>()
-                        .fyrestreamPlayer
-                        .currentMedia);
-              },
-              icon: const Icon(MingCute.more_2_fill,
-                  size: 25, color: Default_Theme.primaryColor1))
-        ],
-        title: Column(
-          children: [
-            Text(
-              'Enjoying From',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  color: Default_Theme.primaryColor1,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold)
-                  .merge(Default_Theme.secondoryTextStyle),
-            ),
-            StreamBuilder<String>(
-                stream: context
-                    .watch<FyrestreamPlayerCubit>()
-                    .fyrestreamPlayer
-                    .queueTitle,
-                builder: (context, snapshot) {
-                  return Text(
-                    snapshot.data ?? "Unknown",
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Default_Theme.primaryColor2,
-                      fontSize: 12,
-                    ).merge(Default_Theme.secondoryTextStyle),
-                  );
-                }),
+    return CallbackShortcuts(
+      // Shortcuts keys for controlling actions from key board
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.space): () {
+          // play pause -> space
+          if (context
+              .read<FyrestreamPlayerCubit>()
+              .fyrestreamPlayer
+              .audioPlayer
+              .playing) {
+            context
+                .read<FyrestreamPlayerCubit>()
+                .fyrestreamPlayer
+                .audioPlayer
+                .pause();
+          } else {
+            context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.audioPlayer.play();
+          }
+        },
+        const SingleActivator(LogicalKeyboardKey.arrowLeft): () {
+          musicPlayer.skipToPrevious();
+        },
+        const SingleActivator(LogicalKeyboardKey.arrowRight): () {
+          musicPlayer.skipToNext();
+        },
+        const SingleActivator(LogicalKeyboardKey.arrowRight, alt: true): () {
+          musicPlayer.seekNSecForward(const Duration(seconds: 5));
+        },
+        const SingleActivator(LogicalKeyboardKey.arrowLeft, alt: true): () {
+          musicPlayer.seekNSecBackward(const Duration(seconds: 5));
+        },
+        // Temp. solution for volume control, will be replaced by global volume control
+        const SingleActivator(LogicalKeyboardKey.arrowUp): () {
+          musicPlayer.audioPlayer.setVolume(
+              (musicPlayer.audioPlayer.volume + 0.1).clamp(0.0, 1.0));
+        },
+        const SingleActivator(LogicalKeyboardKey.arrowDown): () {
+          musicPlayer.audioPlayer.setVolume(
+              (musicPlayer.audioPlayer.volume - 0.1).clamp(0.0, 1.0));
+        },
+        const SingleActivator(LogicalKeyboardKey.keyS): () {
+          // shuffle mode on/off
+          if (context
+              .read<FyrestreamPlayerCubit>()
+              .fyrestreamPlayer
+              .audioPlayer
+              .shuffleModeEnabled) {
+            context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.shuffle(false);
+          } else {
+            context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.shuffle(true);
+          }
+        },
+        const SingleActivator(LogicalKeyboardKey.keyL): () {
+          context
+              .read<FyrestreamPlayerCubit>()
+              .fyrestreamPlayer
+              .setLoopMode(LoopMode.all);
+        },
+        const SingleActivator(LogicalKeyboardKey.keyM): () {
+          context
+              .read<FyrestreamPlayerCubit>()
+              .fyrestreamPlayer
+              .setLoopMode(LoopMode.off);
+        },
+        const SingleActivator(LogicalKeyboardKey.keyO): () {
+          context
+              .read<FyrestreamPlayerCubit>()
+              .fyrestreamPlayer
+              .setLoopMode(LoopMode.one);
+        },
+        const SingleActivator(LogicalKeyboardKey.keyT): () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const TimerView()));
+        },
+        // backspace for back
+        const SingleActivator(LogicalKeyboardKey.backspace): () {
+          Navigator.pop(context);
+        },
+      },
+      child: Scaffold(
+        backgroundColor: const Color.fromARGB(255, 12, 4, 9),
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          foregroundColor: Default_Theme.primaryColor1,
+          centerTitle: true,
+          actions: [
+            IconButton(
+                onPressed: () {
+                  showMoreBottomSheet(
+                      context,
+                      context
+                          .read<FyrestreamPlayerCubit>()
+                          .fyrestreamPlayer
+                          .currentMedia);
+                },
+                icon: const Icon(MingCute.more_2_fill,
+                    size: 25, color: Default_Theme.primaryColor1))
           ],
-        ),
-      ),
-      body: AnimatedSwitcher(
-          duration: const Duration(seconds: 1),
-          child: ResponsiveBreakpoints.of(context).smallerOrEqualTo(TABLET)
-              ? SlidingUpPanel(
-            controller: _panelController,
-            minHeight: 52,
-            maxHeight: MediaQuery.of(context).size.height * 0.40,
-            // backdropColor: Colors.transparent,
-            color: Colors.transparent,
-            backdropTapClosesPanel: true,
-            panel: UpNextPanel(panelController: _panelController),
-            body: playerUI(context, musicPlayer),
-          )
-              : Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+          title: Column(
             children: [
-              ConstrainedBox(
-                  constraints: BoxConstraints(
-                      minWidth: 400,
-                      maxWidth: MediaQuery.of(context).size.width * 0.60),
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: playerUI(context, musicPlayer),
-                  )),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.8,
-                      child:
-                      UpNextPanel(panelController: _panelController)),
-                ),
-              )
+              Text(
+                'Enjoying From',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    color: Default_Theme.primaryColor1,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold)
+                    .merge(Default_Theme.secondoryTextStyle),
+              ),
+              StreamBuilder<String>(
+                  stream: context
+                      .watch<FyrestreamPlayerCubit>()
+                      .fyrestreamPlayer
+                      .queueTitle,
+                  builder: (context, snapshot) {
+                    return Text(
+                      snapshot.data ?? "Unknown",
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Default_Theme.primaryColor2,
+                        fontSize: 12,
+                      ).merge(Default_Theme.secondoryTextStyle),
+                    );
+                  }),
             ],
-          )),
+          ),
+        ),
+        body: AnimatedSwitcher(
+            duration: const Duration(seconds: 1),
+            child: ResponsiveBreakpoints.of(context).smallerOrEqualTo(TABLET)
+                ? SlidingUpPanel(
+              controller: _panelController,
+              minHeight: 52,
+              maxHeight: MediaQuery.of(context).size.height * 0.40,
+              // backdropColor: Colors.transparent,
+              color: Colors.transparent,
+              backdropTapClosesPanel: true,
+              panel: UpNextPanel(panelController: _panelController),
+              body: playerUI(context, musicPlayer),
+            )
+                : Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                ConstrainedBox(
+                    constraints: BoxConstraints(
+                        minWidth: 400,
+                        maxWidth:
+                        MediaQuery.of(context).size.width * 0.60),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: playerUI(context, musicPlayer),
+                    )),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.8,
+                        child: UpNextPanel(
+                            panelController: _panelController)),
+                  ),
+                )
+              ],
+            )),
+      ),
     );
   }
 
@@ -173,44 +274,45 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
                           children: [
                             Flexible(
                               child: Container(
-                                height: 20,
+                                height: 5,
                               ),
                             ),
                             Flexible(
                               flex: 7,
                               child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: VolumeDragController(
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(25),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Default_Theme.accentColor2.withOpacity(0.08),
+                                padding: const EdgeInsets.only(
+                                    right: 16, left: 16, top: 8, bottom: 8),
+                                // child: coverImage(context, constraints),
+                                child: BlocListener<FyrestreamPlayerCubit,
+                                    FyreStreamPlayerState>(
+                                  listener: (context, state) {
+                                    if (state.showLyrics) {
+                                      _tabController.animateTo(1);
+                                    } else {
+                                      _tabController.animateTo(0);
+                                    }
+                                  },
+                                  child: TabBarView(
+                                    controller: _tabController,
+                                    physics: const BouncingScrollPhysics(),
+                                    children: [
+                                      Tab(
+                                        child: Padding(
+                                          padding:
+                                          const EdgeInsets.only(top: 10),
+                                          child:
+                                          coverImage(context, constraints),
+                                        ),
                                       ),
-                                      child: StreamBuilder<MediaItem?>(
-                                        stream: context
-                                          .watch<FyrestreamPlayerCubit>()
-                                          .fyrestreamPlayer
-                                          .mediaItem,
-                                        builder: (context, snapshot) {
-                                          return ConstrainedBox(
-                                            constraints: BoxConstraints(
-                                              maxWidth: 200 + constraints.maxWidth * 0.90,
-                                              minWidth: 200,
-                                              maxHeight: 200 + constraints.maxHeight * 0.90,
-                                              minHeight: 200,
-                                            ),
-                                            child: AspectRatio(
-                                              aspectRatio: 1.0,
-                                              child: loadImageCached(
-                                                (snapshot.data?.artUri ?? "").toString(),
-                                                fit: BoxFit.fitWidth
-                                              ),
-                                            ),
-                                          );
-                                        }
+                                      Tab(
+                                        child: ConstrainedBox(
+                                          constraints: const BoxConstraints(
+                                            minHeight: 200,
+                                          ),
+                                          child: const LyricsWidget(),
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -229,6 +331,39 @@ class _AudioPlayerViewState extends State<AudioPlayerView> {
         ),
       );
     });
+  }
+
+  VolumeDragController coverImage(
+      BuildContext context, BoxConstraints constraints) {
+    return VolumeDragController(
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(25),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Default_Theme.accentColor2.withOpacity(0.08),
+          ),
+          child: StreamBuilder<MediaItem?>(
+              stream:
+              context.watch<FyrestreamPlayerCubit>().fyrestreamPlayer.mediaItem,
+              builder: (context, snapshot) {
+                return ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: 200 + constraints.maxWidth * 0.85,
+                    minWidth: 200,
+                    maxHeight: 200 + constraints.maxHeight * 0.90,
+                    minHeight: 200,
+                  ),
+                  child: AspectRatio(
+                    aspectRatio: 1.0,
+                    child: loadImageCached(
+                        (snapshot.data?.artUri ?? "").toString(),
+                        fit: BoxFit.fitWidth),
+                  ),
+                );
+              }),
+        ),
+      ),
+    );
   }
 }
 
@@ -644,116 +779,160 @@ class PlayerCtrlWidgets extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Tooltip(
-                  message: "Loop",
-                  child: PopupMenuButton(
-                    color: const Color.fromARGB(255, 17, 17, 17),
-                    surfaceTintColor: const Color.fromARGB(255, 19, 19, 19),
-                    padding: const EdgeInsets.all(5),
-                    itemBuilder: (BuildContext context) => [
-                      PopupMenuItem(
-                        value: 0,
-                        child: Text(
-                          "Off",
-                          style: Default_Theme.secondoryTextStyle.merge(
-                            const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Default_Theme.primaryColor1,
-                                fontSize: 14),
-                          ),
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 1,
-                        child: Text(
-                          "Loop One",
-                          style: Default_Theme.secondoryTextStyle.merge(
-                            const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Default_Theme.primaryColor1,
-                                fontSize: 14),
-                          ),
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 2,
-                        child: Text(
-                          "Loop All",
-                          style: Default_Theme.secondoryTextStyle.merge(
-                            const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Default_Theme.primaryColor1,
-                                fontSize: 14),
-                          ),
-                        ),
-                      )
-                    ],
-                    child: Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: StreamBuilder<LoopMode>(
-                          stream: context
-                              .watch<FyrestreamPlayerCubit>()
-                              .fyrestreamPlayer
-                              .loopMode,
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData) {
-                              switch (snapshot.data) {
-                                case LoopMode.off:
-                                  return const Icon(
-                                    MingCute.repeat_line,
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Tooltip(
+                      message: "Loop",
+                      child: PopupMenuButton(
+                        color: const Color.fromARGB(255, 17, 17, 17),
+                        surfaceTintColor: const Color.fromARGB(255, 19, 19, 19),
+                        padding: const EdgeInsets.all(5),
+                        itemBuilder: (BuildContext context) => [
+                          PopupMenuItem(
+                            value: 0,
+                            child: Text(
+                              "Off",
+                              style: Default_Theme.secondoryTextStyle.merge(
+                                const TextStyle(
+                                    fontWeight: FontWeight.bold,
                                     color: Default_Theme.primaryColor1,
-                                    size: 30,
-                                  );
-                                case LoopMode.one:
-                                  return const Icon(
-                                    MingCute.repeat_one_line,
-                                    color: Default_Theme.accentColor1,
-                                    size: 30,
-                                  );
-                                case LoopMode.all:
-                                  return const Icon(
-                                    MingCute.repeat_fill,
-                                    color: Default_Theme.accentColor1,
-                                    size: 30,
-                                  );
-                                case null:
-                                  return const Icon(
-                                    MingCute.repeat_line,
+                                    fontSize: 14),
+                              ),
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 1,
+                            child: Text(
+                              "Loop One",
+                              style: Default_Theme.secondoryTextStyle.merge(
+                                const TextStyle(
+                                    fontWeight: FontWeight.bold,
                                     color: Default_Theme.primaryColor1,
-                                    size: 30,
-                                  );
-                              }
-                            }
-                            return const Icon(
-                              MingCute.repeat_line,
-                              color: Default_Theme.primaryColor1,
-                              size: 30,
-                            );
-                          }),
+                                    fontSize: 14),
+                              ),
+                            ),
+                          ),
+                          PopupMenuItem(
+                            value: 2,
+                            child: Text(
+                              "Loop All",
+                              style: Default_Theme.secondoryTextStyle.merge(
+                                const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Default_Theme.primaryColor1,
+                                    fontSize: 14),
+                              ),
+                            ),
+                          )
+                        ],
+                        child: Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: StreamBuilder<LoopMode>(
+                              stream: context
+                                  .watch<FyrestreamPlayerCubit>()
+                                  .fyrestreamPlayer
+                                  .loopMode,
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  switch (snapshot.data) {
+                                    case LoopMode.off:
+                                      return const Icon(
+                                        MingCute.repeat_line,
+                                        color: Default_Theme.primaryColor1,
+                                        size: 30,
+                                      );
+                                    case LoopMode.one:
+                                      return const Icon(
+                                        MingCute.repeat_one_line,
+                                        color: Default_Theme.accentColor1,
+                                        size: 30,
+                                      );
+                                    case LoopMode.all:
+                                      return const Icon(
+                                        MingCute.repeat_fill,
+                                        color: Default_Theme.accentColor1,
+                                        size: 30,
+                                      );
+                                    case null:
+                                      return const Icon(
+                                        MingCute.repeat_line,
+                                        color: Default_Theme.primaryColor1,
+                                        size: 30,
+                                      );
+                                  }
+                                }
+                                return const Icon(
+                                  MingCute.repeat_line,
+                                  color: Default_Theme.primaryColor1,
+                                  size: 30,
+                                );
+                              }),
+                        ),
+                        onSelected: (value) {
+                          switch (value) {
+                            case 0:
+                              context
+                                  .read<FyrestreamPlayerCubit>()
+                                  .fyrestreamPlayer
+                                  .setLoopMode(LoopMode.off);
+                              break;
+                            case 1:
+                              context
+                                  .read<FyrestreamPlayerCubit>()
+                                  .fyrestreamPlayer
+                                  .setLoopMode(LoopMode.one);
+                              break;
+                            case 2:
+                              context
+                                  .read<FyrestreamPlayerCubit>()
+                                  .fyrestreamPlayer
+                                  .setLoopMode(LoopMode.all);
+                              break;
+                          }
+                        },
+                      ),
                     ),
-                    onSelected: (value) {
-                      switch (value) {
-                        case 0:
-                          context
-                              .read<FyrestreamPlayerCubit>()
-                              .fyrestreamPlayer
-                              .setLoopMode(LoopMode.off);
-                          break;
-                        case 1:
-                          context
-                              .read<FyrestreamPlayerCubit>()
-                              .fyrestreamPlayer
-                              .setLoopMode(LoopMode.one);
-                          break;
-                        case 2:
-                          context
-                              .read<FyrestreamPlayerCubit>()
-                              .fyrestreamPlayer
-                              .setLoopMode(LoopMode.all);
-                          break;
-                      }
-                    },
-                  ),
+                    Tooltip(
+                      message: "Lyrics",
+                      child:
+                      BlocBuilder<FyrestreamPlayerCubit, FyreStreamPlayerState>(
+                        builder: (context, state) {
+                          return Padding(
+                            padding: const EdgeInsets.only(left: 5),
+                            child: SizedBox(
+                              height: 25,
+                              width: 35,
+                              child: OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.all(0),
+                                  side: BorderSide(
+                                      color: state.showLyrics
+                                          ? Default_Theme.accentColor2
+                                          : Default_Theme.primaryColor1,
+                                      width: 2),
+                                ),
+                                onPressed: () {
+                                  context
+                                      .read<FyrestreamPlayerCubit>()
+                                      .switchShowLyrics();
+                                },
+                                child: Text('L',
+                                    style: Default_Theme.secondoryTextStyle
+                                        .merge(TextStyle(
+                                        color: state.showLyrics
+                                            ? Default_Theme.accentColor2
+                                            : Default_Theme.primaryColor1,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold))),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
                 Tooltip(
                   message: "Open Original Link",

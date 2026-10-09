@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:fyrestream/model/chart_model.dart';
-import 'package:fyrestream/plugins/chart_defines.dart';
+import 'package:fyrestream/plugins/ext_charts/chart_defines.dart';
 // import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:http/http.dart' as http;
 

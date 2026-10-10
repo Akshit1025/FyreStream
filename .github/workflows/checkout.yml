@@ -43,7 +43,7 @@ jobs:
 
 
       - name: Rename APK file
-        run: Rename-Item -Path "build/app/outputs/flutter-apk/app-release.apk" -NewName "FyreStream_android_v2.8.3+${{github.run_number}}.apk"
+        run: Rename-Item -Path "build/app/outputs/flutter-apk/app-release.apk" -NewName "FyreStream_android_v2.9.1+${{github.run_number}}.apk"
 
       - name: Build Windows App
         run: flutter build windows --release --build-number ${{github.run_number}}
@@ -52,12 +52,12 @@ jobs:
         run: Rename-Item -Path "build/windows/x64/runner/Release/fyrestream.exe" -NewName "FyreStream.exe"
 
       - name: ZIP build
-        run: Compress-Archive -Path build/windows/x64/runner/Release/* -Destination  build/windows/x64/FyreStream_windows_x64_v2.8.3+${{github.run_number}}.zip
+        run: Compress-Archive -Path build/windows/x64/runner/Release/* -Destination  build/windows/x64/FyreStream_windows_x64_v2.9.1+${{github.run_number}}.zip
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
           name: Release
           path: |
-            build/app/outputs/flutter-apk/FyreStream_android_v2.8.3+${{github.run_number}}.apk
-            build/windows/x64/FyreStream_windows_x64_v2.8.3+${{github.run_number}}.zip
+            build/app/outputs/flutter-apk/FyreStream_android_v2.9.1+${{github.run_number}}.apk
+            build/windows/x64/FyreStream_windows_x64_v2.9.1+${{github.run_number}}.zip

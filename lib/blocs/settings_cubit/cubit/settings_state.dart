@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 part of 'settings_cubit.dart';
 
-class SettingsState {
+class SettingsState extends Equatable {
   bool autoUpdateNotify;
   bool autoSlideCharts;
   String downPath;
@@ -15,6 +15,7 @@ class SettingsState {
   bool autoGetCountry;
   String countryCode;
   List<bool> sourceEngineSwitches;
+  Map chartMap;
   SettingsState({
     required this.autoUpdateNotify,
     required this.autoSlideCharts,
@@ -29,6 +30,7 @@ class SettingsState {
     required this.autoGetCountry,
     required this.countryCode,
     required this.sourceEngineSwitches,
+    required this.chartMap,
   });
 
   SettingsState copyWith({
@@ -45,6 +47,7 @@ class SettingsState {
     bool? autoGetCountry,
     String? countryCode,
     List<bool>? sourceEngineSwitches,
+    Map? chartMap,
   }) {
     return SettingsState(
       autoUpdateNotify: autoUpdateNotify ?? this.autoUpdateNotify,
@@ -59,12 +62,31 @@ class SettingsState {
       historyClearTime: historyClearTime ?? this.historyClearTime,
       autoGetCountry: autoGetCountry ?? this.autoGetCountry,
       countryCode: countryCode ?? this.countryCode,
-      sourceEngineSwitches: sourceEngineSwitches ?? this.sourceEngineSwitches,
+      sourceEngineSwitches: List.from(sourceEngineSwitches ?? this.sourceEngineSwitches),
+      chartMap: Map.from(chartMap ?? this.chartMap),
     );
   }
+
+  @override
+  List<Object?> get props => [
+    autoUpdateNotify,
+    autoSlideCharts,
+    downPath,
+    downQuality,
+    ytDownQuality,
+    strmQuality,
+    ytStrmQuality,
+    backupPath,
+    autoBackup,
+    historyClearTime,
+    autoGetCountry,
+    countryCode,
+    sourceEngineSwitches,
+    chartMap,
+  ];
 }
 
-final class SettingsInitial extends SettingsState {
+class SettingsInitial extends SettingsState {
   SettingsInitial()
       : super(
     autoUpdateNotify: false,
@@ -80,5 +102,6 @@ final class SettingsInitial extends SettingsState {
     autoGetCountry: true,
     countryCode: "IN",
     sourceEngineSwitches: SourceEngine.values.map((e) => true).toList(),
+    chartMap: {},
   );
 }

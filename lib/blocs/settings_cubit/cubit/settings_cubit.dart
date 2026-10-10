@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'package:fyrestream/model/source_engines.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/services/db/fyrestream_db_service.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 part 'settings_state.dart';
@@ -91,13 +93,30 @@ class SettingsCubit extends Cubit<SettingsState> {
       emit(state.copyWith(countryCode: value ?? "IN"));
     });
 
-    SourceEngine.values.map((e) {
-      FyreStreamDBService.getSettingBool(e.value).then((value) {
+    for (var eg in SourceEngine.values) {
+      FyreStreamDBService.getSettingBool(eg.value).then((value) {
         List<bool> switches = List.from(state.sourceEngineSwitches);
-        switches[SourceEngine.values.indexOf(e)] = value ?? true;
+        switches[SourceEngine.values.indexOf(eg)] = value ?? true;
         emit(state.copyWith(sourceEngineSwitches: switches));
+        log(switches.toString(), name: "SettingsCubit");
       });
+    }
+
+    Map chartMap = Map.from(state.chartMap);
+    FyreStreamDBService.getSettingStr(GlobalStrConsts.chartShowMap).then((value) {
+      if (value != null) {
+        chartMap = jsonDecode(value);
+      }
+      emit(state.copyWith(chartMap: Map.from(chartMap)));
     });
+  }
+
+  void setChartShow(String title, bool value) {
+    Map chartMap = Map.from(state.chartMap);
+    chartMap[title] = value;
+    FyreStreamDBService.putSettingStr(
+        GlobalStrConsts.chartShowMap, jsonEncode(chartMap));
+    emit(state.copyWith(chartMap: Map.from(chartMap)));
   }
 
   void autoUpdate() {
@@ -172,7 +191,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     List<bool> switches = List.from(state.sourceEngineSwitches);
     switches[index] = value;
     FyreStreamDBService.putSettingBool(SourceEngine.values[index].value, value);
-    emit(state.copyWith(sourceEngineSwitches: switches));
+    emit(state.copyWith(sourceEngineSwitches: List.from(switches)));
   }
 
   Future<void> resetDownPath() async {

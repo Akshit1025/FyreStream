@@ -1,7 +1,6 @@
 import 'dart:developer';
-import 'package:fyrestream/model/lyrics_models.dart';
-import 'package:fyrestream/repository/Lyrics/lrcnet_api.dart';
-import 'package:fyrestream/repository/Lyrics/lyrics.dart';
+import 'package:fyrestream/model/yt_music_model.dart';
+import 'package:fyrestream/repository/Youtube/yt_music_api.dart';
 import 'package:flutter/material.dart';
 import 'package:fyrestream/theme_data/default.dart';
 
@@ -33,12 +32,10 @@ class TestView extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () async {
-                LyricsRepository.getLyrics("bliss", "milet",
-                    album: "anytime anywhere",
-                    duration: Duration(seconds: 260),
-                    provider: LyricsProvider.lrcnet)
+                YtMusicService()
+                    .getSongData(videoId: "GlMS1asPlFQ")
                     .then((value) {
-                  log(value.toString());
+                  log(fromYtSongMap2MediaItem(value).toString());
                 });
               },
               child: const Text(

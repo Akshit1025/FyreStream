@@ -2,7 +2,6 @@
 import 'dart:developer';
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/screens/widgets/snackbar.dart';
-import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/services/db/fyrestream_db_service.dart';
 import 'package:fyrestream/utils/external_list_importer.dart';
 import 'package:fyrestream/services/file_manager.dart';
@@ -253,9 +252,7 @@ Future getIdAndShowBottomSheet(BuildContext context,
                                       if (value != null) {
                                         FyreStreamDBService.addMediaItem(
                                             MediaItem2MediaItemDB(value),
-                                            MediaPlaylistDB(
-                                                playlistName:
-                                                "Spotify Imports"));
+                                            "Spotify Imports");
                                         SnackbarService.showMessage(
                                             "Imported Media: ${value.title}");
                                       } else {
@@ -293,9 +290,7 @@ Future getIdAndShowBottomSheet(BuildContext context,
                                       if (value != null) {
                                         FyreStreamDBService.addMediaItem(
                                             MediaItem2MediaItemDB(value),
-                                            MediaPlaylistDB(
-                                                playlistName:
-                                                "Youtube Imports"));
+                                            "Youtube Imports");
                                         SnackbarService.showMessage(
                                             "Imported Media: ${value.title}");
                                       } else {
@@ -337,9 +332,7 @@ Future getIdAndShowBottomSheet(BuildContext context,
                                       if (value != null) {
                                         FyreStreamDBService.addMediaItem(
                                             MediaItem2MediaItemDB(value),
-                                            MediaPlaylistDB(
-                                                playlistName:
-                                                "Youtube Imports"));
+                                            "Youtube Imports");
                                         SnackbarService.showMessage(
                                             "Imported Media: ${value.title}");
                                       } else {

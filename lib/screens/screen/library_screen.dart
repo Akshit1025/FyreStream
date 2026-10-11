@@ -25,7 +25,7 @@ class LibraryScreen extends StatelessWidget {
               delegate: SliverChildListDelegate([
                 Padding(
                   padding: const EdgeInsets.only(
-                    left: 16,
+                    left: 8,
                   ),
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width,
@@ -127,9 +127,9 @@ class _ListOfPlaylistsState extends State<ListOfPlaylists> {
                 onSecondaryTap: () {
                   showPlaylistOptsSheet(context, widget.state.playlists[index].playlistName);
                 },
-                splashColor: Default_Theme.accentColor1.withOpacity(0.2),
-                hoverColor: Default_Theme.accentColor2.withOpacity(0.1),
-                highlightColor: Default_Theme.accentColor2.withOpacity(0.1),
+                splashColor: Default_Theme.primaryColor2.withOpacity(0.1),
+                hoverColor: Colors.white.withOpacity(0.05),
+                highlightColor: Default_Theme.primaryColor2.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(10),
                 onLongPress: () {
                   showPlaylistOptsSheet(

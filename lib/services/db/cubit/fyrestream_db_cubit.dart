@@ -31,8 +31,7 @@ class FyreStreamDBCubit extends Cubit<MediadbState> {
   }
 
   Future<void> setLike(MediaItem mediaItem, {isLiked = false}) async {
-    FyreStreamDBService.addMediaItem(MediaItem2MediaItemDB(mediaItem),
-        MediaPlaylistDB(playlistName: "Liked"));
+    FyreStreamDBService.addMediaItem(MediaItem2MediaItemDB(mediaItem), "Liked");
     // refreshLibrary.add(true);
     FyreStreamDBService.likeMediaItem(MediaItem2MediaItemDB(mediaItem),
         isLiked: isLiked);
@@ -72,17 +71,28 @@ class FyreStreamDBCubit extends Cubit<MediadbState> {
   }
   Future<MediaPlaylist> getPlaylistItems(
       MediaPlaylistDB mediaPlaylistDB) async {
-    MediaPlaylist _mediaPlaylist =
-    MediaPlaylist(mediaItems: [], albumName: mediaPlaylistDB.playlistName);
+    MediaPlaylist _mediaPlaylist = MediaPlaylist(mediaItems: [], playlistName: mediaPlaylistDB.playlistName);
     var _dbList = await FyreStreamDBService.getPlaylistItems(mediaPlaylistDB);
-    if (_dbList != null) {
-      List<int> _rankList =
-      await FyreStreamDBService.getPlaylistItemsRank(mediaPlaylistDB);
-      if (_rankList.isNotEmpty) {
-        _dbList = reorderByRank(_dbList, _rankList);
-      }
-      for (var element in _dbList) {
-        _mediaPlaylist.mediaItems.add(MediaItemDB2MediaItem(element));
+    final playlist =
+    await FyreStreamDBService.getPlaylist(mediaPlaylistDB.playlistName);
+    final info =
+    await FyreStreamDBService.getPlaylistInfo(mediaPlaylistDB.playlistName);
+    if (playlist != null) {
+      _mediaPlaylist =
+          fromPlaylistDB2MediaPlaylist(mediaPlaylistDB, playlistsInfoDB: info);
+
+      if (_dbList != null) {
+        List<int> _rankList =
+        await FyreStreamDBService.getPlaylistItemsRank(mediaPlaylistDB);
+
+        if (_rankList.isNotEmpty) {
+          _dbList = reorderByRank(_dbList, _rankList);
+        }
+        _mediaPlaylist.mediaItems.clear();
+
+        for (var element in _dbList) {
+          _mediaPlaylist.mediaItems.add(MediaItemDB2MediaItem(element));
+        }
       }
     }
     return _mediaPlaylist;
@@ -110,7 +120,7 @@ class FyreStreamDBCubit extends Cubit<MediadbState> {
     final _albumList = await FyreStreamDBService.getPlaylists4Library();
     if (_albumList.isNotEmpty) {
       _albumList.toList().forEach((element) {
-        mediaPlaylists.add(fromPlaylistDB2MediaPlaylist(element));
+        mediaPlaylists.add(element);
       });
     }
     return mediaPlaylists;
@@ -151,7 +161,7 @@ class FyreStreamDBCubit extends Cubit<MediadbState> {
       MediaItemModel mediaItemModel, MediaPlaylistDB mediaPlaylistDB,
       {bool undo = false}) async {
     final _id = await FyreStreamDBService.addMediaItem(
-        MediaItem2MediaItemDB(mediaItemModel), mediaPlaylistDB);
+        MediaItem2MediaItemDB(mediaItemModel), mediaPlaylistDB.playlistName);
     // refreshLibrary.add(true);
     if (!undo) {
       SnackbarService.showMessage(

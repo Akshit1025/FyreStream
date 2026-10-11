@@ -114,7 +114,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                         context
                                           .read<FyrestreamPlayerCubit>()
                                           .fyrestreamPlayer
-                                          .addQueueItem(e);
+                                          .addQueueItem(e, doPlay: true);
                                         // context
                                         //   .read<DownloaderCubit>()
                                         //   .downloadSong(e);

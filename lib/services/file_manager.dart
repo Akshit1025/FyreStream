@@ -82,13 +82,9 @@ class FyreStreamFileManager {
           }
           log("Playlist name: $playlistName", name: "FileManager");
 
-          final mediaPlaylistDB = MediaPlaylistDB(
-            playlistName: playlistName,
-          );
-
           for (final mediaItemMap in playlistMap['mediaItems']) {
             final mediaItemDB = MediaItemDB.fromMap(mediaItemMap);
-            await FyreStreamDBService.addMediaItem(mediaItemDB, mediaPlaylistDB);
+            await FyreStreamDBService.addMediaItem(mediaItemDB, playlistName);
             log("Media item imported successfully - ${mediaItemDB.title}",
                 name: "FileManager");
           }
@@ -114,8 +110,7 @@ class FyreStreamFileManager {
       await readFromJSON(filePath).then((mediaItemMap) {
         if (mediaItemMap != null && mediaItemMap.isNotEmpty) {
           final mediaItemDB = MediaItemDB.fromMap(mediaItemMap);
-          FyreStreamDBService.addMediaItem(
-              mediaItemDB, MediaPlaylistDB(playlistName: "Imported"));
+          FyreStreamDBService.addMediaItem(mediaItemDB, "Imported");
           log("Media item imported successfully");
           // SnackbarService.showMessage("Media item imported successfully");
         }

@@ -17,23 +17,6 @@ class CurrentPlaylistCubit extends Cubit<CurrentPlaylistState> {
   CurrentPlaylistCubit({this.mediaPlaylist, required this.fyrestreamDBCubit})
     : super(CurrentPlaylistInitial()) {}
 
-  Future<void> loadPlaylist(String playlistName) async {
-    if (mediaPlaylist !=
-        await fyrestreamDBCubit.getPlaylistItems(
-          MediaPlaylistDB(playlistName: playlistName),
-        )) {
-      setupPlaylist(playlistName);
-    } else {
-      emit(
-        state.copyWith(
-          albumName: mediaPlaylist?.albumName,
-          isFetched: true,
-            mediaItem: List<MediaItemModel>.from(mediaPlaylist!.mediaItems)
-        )
-      );
-    }
-  }
-
   Future<void> setupPlaylist(String playlistName) async {
     emit(CurrentPlaylistLoading());
     mediaPlaylist = await fyrestreamDBCubit.getPlaylistItems(
@@ -48,9 +31,10 @@ class CurrentPlaylistCubit extends Cubit<CurrentPlaylistState> {
     // log(paletteGenerator.toString());
     emit(
       state.copyWith(
-        albumName: mediaPlaylist?.albumName,
+        playlistName: mediaPlaylist?.playlistName,
         isFetched: true,
-          mediaItem: List<MediaItemModel>.from(mediaPlaylist!.mediaItems)
+        mediaPlaylist: mediaPlaylist,
+        mediaItem: List<MediaItemModel>.from(mediaPlaylist!.mediaItems)
       )
     );
   }

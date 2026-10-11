@@ -3,13 +3,13 @@
 
 <p align="center"><img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/Akshit1025/FyreStream/total?style=for-the-badge" >
 <img alt="GitHub Release" src="https://img.shields.io/github/v/release/Akshit1025/FyreStream?display_name=release&style=for-the-badge&color=f01d7c" >
-<img alt="GitHub License" src="https://img.shields.io/github/license/Akshit1025/FyreStream?style=for-the-badge&color=1881cc" > <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/Akshit1025/FyreStream/checkout.yml?style=for-the-badge" > <img src=https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white /><br><img src=https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white > <img src=https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white />
+<img alt="GitHub License" src="https://img.shields.io/github/license/Akshit1025/FyreStream?style=for-the-badge&color=1881cc" > <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/Akshit1025/FyreStream/checkout.yml?style=for-the-badge" > <img src=https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white /><br><img src=https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white > <img src=https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white /> <img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black"/>
 
 
 </p>
 <br>
 
-FyreStream is my Flutter project, An Open Source Music app designed to bring you Ad-free tunes from various sources. Dive into a world of limitless music from platforms like YouTube and Jio Saavn, with more sources firing soon! 🔥🎵
+FyreStream is experimental cross-platform Open-Source Music player designed to bring you Ad-free tunes from various sources. Dive into a world of limitless music from platforms like YouTube and Jio Saavn, with more sources firing soon! 🔥🎵
 
 ### **Why FyreStream?**
 
@@ -31,7 +31,7 @@ FyreStream is my Flutter project, An Open Source Music app designed to bring you
 - [x] 🌐 Daily Updated Global Charts
 - [x] 🖥️ Support for Windows
 - [x] 📝 Lyrics Support
-- [ ] 🐧 Support for Linux
+- [x] 🐧 Support for Linux
 - [ ] 🍏 Support for iOS
 - [ ] 🎼 AI-Generated Playlist
 - [ ] 💡 AI-Based Recommendations
@@ -40,7 +40,7 @@ FyreStream is my Flutter project, An Open Source Music app designed to bring you
 
 <center>
 <br>
-<h3>Download for Android and Windows 😍</h3>
+<h3>Download for Android, Windows & Linux(dev) 😍</h3>
 <a href="https://github.com/Akshit1025/FyreStream/releases/latest">
   <img alt="Download FyreStream" src="https://img.shields.io/badge/Download-FyreStream-2ea44f?style=for-the-badge&logo=github&logoColor=white" height="40" />
 </a></center>
@@ -54,7 +54,7 @@ FyreStream is my Flutter project, An Open Source Music app designed to bring you
 
 **How to Contribute:**
 
-1. **Fork the Repository:** Start your FyreStream journey by forking **dev(Branch)**.
+1. **Fork the Repository:** Start your FyreStream journey by forking **main(Branch)**.
 
 2. **Clone Locally:** Clone the forked repository to your local machine.
 

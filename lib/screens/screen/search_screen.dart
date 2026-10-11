@@ -244,13 +244,12 @@ class _SearchScreenState extends State<SearchScreen> {
                                         .fyrestreamPlayer
                                         .loadPlaylist(
                                         MediaPlaylist(
-                                            albumName:
+                                            playlistName:
                                             state.albumName,
                                             mediaItems:
                                             state.mediaItems),
                                         idx: index,
                                         doPlay: true);
-                                    // context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.play();
                                   } else if (context
                                       .read<FyrestreamPlayerCubit>()
                                       .fyrestreamPlayer

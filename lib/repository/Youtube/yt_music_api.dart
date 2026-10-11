@@ -217,7 +217,7 @@ class YtMusicService {
 
   Future<void> init() async {
     //Get country data
-    String? countryCode = "IN";
+    // String? countryCode = "IN";
     // if (countryCode == null) {
     //   try {
     //     final response = await get(Uri.parse('http://ip-api.com/json'));
@@ -1241,10 +1241,11 @@ class YtMusicService {
 
     return {
       'songs': songResults,
-      'name': heading,
-      'subtitle': subtitle,
-      'description': description,
+      'name': decodeUnicode(heading ?? "YoutubeMusic"),
+      'subtitle': decodeUnicode(subtitle),
+      'description': decodeUnicode(description ?? ""),
       'images': images,
+      'url': "https://music.youtube.com/playlist?list=$playlistId",
       'id': playlistId,
       'total_songs': songResults.length,
       'type':
@@ -1304,13 +1305,13 @@ class YtMusicService {
 
     body['browseId'] = "FEmusic_home";
 
-    Map params = {
-      'ctoken': cToken,
-      'continuation': cToken,
-      'itct': itct,
-    };
+    // Map params = {
+    //   'ctoken': cToken,
+    //   'continuation': cToken,
+    //   'itct': itct,
+    // };
     // print(cToken);
-    final response = await sendRequest(endpoint, body, headers, params: params);
+    // final response = await sendRequest(endpoint, body, headers, params: params);
     // print(response);
   }
 

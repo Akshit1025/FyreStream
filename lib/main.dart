@@ -237,6 +237,7 @@ class _MyAppState extends State<MyApp> {
                 routerConfig: GlobalRoutes.globalRouter,
                 theme: Default_Theme().defaultThemeData,
                 scrollBehavior: CustomScrollBehavior(),
+                debugShowCheckedModeBanner: false,
               );
             }
           },

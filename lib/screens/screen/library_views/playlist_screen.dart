@@ -1,224 +1,431 @@
+import 'dart:io';
+import 'dart:ui';
+import 'package:fyrestream/blocs/mediaPlayer/fyrestream_player_cubit.dart';
 import 'package:fyrestream/model/MediaPlaylistModel.dart';
-import 'package:fyrestream/screens/widgets/more_bottom_sheet.dart';
-import 'package:fyrestream/screens/widgets/sign_board_widget.dart';
-import 'package:fyrestream/screens/widgets/song_tile.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:icons_plus/icons_plus.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/screens/screen/library_views/cubit/current_playlist_cubit.dart';
+import 'package:fyrestream/screens/widgets/more_bottom_sheet.dart';
 import 'package:fyrestream/screens/widgets/playPause_widget.dart';
+import 'package:fyrestream/screens/widgets/sign_board_widget.dart';
+import 'package:fyrestream/screens/widgets/snackbar.dart';
+import 'package:fyrestream/screens/widgets/song_tile.dart';
 import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:fyrestream/utils/load_Image.dart';
-import '../../../blocs/mediaPlayer/fyrestream_player_cubit.dart';
-import 'dart:ui';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:icons_plus/icons_plus.dart';
+import 'package:just_audio/just_audio.dart';
+
+part 'playlist_info_dialog.dart';
 
 class PlaylistView extends StatelessWidget {
-  PlaylistView({Key? key, }) : super(key: key);
+  const PlaylistView({super.key});
+
+  final double titleScale = 1.5;
+  final double titleFontSize = 16;
+
+  Color _adjustColor(Color color, bool darken, {double amount = 0.1}) {
+    final hsl = HSLColor.fromColor(color);
+    HSLColor adjustedHsl = darken
+        ? hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0))
+        : hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
+    if (!darken && adjustedHsl.lightness < 0.75) {
+      adjustedHsl = adjustedHsl.withLightness(0.85);
+    }
+    return adjustedHsl.toColor();
+  }
+
+  List<Color> getFBColor(BuildContext context) {
+    // get foreground and background color from current playlist pallete
+    Color? color = context
+        .read<CurrentPlaylistCubit>()
+        .getCurrentPlaylistPallete()
+        ?.lightVibrantColor
+        ?.color;
+    Color? bgColor = context
+        .read<CurrentPlaylistCubit>()
+        .getCurrentPlaylistPallete()
+        ?.darkMutedColor
+        ?.color;
+    if (bgColor != null && color != null) {
+      //calculate contrast between two color and bgcolor
+      final double contrast =
+          bgColor.computeLuminance() / color.computeLuminance();
+      if (contrast > 0.05) {
+        color = _adjustColor(color, false);
+        bgColor = _adjustColor(bgColor, true);
+      }
+      return [color, bgColor];
+    }
+    return [Colors.white, Colors.black];
+  }
 
   @override
   Widget build(BuildContext context) {
-    // setUpPlaylist(context);
-    return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Default_Theme.themeColor,
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(0, 0, 0, 0),
-        elevation: 0,
-        foregroundColor: Default_Theme.primaryColor1,
-      ),
-      body: BlocBuilder<CurrentPlaylistCubit, CurrentPlaylistState>(
-        builder: (context, state) {
-          if (state is! CurrentPlaylistInitial && state.mediaItems.isNotEmpty) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SizedBox(
-                  height: 380,
-                  child: Stack(
-                    children: [
-                      Opacity(
-                        opacity: 0.5,
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          height: 260,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.transparent,
-                              boxShadow: [
-                                BoxShadow(
-                                  color:
-                                      context
-                                          .read<CurrentPlaylistCubit>()
-                                          .getCurrentPlaylistPallete()
-                                          ?.lightVibrantColor
-                                          ?.color ??
-                                      Colors.blue,
-                                  blurRadius: 50,
-                                  spreadRadius: 2,
-                                ),
-                              ],
+    return SafeArea(
+      child: Scaffold(
+        extendBodyBehindAppBar: true,
+        backgroundColor: Default_Theme.themeColor,
+        body: BlocBuilder<CurrentPlaylistCubit, CurrentPlaylistState>(
+          builder: (context, state) {
+            const double maxExtent = 300;
+            return AnimatedSwitcher(
+              duration: const Duration(milliseconds: 400),
+              child: (state is! CurrentPlaylistInitial &&
+                  state.mediaPlaylist.mediaItems.isNotEmpty)
+                  ? CustomScrollView(
+                key: const ValueKey('1'),
+                physics: const BouncingScrollPhysics(),
+                primary: true,
+                slivers: [
+                  SliverAppBar(
+                    leading: IconButton(
+                      icon: const Icon(
+                        Icons.arrow_back,
+                      ),
+                      hoverColor: getFBColor(context)[1].withOpacity(0.3),
+                      highlightColor:
+                      getFBColor(context)[0].withOpacity(0.6),
+                      color: getFBColor(context)[0],
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                            getFBColor(context)[1].withOpacity(0.1)),
+                      ),
+                      onPressed: () {
+                        context.pop();
+                      },
+                    ),
+                    backgroundColor: Default_Theme.themeColor,
+                    surfaceTintColor: Default_Theme.themeColor,
+                    expandedHeight: maxExtent,
+                    floating: false,
+                    pinned: true,
+                    centerTitle: false,
+                    flexibleSpace:
+                    LayoutBuilder(builder: (context, constraints) {
+                      final double percentage =
+                          (constraints.maxHeight - kToolbarHeight) /
+                              (maxExtent - kToolbarHeight);
+                      const double startPadding = 20.0;
+                      const double endPadding = 60.0;
+                      final double horizontalPadding = startPadding +
+                          (endPadding - startPadding) *
+                              (1.0 - percentage);
+                      final bool isCollapsed = percentage < 0.4;
+
+                      final span = TextSpan(
+                        text: state.mediaPlaylist.playlistName,
+                        style:
+                        Default_Theme.secondoryTextStyleMedium.merge(
+                          TextStyle(
+                            fontSize: titleFontSize,
+                            color: getFBColor(context)[0],
+                          ),
+                        ),
+                      );
+
+                      final textPainter = TextPainter(
+                          text: span,
+                          textDirection: TextDirection.ltr,
+                          maxLines: 3,
+                          textScaler: TextScaler.linear(titleScale))
+                        ..layout(
+                            maxWidth:
+                            constraints.maxWidth - horizontalPadding);
+
+                      final textHeight = textPainter.height;
+
+                      return FlexibleSpaceBar(
+                        expandedTitleScale: titleScale,
+                        titlePadding: EdgeInsets.only(
+                            left: horizontalPadding,
+                            bottom: isCollapsed ? 16 : 10),
+                        title: Text(
+                          state.mediaPlaylist.playlistName,
+                          maxLines: isCollapsed ? 1 : 3,
+                          style: Default_Theme.secondoryTextStyleMedium
+                              .merge(
+                            TextStyle(
+                              fontSize: titleFontSize,
+                              overflow: TextOverflow.ellipsis,
+                              color: getFBColor(context)[0],
                             ),
                           ),
                         ),
+                        background: LayoutBuilder(
+                            builder: (context, constraints) {
+                              return Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  loadImageCached(state
+                                      .mediaPlaylist.mediaItems.first.artUri
+                                      .toString()),
+                                  Positioned(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                            colors: [
+                                              getFBColor(context)[1]
+                                                  .withOpacity(0.0),
+                                              getFBColor(context)[1]
+                                                  .withOpacity(1),
+                                            ],
+                                            stops: const [0.5, 1],
+                                          ),
+                                        ),
+                                      )),
+
+                                  // Lower portion with blur
+                                  Positioned.fill(
+                                    top: MediaQuery.of(context).size.height *
+                                        0.6, // Adjust this position as needed
+                                    child: BackdropFilter(
+                                      filter: ImageFilter.blur(
+                                          sigmaX: 30, sigmaY: 30),
+                                      child: Container(
+                                        color: Colors.black.withOpacity(
+                                            0), // Keep the container color transparent
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned.fill(
+                                    top: 10,
+                                    child: Align(
+                                      alignment: Alignment.topCenter,
+                                      child: SizedBox(
+                                        height: constraints.maxHeight -
+                                            (textHeight + 30),
+                                        child: FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 80, right: 80),
+                                            child: loadImageCached(state
+                                                .mediaPlaylist
+                                                .mediaItems
+                                                .first
+                                                .artUri
+                                                .toString()),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Positioned(
+                                      right: 8,
+                                      top: 8,
+                                      child: IconButton(
+                                        icon: const Icon(
+                                          MingCute.more_1_line,
+                                        ),
+                                        hoverColor: getFBColor(context)[1]
+                                            .withOpacity(0.2),
+                                        color: getFBColor(context)[0],
+                                        style: ButtonStyle(
+                                          backgroundColor:
+                                          MaterialStateProperty.all(
+                                              getFBColor(context)[1]
+                                                  .withOpacity(0.05)),
+                                        ),
+                                        onPressed: () {
+                                          // dialog to show all information about the playlist (playlist name, source, description, original link, type, etc  )
+                                          showPlaylistInfo(context, state,
+                                              fgColor: getFBColor(context)[0],
+                                              bgColor:
+                                              getFBColor(context)[1]);
+                                        },
+                                      )),
+                                  // blur fade effect bottom edge
+                                ],
+                              );
+                            }),
+                      );
+                    }),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        top: 12,
+                        bottom: 12,
+                        left: 16,
                       ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        height: 260,
-                        child: Container(
-                          color: Colors.blueAccent.shade400,
-                          child: loadImageCached(
-                              context
-                                  .read<CurrentPlaylistCubit>()
-                                  .getPlaylistCoverArt(),
-                              fit: BoxFit.cover
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              "${state.mediaPlaylist.isAlbum ? "Album" : "Playlist"} • ${state.mediaPlaylist.mediaItems.length} Songs \nby ${state.mediaPlaylist.artists ?? 'You'}",
+                              style: Default_Theme.secondoryTextStyle
+                                  .merge(TextStyle(
+                                color: Default_Theme.primaryColor1
+                                    .withOpacity(0.8),
+                                fontSize: 12,
+                              )),
+                            ),
                           ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 225,
-                        right: 20,
-                        child: StreamBuilder<String>(
-                          stream: context
-                              .watch<FyrestreamPlayerCubit>()
-                              .fyrestreamPlayer
-                              .queueTitle,
-                          builder: (context, snapshot) {
-                            if (snapshot.hasData &&
-                                snapshot.data == state.albumName) {
-                              return StreamBuilder<PlayerState>(
-                                stream: context
+                          const Spacer(),
+                          IconButton(
+                              onPressed: () {
+                                context
                                     .read<FyrestreamPlayerCubit>()
                                     .fyrestreamPlayer
                                     .audioPlayer
-                                    .playerStateStream,
-                                builder: (context, snapshot2) {
-                                  if (snapshot2.hasData &&
-                                      (snapshot2.data?.playing ?? false)) {
-                                    return PlayPauseButton(
-                                      onPause: () => context
-                                          .read<FyrestreamPlayerCubit>()
-                                          .fyrestreamPlayer
-                                          .pause(),
-                                      onPlay: () => context
-                                          .read<FyrestreamPlayerCubit>()
-                                          .fyrestreamPlayer
-                                          .play(),
-                                      isPlaying: true,
-                                      size: 70,
-                                    );
-                                  } else {
-                                    return PlayPauseButton(
-                                      onPause: () => context
-                                          .read<FyrestreamPlayerCubit>()
-                                          .fyrestreamPlayer
-                                          .pause(),
-                                      onPlay: () => context
-                                          .read<FyrestreamPlayerCubit>()
-                                          .fyrestreamPlayer
-                                          .play(),
-                                      isPlaying: false,
-                                      size: 70,
-                                    );
-                                  }
-                                },
-                              );
-                            } else {
-                              return PlayPauseButton(
-                                onPause: () => context
+                                    .setShuffleModeEnabled(true);
+                                context
                                     .read<FyrestreamPlayerCubit>()
                                     .fyrestreamPlayer
-                                    .pause(),
-                                onPlay: () {
-                                  context
-                                      .read<FyrestreamPlayerCubit>()
-                                      .fyrestreamPlayer
-                                      .loadPlaylist(MediaPlaylist(
-                                      mediaItems: state.mediaItems,
-                                      albumName: state.albumName));
-                                  context
-                                      .read<FyrestreamPlayerCubit>()
-                                      .fyrestreamPlayer
-                                      .play();
-                                },
-                                size: 70,
-                              );
-                            }
-                          },
-                        ),
-                      ),
-                      Positioned(
-                        top: 280,
-                        left: 14,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(
-                              width: 300,
-                              child: Text(
-                                state.albumName,
-                                maxLines: 2,
-                                overflow: TextOverflow.fade,
-                                style: Default_Theme.secondoryTextStyle.merge(
-                                  const TextStyle(
-                                    color: Default_Theme.primaryColor1,
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Text(
-                              "Playlist",
-                              style: Default_Theme.secondoryTextStyle.merge(
-                                TextStyle(
+                                    .loadPlaylist(
+                                    MediaPlaylist(
+                                        mediaItems: state
+                                            .mediaPlaylist.mediaItems,
+                                        playlistName: state
+                                            .mediaPlaylist
+                                            .playlistName),
+                                    doPlay: true);
+                              },
+                              iconSize: 22,
+                              padding: EdgeInsets.zero,
+                              icon: Icon(MingCute.shuffle_line,
                                   color: Default_Theme.primaryColor1
-                                      .withOpacity(0.8),
-                                  fontSize: 14,
-                                ),
-                              ),
+                                      .withOpacity(0.8))),
+                          Padding(
+                            padding:
+                            const EdgeInsets.only(right: 16, left: 5),
+                            child: BlocBuilder<CurrentPlaylistCubit,
+                                CurrentPlaylistState>(
+                              builder: (context, state) {
+                                return StreamBuilder<String>(
+                                    stream: context
+                                        .watch<FyrestreamPlayerCubit>()
+                                        .fyrestreamPlayer
+                                        .queueTitle,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData &&
+                                          snapshot.data ==
+                                              state.mediaPlaylist
+                                                  .playlistName) {
+                                        return StreamBuilder<PlayerState>(
+                                            stream: context
+                                                .read<
+                                                FyrestreamPlayerCubit>()
+                                                .fyrestreamPlayer
+                                                .audioPlayer
+                                                .playerStateStream,
+                                            builder:
+                                                (context, snapshot2) {
+                                              if (snapshot2.hasData &&
+                                                  (snapshot2.data
+                                                      ?.playing ??
+                                                      false)) {
+                                                return PlayPauseButton(
+                                                  onPause: () => context
+                                                      .read<
+                                                      FyrestreamPlayerCubit>()
+                                                      .fyrestreamPlayer
+                                                      .pause(),
+                                                  onPlay: () => context
+                                                      .read<
+                                                      FyrestreamPlayerCubit>()
+                                                      .fyrestreamPlayer
+                                                      .audioPlayer
+                                                      .play(),
+                                                  isPlaying: true,
+                                                  size: 35,
+                                                );
+                                              } else {
+                                                return PlayPauseButton(
+                                                  onPause: () => context
+                                                      .read<
+                                                      FyrestreamPlayerCubit>()
+                                                      .fyrestreamPlayer
+                                                      .pause(),
+                                                  onPlay: () => context
+                                                      .read<
+                                                      FyrestreamPlayerCubit>()
+                                                      .fyrestreamPlayer
+                                                      .audioPlayer
+                                                      .play(),
+                                                  isPlaying: false,
+                                                  size: 35,
+                                                );
+                                              }
+                                            });
+                                      } else {
+                                        return PlayPauseButton(
+                                          onPause: () => context
+                                              .read<FyrestreamPlayerCubit>()
+                                              .fyrestreamPlayer
+                                              .pause(),
+                                          onPlay: () {
+                                            context
+                                                .read<
+                                                FyrestreamPlayerCubit>()
+                                                .fyrestreamPlayer
+                                                .loadPlaylist(
+                                                MediaPlaylist(
+                                                    mediaItems: state
+                                                        .mediaPlaylist
+                                                        .mediaItems,
+                                                    playlistName: state
+                                                        .mediaPlaylist
+                                                        .playlistName),
+                                                doPlay: true);
+                                          },
+                                          size: 35,
+                                        );
+                                      }
+                                    });
+                              },
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 20),
-                              child: Text(
-                                "${state.mediaItems.length} Songs",
-                                style: Default_Theme.secondoryTextStyle.merge(
-                                  TextStyle(
-                                    color: Default_Theme.primaryColor1
-                                        .withOpacity(0.8),
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-                Expanded(child: Playlist(state: state)),
-              ],
+                  SliverToBoxAdapter(
+                    child: Playlist(
+                      state: state,
+                    ),
+                  )
+                ],
+              )
+                  : ((state is CurrentPlaylistInitial ||
+                  state is CurrentPlaylistLoading)
+                  ? const CustomScrollView(
+                key: ValueKey('2'),
+                slivers: [
+                  SliverAppBar(),
+                  SliverFillRemaining(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                ],
+              )
+                  : const CustomScrollView(
+                key: ValueKey('3'),
+                slivers: [
+                  SliverAppBar(),
+                  SliverFillRemaining(
+                    child: Center(
+                      child: SignBoardWidget(
+                        message: "No Songs Yet!",
+                        icon: MingCute.playlist_line,
+                      ),
+                    ),
+                  )
+                ],
+              )),
             );
-          } else if (state is CurrentPlaylistLoading) {
-            return const Center(
-              child: SizedBox(
-                width: 50,
-                height: 50,
-                child: CircularProgressIndicator(),
-              ),
-            );
-          } else {
-            return const SignBoardWidget(
-                message: "No Songs Yet", icon: MingCute.playlist_line
-            );
-          }
-        },
+          },
+        ),
       ),
     );
   }
@@ -226,7 +433,6 @@ class PlaylistView extends StatelessWidget {
 
 class Playlist extends StatefulWidget {
   final CurrentPlaylistState state;
-
   const Playlist({super.key, required this.state});
 
   @override
@@ -239,65 +445,71 @@ class _PlaylistState extends State<Playlist> {
     final _state = widget.state;
     return ReorderableListView.builder(
       physics: const BouncingScrollPhysics(),
+      shrinkWrap: true,
       proxyDecorator: proxyDecorator,
       itemBuilder: (context, index) {
         return SongCardWidget(
-          song: _state.mediaItems[index],
-          key: ValueKey(_state.mediaItems[index].id),
-            onTap: () {
-              if (!listEquals(
-                context
-                    .read<FyrestreamPlayerCubit>()
-                    .fyrestreamPlayer
-                    .queue
-                    .value,
-                  _state.mediaItems)) {
-                context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.loadPlaylist(
-                    MediaPlaylist(
-                        mediaItems: _state.mediaItems,
-                        albumName: _state.albumName),
-                    idx: index,
-                    doPlay: true);
-                // context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.play();
-              } else if (context
+          song: _state.mediaPlaylist.mediaItems[index],
+          key: ValueKey(_state.mediaPlaylist.mediaItems[index].id),
+          trailing: Platform.isAndroid
+              ? null
+              : ReorderableDragStartListener(
+            index: index,
+            child: SizedBox(
+              child: Icon(
+                Icons.drag_handle,
+                color: Default_Theme.primaryColor1.withOpacity(0.0),
+              ),
+            ),
+          ),
+          onTap: () {
+            if (!listEquals(
+                context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.queue.value,
+                _state.mediaPlaylist.mediaItems)) {
+              context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.loadPlaylist(
+                  MediaPlaylist(
+                      mediaItems: _state.mediaPlaylist.mediaItems,
+                      playlistName: _state.mediaPlaylist.playlistName),
+                  idx: index,
+                  doPlay: true);
+            } else if (context
+                .read<FyrestreamPlayerCubit>()
+                .fyrestreamPlayer
+                .currentMedia !=
+                _state.mediaPlaylist.mediaItems[index]) {
+              context
                   .read<FyrestreamPlayerCubit>()
                   .fyrestreamPlayer
-                  .currentMedia !=
-                  _state.mediaItems[index]) {
-                context
-                    .read<FyrestreamPlayerCubit>()
-                    .fyrestreamPlayer
-                    .prepare4play(idx: index, doPlay: true);
-              }
+                  .prepare4play(idx: index, doPlay: true);
+            }
 
-              context.push('/MusicPlayer');
-            },
+            context.push('/MusicPlayer');
+          },
           onOptionsTap: () {
-            showMoreBottomSheet(context, _state.mediaItems[index],
+            showMoreBottomSheet(context, _state.mediaPlaylist.mediaItems[index],
                 onDelete: () {
                   context.read<FyreStreamDBCubit>().removeMediaFromPlaylist(
-                      _state.mediaItems[index],
-                      MediaPlaylistDB(playlistName: _state.albumName));
+                      _state.mediaPlaylist.mediaItems[index],
+                      MediaPlaylistDB(
+                          playlistName: _state.mediaPlaylist.playlistName));
                   setState(() {
-                    _state.mediaItems.removeAt(index);
+                    _state.mediaPlaylist.mediaItems.removeAt(index);
                   });
                 }, showDelete: true);
           },
         );
       },
-      itemCount: _state.mediaItems.length,
+      itemCount: _state.mediaPlaylist.mediaItems.length,
       onReorder: (oldIndex, newIndex) {
         setState(() {
           if (oldIndex < newIndex) {
             newIndex -= 1;
           }
-          final MediaItemModel item = _state.mediaItems.removeAt(oldIndex);
-          _state.mediaItems.insert(newIndex, item);
+          final MediaItemModel item =
+          _state.mediaPlaylist.mediaItems.removeAt(oldIndex);
+          _state.mediaPlaylist.mediaItems.insert(newIndex, item);
           context.read<FyreStreamDBCubit>().reorderPositionOfItemInDB(
-            _state.albumName,
-            oldIndex,
-            newIndex,
-          );
+              _state.mediaPlaylist.playlistName, oldIndex, newIndex);
         });
       },
     );

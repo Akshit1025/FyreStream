@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:fyrestream/blocs/add_to_playlist/cubit/add_to_playlist_cubit.dart';
 import 'package:fyrestream/blocs/mediaPlayer/fyrestream_player_cubit.dart';
 import 'package:fyrestream/blocs/mini_player/mini_player_bloc.dart';
@@ -10,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 class MiniPlayerWidget extends StatelessWidget {
   const MiniPlayerWidget({Key? key}) : super(key: key);
@@ -88,8 +91,17 @@ class MiniPlayerCard extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
-              Container(
-                color: Colors.black.withOpacity(0.85),
+              Positioned.fill(
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaY: 18,
+                    sigmaX: 18,
+                  ),
+                  child: Container(
+                    color: Colors.black.withOpacity(
+                        0.55), // Keep the container color transparent
+                  ),
+                ),
               ),
               Row(
                 children: [
@@ -137,6 +149,15 @@ class MiniPlayerCard extends StatelessWidget {
                       ],
                     ),
                   ),
+                  ResponsiveBreakpoints.of(context).isDesktop
+                      ? IconButton(
+                    icon: const Icon(
+                      FontAwesome.backward_step_solid,
+                      size: 28,
+                    ),
+                    onPressed: () {},
+                  )
+                      : const SizedBox.shrink(),
                   (state.isBuffering || isProcessing)
                       ? const Padding(
                     padding: EdgeInsets.all(10.0),
@@ -152,7 +173,7 @@ class MiniPlayerCard extends StatelessWidget {
                         context
                             .read<FyrestreamPlayerCubit>()
                             .fyrestreamPlayer
-                            .rewind();
+                            .skipToPrevious();
                       },
                       icon: const Icon(FontAwesome.rotate_right_solid,
                           size: 25))
@@ -175,6 +196,20 @@ class MiniPlayerCard extends StatelessWidget {
                           .play();
                     },
                   )),
+                  ResponsiveBreakpoints.of(context).isDesktop
+                      ? IconButton(
+                    icon: const Icon(
+                      FontAwesome.forward_step_solid,
+                      size: 28,
+                    ),
+                    onPressed: () {
+                      context
+                          .read<FyrestreamPlayerCubit>()
+                          .fyrestreamPlayer
+                          .skipToNext();
+                    },
+                  )
+                      : const SizedBox.shrink(),
                   IconButton(
                       onPressed: () {
                         context.read<AddToPlaylistCubit>().setMediaItemModel(

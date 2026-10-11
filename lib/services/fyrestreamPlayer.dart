@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 import 'package:fyrestream/model/saavnModel.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/widgets/snackbar.dart';
@@ -261,9 +262,10 @@ class FyreStreamMusicPlayer extends BaseAudioHandler
             isLinkProcessing.add(false);
             if (!isPaused || doPlay) {
               log("doPlay", name: "fyrestreamPlayer");
-              await audioPlayer.play();
-              if (!audioPlayer.playing) {
-                await audioPlayer.play();
+              await play();
+              if (Platform.isWindows && audioPlayer.playing == false) {
+                // temp fix for windows (first play not working)
+                await play();
               }
             }
           });

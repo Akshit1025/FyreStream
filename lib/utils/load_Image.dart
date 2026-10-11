@@ -68,6 +68,45 @@ CachedNetworkImage loadImageCached(
   );
 }
 
+class LoadImageCached extends StatefulWidget {
+  final String imageUrl;
+  final String placeholderUrl;
+  final BoxFit fit;
+  final double height;
+
+  const LoadImageCached({
+    Key? key,
+    required this.imageUrl,
+    this.placeholderUrl = "assets/icons/fyrestream_new_logo_c.png",
+    this.fit = BoxFit.cover,
+    this.height = 500,
+  }) : super(key: key);
+
+  @override
+  State<LoadImageCached> createState() => _LoadImageCachedState();
+}
+
+class _LoadImageCachedState extends State<LoadImageCached> {
+  @override
+  Widget build(BuildContext context) {
+    return CachedNetworkImage(
+      imageUrl: widget.imageUrl,
+      height: widget.height,
+      // memCacheHeight: 500,
+      placeholder: (context, url) => Image(
+        image: const AssetImage("assets/icons/lazy_loading.png"),
+        fit: widget.fit,
+      ),
+      errorWidget: (context, url, error) => Image(
+        image: AssetImage(widget.placeholderUrl),
+        fit: widget.fit,
+      ),
+      fadeInDuration: const Duration(milliseconds: 700),
+      fit: widget.fit,
+    );
+  }
+}
+
 Future<ImageProvider> getImageProvider(
   String imageUrl, {
   String placeholderUrl = "assets/icons/fyrestream_new_logo_c.png",

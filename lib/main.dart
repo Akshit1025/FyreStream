@@ -99,9 +99,11 @@ void setupPlayerCubit() {
 }
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  GestureBinding.instance.resamplingEnabled = true;
   if (io.Platform.isLinux) {
     JustAudioMediaKit.ensureInitialized(
       linux: true,
+      windows: false,
     );
   }
   setHighRefreshRate();

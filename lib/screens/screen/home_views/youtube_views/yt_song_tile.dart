@@ -50,12 +50,12 @@ class _YtSongTileState extends State<YtSongTile> {
                   height: 60,
                   width: 80,
                   child:
-                  loadImageCached(widget.imgUrl, fit: BoxFit.cover),
+                  LoadImageCached(imageUrl: widget.imgUrl, fit: BoxFit.cover),
                 )
                     : SizedBox(
                     height: 60,
                     width: 60,
-                    child: loadImageCached(widget.imgUrl))),
+                    child: LoadImageCached(imageUrl: widget.imgUrl))),
           ),
           title: Text(
             widget.title,

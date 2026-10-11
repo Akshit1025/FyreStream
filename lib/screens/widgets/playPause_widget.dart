@@ -27,7 +27,6 @@ class _PlayPauseButtonState extends State<PlayPauseButton> {
   late Color _currentColor;
 
   void _togglePlayPause() {
-    print(_isPlaying);
     setState(() {
       _isPlaying ? widget.onPause!() : widget.onPlay!();
       _isPlaying = !_isPlaying;

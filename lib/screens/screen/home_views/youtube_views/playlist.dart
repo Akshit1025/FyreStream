@@ -15,6 +15,7 @@ import 'package:fyrestream/model/youtube_vid_model.dart';
 import 'package:fyrestream/repository/Youtube/youtube_api.dart';
 import 'package:fyrestream/repository/Youtube/yt_music_api.dart';
 import 'package:fyrestream/screens/widgets/sign_board_widget.dart';
+import 'package:fyrestream/utils/imgurl_formator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fyrestream/theme_data/default.dart';
@@ -110,12 +111,24 @@ class _YoutubePlaylistState extends State<YoutubePlaylist> {
                           child: CircularProgressIndicator()),
                     )
                         : snapshot.hasError
-                        ? const Center(
-                      child: SignBoardWidget(
-                        message:
-                        "Got Error while loading data",
-                        icon: MingCute.loading_line,
-                      ),
+                        ? const CustomScrollView(
+                      slivers: [
+                        SliverAppBar(
+                          backgroundColor:
+                          Default_Theme.themeColor,
+                          surfaceTintColor:
+                          Default_Theme.themeColor,
+                        ),
+                        SliverFillRemaining(
+                          child: Center(
+                            child: SignBoardWidget(
+                              message:
+                              "Got Error while loading data",
+                              icon: MingCute.loading_line,
+                            ),
+                          ),
+                        ),
+                      ],
                     )
                         : CustomScrollView(
                       slivers: [
@@ -200,7 +213,10 @@ class _YoutubePlaylistState extends State<YoutubePlaylist> {
                                             .width *
                                             0.15,
                                         child: LoadImageCached(
-                                          imageUrl: widget.imgPath,
+                                          imageUrl: formatImgURL(
+                                            widget.imgPath,
+                                            ImageQuality.low,
+                                          ),
                                         ),
                                       ),
                                     ),

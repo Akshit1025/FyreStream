@@ -2,6 +2,7 @@
 import 'package:fyrestream/screens/screen/song_info_screen.dart';
 import 'package:fyrestream/screens/widgets/snackbar.dart';
 import 'package:fyrestream/services/db/fyrestream_db_service.dart';
+import 'package:fyrestream/utils/imgurl_formator.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -87,14 +88,24 @@ class SongCardWidget extends StatelessWidget {
                       ? SizedBox(
                     width: 80,
                     height: 55,
-                    child: LoadImageCached(imageUrl: song.artUri.toString(),
-                        fit: BoxFit.cover, height: 80,),
+                    child: LoadImageCached(
+                      imageUrl: formatImgURL(
+                        song.artUri.toString(),
+                        ImageQuality.low,
+                      ),
+                      fit: BoxFit.cover,
+                    ),
                   )
                       : SizedBox(
                     width: 55,
                     height: 55,
-                    child: LoadImageCached(imageUrl: song.artUri.toString(),
-                        fit: BoxFit.cover, height: 80,),
+                    child: LoadImageCached(
+                      imageUrl: formatImgURL(
+                        song.artUri.toString(),
+                        ImageQuality.low,
+                      ),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),

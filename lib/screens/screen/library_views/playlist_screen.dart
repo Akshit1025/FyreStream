@@ -12,6 +12,7 @@ import 'package:fyrestream/screens/widgets/song_tile.dart';
 import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/theme_data/default.dart';
+import 'package:fyrestream/utils/imgurl_formator.dart';
 import 'package:fyrestream/utils/load_Image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -164,9 +165,7 @@ class PlaylistView extends StatelessWidget {
                                 fit: StackFit.expand,
                                 children: [
                                   LoadImageCached(
-                                      imageUrl: state.mediaPlaylist.mediaItems
-                                          .first.artUri
-                                          .toString()),
+                                      imageUrl: formatImgURL(state.mediaPlaylist.mediaItems.first.artUri.toString(), ImageQuality.low)),
                                   Positioned(
                                       child: Container(
                                         decoration: BoxDecoration(
@@ -209,10 +208,31 @@ class PlaylistView extends StatelessWidget {
                                           child: Padding(
                                             padding: const EdgeInsets.only(
                                                 left: 80, right: 80),
-                                            child: LoadImageCached(
-                                                imageUrl: state.mediaPlaylist
-                                                    .mediaItems.first.artUri
-                                                    .toString()),
+                                            child: Container(
+                                              // shadow effect
+                                              decoration: BoxDecoration(
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color:
+                                                    getFBColor(context)[1]
+                                                        .withOpacity(0.2),
+                                                    spreadRadius: 5,
+                                                    blurRadius: 7,
+                                                    offset: const Offset(0,
+                                                        3), // changes position of shadow
+                                                  ),
+                                                ],
+                                              ),
+                                              child: LoadImageCached(
+                                                  imageUrl: formatImgURL(
+                                                      state
+                                                          .mediaPlaylist
+                                                          .mediaItems
+                                                          .first
+                                                          .artUri
+                                                          .toString(),
+                                                      ImageQuality.high)),
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -490,116 +510,4 @@ class PlaylistView extends StatelessWidget {
       ),
     );
   }
-}
-
-class SliverPlaylistItems extends StatefulWidget {
-  const SliverPlaylistItems({Key? key, required this.state}) : super(key: key);
-
-  final CurrentPlaylistState state;
-
-  @override
-  State<SliverPlaylistItems> createState() => _SliverPlaylistItemsState();
-}
-
-class _SliverPlaylistItemsState extends State<SliverPlaylistItems> {
-  List<MediaItemModel> mediaItems = [];
-
-  @override
-  void initState() {
-    setState(() {
-      mediaItems = widget.state.mediaPlaylist.mediaItems;
-    });
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverPadding(
-      padding: const EdgeInsets.only(left: 8, right: 8),
-      sliver: SliverReorderableList(
-        itemBuilder: (context, index) {
-          return ReorderableDelayedDragStartListener(
-            key: ValueKey(mediaItems[index].id),
-            enabled: false,
-            index: index,
-            child: SongCardWidget(
-              song: mediaItems[index],
-              onTap: () {
-                if (!listEquals(
-                    context
-                        .read<FyrestreamPlayerCubit>()
-                        .fyrestreamPlayer
-                        .queue
-                        .value,
-                    widget.state.mediaPlaylist.mediaItems)) {
-                  context.read<FyrestreamPlayerCubit>().fyrestreamPlayer.loadPlaylist(
-                      MediaPlaylist(
-                          mediaItems: mediaItems,
-                          playlistName:
-                          widget.state.mediaPlaylist.playlistName),
-                      idx: index,
-                      doPlay: true);
-                } else if (context
-                    .read<FyrestreamPlayerCubit>()
-                    .fyrestreamPlayer
-                    .currentMedia !=
-                    mediaItems[index]) {
-                  context
-                      .read<FyrestreamPlayerCubit>()
-                      .fyrestreamPlayer
-                      .prepare4play(idx: index, doPlay: true);
-                }
-
-                context.push('/MusicPlayer');
-              },
-              onOptionsTap: () {
-                showMoreBottomSheet(
-                    context, widget.state.mediaPlaylist.mediaItems[index],
-                    onDelete: () {
-                      context.read<FyreStreamDBCubit>().removeMediaFromPlaylist(
-                        widget.state.mediaPlaylist.mediaItems[index],
-                        MediaPlaylistDB(
-                            playlistName:
-                            widget.state.mediaPlaylist.playlistName),
-                      );
-                    }, showDelete: true);
-              },
-            ),
-          );
-        },
-        itemExtent: 70,
-        itemCount: mediaItems.length,
-        proxyDecorator: proxyDecorator,
-        onReorder: (oldIndex, newIndex) {
-          setState(() {
-            if (oldIndex < newIndex) {
-              newIndex -= 1;
-            }
-            final MediaItemModel item = mediaItems.removeAt(oldIndex);
-            mediaItems.insert(newIndex, item);
-            context.read<FyreStreamDBCubit>().reorderPositionOfItemInDB(
-                widget.state.mediaPlaylist.playlistName, oldIndex, newIndex);
-          });
-        },
-      ),
-    );
-  }
-}
-
-Widget proxyDecorator(Widget child, int index, Animation<double> animation) {
-  return AnimatedBuilder(
-    animation: animation,
-    builder: (BuildContext context, Widget? child) {
-      final double animValue = Curves.easeInOut.transform(animation.value);
-      final double elevation = lerpDouble(0, 6, animValue)!;
-      return Material(
-        elevation: elevation,
-        color: const Color.fromARGB(255, 0, 48, 66),
-        borderRadius: BorderRadius.circular(12),
-        shadowColor: Default_Theme.themeColor,
-        child: child,
-      );
-    },
-    child: child,
-  );
 }

@@ -1,9 +1,13 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:developer';
+
+import 'package:fyrestream/utils/imgurl_formator.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/utils/load_Image.dart';
 import '../../theme_data/default.dart';
+
 class ChartListTile extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -24,6 +28,7 @@ class ChartListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
+        log("imgUrl: $imgUrl", name: "ChartListTile");
         if (onTap != null) {
           onTap!();
         } else {
@@ -40,10 +45,14 @@ class ChartListTile extends StatelessWidget {
                   ? SizedBox(
                 height: 60,
                 width: 80,
-                child: LoadImageCached(imageUrl: imgUrl, fit: BoxFit.cover),
+                child: LoadImageCached(imageUrl: formatImgURL(imgUrl, ImageQuality.low), fit: BoxFit.cover),
               )
                   : SizedBox(
-                  height: 60, width: 60, child: LoadImageCached(imageUrl: imgUrl))),
+                  height: 60,
+                  width: 60,
+                  child: LoadImageCached(imageUrl: formatImgURL(imgUrl, ImageQuality.low))
+              )
+          ),
           title: Text(
             title,
             textAlign: TextAlign.start,

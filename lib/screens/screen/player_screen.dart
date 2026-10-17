@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:developer';
 import 'dart:ui';
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/screens/screen/home_views/timer_view.dart';
@@ -5,6 +7,7 @@ import 'package:fyrestream/screens/widgets/more_bottom_sheet.dart';
 import 'package:fyrestream/screens/widgets/song_tile.dart';
 import 'package:fyrestream/screens/widgets/volume_slider.dart';
 import 'package:fyrestream/services/fyrestreamPlayer.dart';
+import 'package:fyrestream/utils/imgurl_formator.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +22,7 @@ import 'package:fyrestream/theme_data/default.dart';
 import 'package:fyrestream/utils/load_Image.dart';
 import 'package:fyrestream/utils/pallete_generator.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 import '../../blocs/mediaPlayer/fyrestream_player_cubit.dart';
@@ -56,6 +60,12 @@ class _AudioPlayerViewState extends State<AudioPlayerView>
         _tabController.animateTo(0);
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
@@ -343,33 +353,93 @@ class CoverImageVolSlider extends StatelessWidget {
         child: StreamBuilder<MediaItem?>(
             stream: context.watch<FyrestreamPlayerCubit>().fyrestreamPlayer.mediaItem,
             builder: (context, snapshot) {
-              return ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: 200 + constraints.maxWidth * 0.85,
-                  minWidth: 200,
-                  maxHeight: 200 + constraints.maxHeight * 0.90,
-                  minHeight: 200,
-                ),
-                child: AspectRatio(
-                  aspectRatio: 1.0,
+              return LayoutBuilder(builder: (context, constraints) {
+                return ConstrainedBox(
+                  constraints: BoxConstraints(
+                      maxWidth: constraints.maxWidth * 0.98,
+                      maxHeight: constraints.maxHeight * 0.98),
                   child: LoadImageCached(
-                      imageUrl: (snapshot.data?.artUri ?? "").toString(),
+                      imageUrl: formatImgURL(
+                          (snapshot.data?.artUri ?? "").toString(),
+                          ImageQuality.high),
+                      fallbackUrl: formatImgURL(
+                        (snapshot.data?.artUri ?? "").toString(),
+                        ImageQuality.medium,
+                      ),
                       fit: BoxFit.fitWidth),
-                ),
-              );
+                );
+              });
             }),
       ),
     );
   }
 }
 
-class UpNextPanel extends StatelessWidget {
+class UpNextPanel extends StatefulWidget {
   const UpNextPanel({
     super.key,
     required PanelController panelController,
   }) : _panelController = panelController;
 
   final PanelController _panelController;
+
+  @override
+  State<UpNextPanel> createState() => _UpNextPanelState();
+}
+
+class _UpNextPanelState extends State<UpNextPanel> {
+  final ItemScrollController _scrollController = ItemScrollController();
+
+  final ItemPositionsListener _itemPositionsListener =
+  ItemPositionsListener.create();
+
+  final ScrollOffsetController _scrollOffsetController =
+  ScrollOffsetController();
+
+  final ScrollOffsetListener _scrollOffsetListener =
+  ScrollOffsetListener.create();
+
+  StreamSubscription? _mediaItemSub;
+
+  @override
+  void initState() {
+    _mediaItemSub = context
+        .read<FyrestreamPlayerCubit>()
+        .fyrestreamPlayer
+        .mediaItem
+        .listen((value) {
+      if (value != null && mounted) {
+        // at first the scrollablepositionedlist is not ready
+        try {
+          _scrollController.scrollTo(
+              index: context
+                  .read<FyrestreamPlayerCubit>()
+                  .fyrestreamPlayer
+                  .currentPlayingIdx,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.easeInOut);
+        } catch (e) {
+          log(e.toString(), name: "UpNextPanel");
+          Future.delayed(const Duration(milliseconds: 500), () {
+            _scrollController.scrollTo(
+                index: context
+                    .read<FyrestreamPlayerCubit>()
+                    .fyrestreamPlayer
+                    .currentPlayingIdx,
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.easeInOut);
+          });
+        }
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _mediaItemSub?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -407,9 +477,9 @@ class UpNextPanel extends StatelessWidget {
               child: Center(
                 child: GestureDetector(
                   onTap: () {
-                    _panelController.isPanelOpen
-                        ? _panelController.close()
-                        : _panelController.open();
+                    widget._panelController.isPanelOpen
+                        ? widget._panelController.close()
+                        : widget._panelController.open();
                   },
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -449,11 +519,16 @@ class UpNextPanel extends StatelessWidget {
             Expanded(
               child: StreamBuilder(
                 stream:
-                context.watch<FyrestreamPlayerCubit>().fyrestreamPlayer.upNext,
+                context.watch<FyrestreamPlayerCubit>().fyrestreamPlayer.queue.stream,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    return ListView.builder(
+                    return ScrollablePositionedList.builder(
+                      itemScrollController: _scrollController,
+                      itemPositionsListener: _itemPositionsListener,
+                      scrollOffsetController: _scrollOffsetController,
+                      scrollOffsetListener: _scrollOffsetListener,
                       padding: const EdgeInsets.only(top: 5),
+                      physics: const BouncingScrollPhysics(),
                       itemCount: snapshot.data?.length ?? 0,
                       shrinkWrap: true,
                       // physics: const NeverScrollableScrollPhysics(),
@@ -464,7 +539,7 @@ class UpNextPanel extends StatelessWidget {
                               context
                                   .read<FyrestreamPlayerCubit>()
                                   .fyrestreamPlayer
-                                  .playOffsetIdx(offset: index);
+                                  .skipToQueueItem(index);
                             },
                             //
                             song: mediaItem2MediaItemModel(

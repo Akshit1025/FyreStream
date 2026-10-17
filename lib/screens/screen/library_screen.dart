@@ -1,6 +1,7 @@
 import 'package:fyrestream/screens/screen/library_views/cubit/current_playlist_cubit.dart';
 import 'package:fyrestream/screens/screen/library_views/more_opts_sheet.dart';
 import 'package:fyrestream/screens/widgets/sign_board_widget.dart';
+import 'package:fyrestream/utils/imgurl_formator.dart';
 import 'package:fyrestream/utils/load_Image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,6 +13,7 @@ import 'package:fyrestream/screens/widgets/playlist_tile.dart';
 import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:icons_plus/icons_plus.dart';
+
 class LibraryScreen extends StatelessWidget {
   const LibraryScreen({super.key});
   @override
@@ -140,7 +142,10 @@ class _ListOfPlaylistsState extends State<ListOfPlaylists> {
                 child: SmallPlaylistCard(
                     playListTitle: widget.state.playlists[index].playlistName,
                     coverArt: LoadImageCached(
-                        imageUrl: widget.state.playlists[index].coverImgUrl.toString()),
+                        imageUrl: formatImgURL(
+                          widget.state.playlists[index].coverImgUrl.toString(),
+                          ImageQuality.medium
+                        )),
                     playListsubTitle:
                     widget.state.playlists[index].subTitle ?? "Unknown"),
               ),

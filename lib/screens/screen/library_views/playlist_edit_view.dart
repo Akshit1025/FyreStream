@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:ui';
 import 'package:fyrestream/model/songModel.dart';
 import 'package:fyrestream/screens/screen/library_views/cubit/current_playlist_cubit.dart';
+import 'package:fyrestream/screens/widgets/snackbar.dart';
 import 'package:fyrestream/screens/widgets/song_tile.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:flutter/material.dart';
@@ -70,20 +71,27 @@ class _PlaylistEditViewState extends State<PlaylistEditView> {
                               fontSize: 16,
                               color: Default_Theme.primaryColor1))),
                   actions: [
-                    IconButton(
-                        onPressed: () {
-                          // check if title is empty or playlist already exist
-                          // check if item order is changed or not
-                          if (mediaItems.length == mediaOrder.length &&
-                              mediaItems.isNotEmpty &&
-                              titleController.text.isNotEmpty) {
-                            context.read<CurrentPlaylistCubit>().updatePlaylist(
-                              mediaOrder,
-                            );
-                          }
-                        },
-                        padding: const EdgeInsets.only(right: 8),
-                        icon: const Icon(MingCute.check_fill))
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: IconButton(
+                          onPressed: () {
+                            // check if title is empty or playlist already exist
+                            // check if item order is changed or not
+                            if (mediaItems.length == mediaOrder.length &&
+                                mediaItems.isNotEmpty &&
+                                titleController.text.isNotEmpty) {
+                              context
+                                  .read<CurrentPlaylistCubit>()
+                                  .updatePlaylist(
+                                mediaOrder,
+                              );
+                              SnackbarService.showMessage("Playlist Updated!");
+                            }
+                            Navigator.of(context).pop();
+                          },
+                          padding: const EdgeInsets.only(right: 8, left: 8),
+                          icon: const Icon(MingCute.check_fill)),
+                    )
                   ],
                 ),
                 // Text field for playlist title and description
@@ -174,10 +182,8 @@ class _PlaylistEditViewState extends State<PlaylistEditView> {
               ],
             );
           }
-          return const SliverToBoxAdapter(
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
+          return const Center(
+            child: CircularProgressIndicator(),
           );
         },
       ),
@@ -186,8 +192,7 @@ class _PlaylistEditViewState extends State<PlaylistEditView> {
 }
 
 class SliverPlaylistItems extends StatefulWidget {
-  SliverPlaylistItems({Key? key, required this.state, this.updatePlaylistItems})
-      : super(key: key);
+  const SliverPlaylistItems({Key? key, required this.state, this.updatePlaylistItems}) : super(key: key);
 
   final CurrentPlaylistState state;
   // Callback function to update the playlistItems

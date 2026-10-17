@@ -31,7 +31,6 @@ class Default_Theme {
     colorScheme: ColorScheme.fromSwatch().copyWith(
       primary: accentColor2,
       secondary: accentColor1,
-      background: themeColor,
       brightness: Brightness.dark,
       surface: themeColor,
     ),
@@ -49,19 +48,17 @@ class Default_Theme {
     ),
     brightness: Brightness.dark,
     switchTheme: SwitchThemeData(
-        thumbColor: MaterialStateProperty.all(primaryColor1),
-        trackOutlineColor: MaterialStateProperty.resolveWith((states) =>
-        states.contains(MaterialState.selected)
+        thumbColor: const WidgetStatePropertyAll(primaryColor1),
+        trackOutlineColor: WidgetStateProperty.resolveWith((states) =>
+        states.contains(WidgetState.selected)
             ? accentColor1
             : accentColor2),
-        trackColor: MaterialStateProperty.resolveWith((states) =>
-        states.contains(MaterialState.selected)
+        trackColor: WidgetStateProperty.resolveWith((states) =>
+        states.contains(WidgetState.selected)
             ? accentColor1
-            : primaryColor2.withOpacity(0)
-        )
-    ),
-    searchBarTheme: SearchBarThemeData(
-      backgroundColor: MaterialStateProperty.all(themeColor),
+            : primaryColor2.withOpacity(0))),
+    searchBarTheme: const SearchBarThemeData(
+      backgroundColor: WidgetStatePropertyAll(themeColor),
     ),
   );
 }

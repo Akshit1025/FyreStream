@@ -7,13 +7,16 @@ import 'package:fyrestream/blocs/search/fetch_search_results.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:icons_plus/icons_plus.dart';
 
-class searchPageDelegate extends SearchDelegate {
+class SearchPageDelegate extends SearchDelegate {
   List<String> searchList = [];
-  SourceEngine _sourceEngine = SourceEngine.eng_YTM;
-  searchPageDelegate(this._sourceEngine,);
-
+  SourceEngine sourceEngine = SourceEngine.eng_YTM;
+  ResultTypes resultType = ResultTypes.songs;
+  SearchPageDelegate(
+      this.sourceEngine,
+      this.resultType,
+      );
   @override
-  String? get searchFieldLabel => "What you want to listen?";
+  String? get searchFieldLabel => "Explore the world of music...";
 
   @override
   ThemeData appBarTheme(BuildContext context) {
@@ -29,15 +32,20 @@ class searchPageDelegate extends SearchDelegate {
           color: Default_Theme.primaryColor1,
         ).merge(Default_Theme.secondoryTextStyleMedium),
       ),
+      inputDecorationTheme: InputDecorationTheme(
+        hintStyle: TextStyle(
+          color: Default_Theme.primaryColor2.withOpacity(0.3),
+        ).merge(Default_Theme.secondoryTextStyle),
+      ),
     );
   }
 
   @override
   void showResults(BuildContext context) {
-    if (query.isNotEmpty) {
+    if (query.replaceAll(' ', '').isNotEmpty) {
       context
           .read<FetchSearchResultsCubit>()
-          .search(query, sourceEngine: _sourceEngine);
+          .search(query, sourceEngine: sourceEngine, resultType: resultType);
     }
     close(context, query);
   }
@@ -46,11 +54,10 @@ class searchPageDelegate extends SearchDelegate {
   List<Widget>? buildActions(BuildContext context) {
     return [
       IconButton(
-        onPressed: () {
-          query = '';
-        },
-        icon: const Icon(MingCute.close_fill),
-      ),
+          onPressed: () {
+            query = '';
+          },
+          icon: const Icon(MingCute.close_fill))
     ];
   }
 
@@ -87,7 +94,8 @@ class searchPageDelegate extends SearchDelegate {
     // final List<String> suggestionList = [];
 
     return FutureBuilder(
-      future: context.read<FetchSearchResultsCubit>().getSearchSuggestions(query),
+      future:
+      context.read<FetchSearchResultsCubit>().getSearchSuggestions(query),
       builder: (context, snapshot) {
         if (!snapshot.hasData || snapshot.data == null) {
           return const Center(
@@ -112,8 +120,25 @@ class searchPageDelegate extends SearchDelegate {
                   Default_Theme.secondoryTextStyle,
                 ),
               ),
+              leading: Icon(
+                MingCute.search_line,
+                size: 22,
+                color: Default_Theme.primaryColor1.withOpacity(0.5),
+              ),
+              trailing: IconButton(
+                onPressed: () {
+                  query = suggestionList[index];
+                  // only update the query and not show the results
+                },
+                icon: Icon(
+                  MingCute.arrow_left_up_line,
+                  color: Default_Theme.primaryColor1.withOpacity(0.5),
+                  size: 22,
+                ),
+              ),
               onTap: () {
                 query = suggestionList[index];
+                showResults(context);
                 // Show the search results based on the selected suggestion.
               },
             );

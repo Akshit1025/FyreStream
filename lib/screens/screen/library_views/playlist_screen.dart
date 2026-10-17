@@ -14,9 +14,11 @@ import 'package:fyrestream/services/db/cubit/fyrestream_db_cubit.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:fyrestream/utils/imgurl_formator.dart';
 import 'package:fyrestream/utils/load_Image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:icons_plus/icons_plus.dart';
@@ -420,61 +422,68 @@ class PlaylistView extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SliverFixedExtentList.builder(
-                      itemBuilder: (context, index) {
-                        return SongCardWidget(
-                          song: state.mediaPlaylist.mediaItems[index],
-                          onTap: () {
-                            if (!listEquals(
-                                context
-                                    .read<FyrestreamPlayerCubit>()
-                                    .fyrestreamPlayer
-                                    .queue
-                                    .value,
-                                state.mediaPlaylist.mediaItems)) {
+                  SliverPrototypeExtentList.builder(
+                    itemBuilder: (context, index) {
+                      return SongCardWidget(
+                        key: ValueKey(
+                            state.mediaPlaylist.mediaItems[index]),
+                        song: state.mediaPlaylist.mediaItems[index],
+                        onTap: () {
+                          if (!listEquals(
                               context
                                   .read<FyrestreamPlayerCubit>()
                                   .fyrestreamPlayer
-                                  .loadPlaylist(
-                                  MediaPlaylist(
-                                      mediaItems: state
-                                          .mediaPlaylist.mediaItems,
-                                      playlistName: state
-                                          .mediaPlaylist
-                                          .playlistName),
-                                  idx: index,
-                                  doPlay: true);
-                            } else if (context
+                                  .queue
+                                  .value,
+                              state.mediaPlaylist.mediaItems)) {
+                            context
                                 .read<FyrestreamPlayerCubit>()
                                 .fyrestreamPlayer
-                                .currentMedia !=
-                                state.mediaPlaylist.mediaItems[index]) {
-                              context
-                                  .read<FyrestreamPlayerCubit>()
-                                  .fyrestreamPlayer
-                                  .prepare4play(idx: index, doPlay: true);
-                            }
+                                .loadPlaylist(
+                                MediaPlaylist(
+                                    mediaItems: state
+                                        .mediaPlaylist.mediaItems,
+                                    playlistName: state
+                                        .mediaPlaylist.playlistName),
+                                idx: index,
+                                doPlay: true);
+                          } else if (context
+                              .read<FyrestreamPlayerCubit>()
+                              .fyrestreamPlayer
+                              .currentMedia !=
+                              state.mediaPlaylist.mediaItems[index]) {
+                            context
+                                .read<FyrestreamPlayerCubit>()
+                                .fyrestreamPlayer
+                                .prepare4play(idx: index, doPlay: true);
+                          }
 
-                            context.push('/MusicPlayer');
-                          },
-                          onOptionsTap: () {
-                            showMoreBottomSheet(context,
-                                state.mediaPlaylist.mediaItems[index],
-                                onDelete: () {
-                                  context
-                                      .read<FyreStreamDBCubit>()
-                                      .removeMediaFromPlaylist(
-                                    state.mediaPlaylist.mediaItems[index],
-                                    MediaPlaylistDB(
-                                        playlistName: state
-                                            .mediaPlaylist.playlistName),
-                                  );
-                                }, showDelete: true);
-                          },
-                        );
-                      },
-                      itemCount: state.mediaPlaylist.mediaItems.length,
-                      itemExtent: 70),
+                          context.push('/MusicPlayer');
+                        },
+                        onOptionsTap: () {
+                          showMoreBottomSheet(context,
+                              state.mediaPlaylist.mediaItems[index],
+                              onDelete: () {
+                                context
+                                    .read<FyreStreamDBCubit>()
+                                    .removeMediaFromPlaylist(
+                                  state.mediaPlaylist.mediaItems[index],
+                                  MediaPlaylistDB(
+                                      playlistName: state
+                                          .mediaPlaylist.playlistName),
+                                );
+                              }, showDelete: true);
+                        },
+                      );
+                    },
+                    itemCount: state.mediaPlaylist.mediaItems.length,
+                    prototypeItem: SongCardWidget(
+                      song: MediaItemModel(
+                          id: "prototype",
+                          artist: "prototype",
+                          title: "prototype"),
+                    ),
+                  ),
                 ],
               )
                   : ((state is CurrentPlaylistInitial ||

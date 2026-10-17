@@ -10,7 +10,6 @@ import 'package:fyrestream/blocs/library/cubit/library_items_cubit.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
 import 'package:fyrestream/screens/widgets/createPlaylist_bottomsheet.dart';
 import 'package:fyrestream/screens/widgets/playlist_tile.dart';
-import 'package:fyrestream/services/db/GlobalDB.dart';
 import 'package:fyrestream/theme_data/default.dart';
 import 'package:icons_plus/icons_plus.dart';
 
@@ -18,38 +17,41 @@ class LibraryScreen extends StatelessWidget {
   const LibraryScreen({super.key});
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          customDiscoverBar(context), //AppBar
-          BlocBuilder<LibraryItemsCubit, LibraryItemsState>(
-            builder: (context, state) {
-              if (state is LibraryItemsInitial) {
-                return const SliverToBoxAdapter(
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              } else if (state is! LibraryItemsInitial) {
-                return ListOfPlaylists(state: state);
-              } else {
-                return const SliverToBoxAdapter(
-                  child: Center(
-                    child: SignBoardWidget(
-                      message: "No Playlists Found!",
-                      icon: MingCute.playlist_fill,
+    return SafeArea(
+      child: Scaffold(
+        body: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            customDiscoverBar(context), //AppBar
+            BlocBuilder<LibraryItemsCubit, LibraryItemsState>(
+              builder: (context, state) {
+                if (state is LibraryItemsInitial) {
+                  return const SliverToBoxAdapter(
+                    child: Center(
+                      child: CircularProgressIndicator(),
                     ),
-                  ),
-                );
-              }
-            },
-          ),
-        ],
+                  );
+                } else if (state is! LibraryItemsInitial) {
+                  return ListOfPlaylists(state: state);
+                } else {
+                  return const SliverToBoxAdapter(
+                    child: Center(
+                      child: SignBoardWidget(
+                        message: "No Playlists Found!",
+                        icon: MingCute.playlist_fill,
+                      ),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        ),
+        backgroundColor: Default_Theme.themeColor,
       ),
-      backgroundColor: Default_Theme.themeColor,
     );
   }
+
   SliverAppBar customDiscoverBar(BuildContext context) {
     return SliverAppBar(
       floating: true,
@@ -96,12 +98,15 @@ class LibraryScreen extends StatelessWidget {
     );
   }
 }
+
 class ListOfPlaylists extends StatefulWidget {
   final LibraryItemsState state;
   const ListOfPlaylists({super.key, required this.state});
+
   @override
   State<ListOfPlaylists> createState() => _ListOfPlaylistsState();
 }
+
 class _ListOfPlaylistsState extends State<ListOfPlaylists> {
   @override
   Widget build(BuildContext context) {
@@ -143,9 +148,9 @@ class _ListOfPlaylistsState extends State<ListOfPlaylists> {
                     playListTitle: widget.state.playlists[index].playlistName,
                     coverArt: LoadImageCached(
                         imageUrl: formatImgURL(
-                          widget.state.playlists[index].coverImgUrl.toString(),
-                          ImageQuality.medium
-                        )),
+                            widget.state.playlists[index].coverImgUrl
+                                .toString(),
+                            ImageQuality.medium)),
                     playListsubTitle:
                     widget.state.playlists[index].subTitle ?? "Unknown"),
               ),

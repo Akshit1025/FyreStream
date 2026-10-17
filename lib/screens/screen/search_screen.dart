@@ -3,7 +3,10 @@ import 'dart:developer';
 import 'package:fyrestream/blocs/mediaPlayer/fyrestream_player_cubit.dart';
 import 'package:fyrestream/model/MediaPlaylistModel.dart';
 import 'package:fyrestream/model/source_engines.dart';
+import 'package:fyrestream/screens/widgets/album_card.dart';
+import 'package:fyrestream/screens/widgets/artist_card.dart';
 import 'package:fyrestream/screens/widgets/more_bottom_sheet.dart';
+import 'package:fyrestream/screens/widgets/playlist_card.dart';
 import 'package:fyrestream/screens/widgets/sign_board_widget.dart';
 import 'package:fyrestream/screens/widgets/song_tile.dart';
 import 'package:flutter/foundation.dart';
@@ -18,7 +21,10 @@ import 'package:fyrestream/theme_data/default.dart';
 
 class SearchScreen extends StatefulWidget {
   final String searchQuery;
-  const SearchScreen({Key? key, this.searchQuery = ""}) : super(key: key);
+  const SearchScreen({
+    Key? key,
+    this.searchQuery = "",
+  }) : super(key: key);
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -29,6 +35,17 @@ class _SearchScreenState extends State<SearchScreen> {
   late SourceEngine _sourceEngine;
   final TextEditingController _textEditingController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final ValueNotifier<ResultTypes> resultType =
+  ValueNotifier(ResultTypes.songs);
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(loadMoreResults);
+    _scrollController.dispose();
+    _textEditingController.dispose();
+    resultType.dispose();
+    super.dispose();
+  }
 
   void loadMoreResults() {
     if (_scrollController.position.pixels ==
@@ -37,7 +54,7 @@ class _SearchScreenState extends State<SearchScreen> {
         context.read<FetchSearchResultsCubit>().state.hasReachedMax == false) {
       context
           .read<FetchSearchResultsCubit>()
-          .searchJIS(_textEditingController.text, loadMore: true);
+          .searchJISTracks(_textEditingController.text, loadMore: true);
     }
   }
 
@@ -56,9 +73,11 @@ class _SearchScreenState extends State<SearchScreen> {
     _scrollController.addListener(loadMoreResults);
     if (widget.searchQuery != "") {
       _textEditingController.text = widget.searchQuery;
-      context
-          .read<FetchSearchResultsCubit>()
-          .search(widget.searchQuery.toString(), sourceEngine: _sourceEngine);
+      context.read<FetchSearchResultsCubit>().search(
+        widget.searchQuery.toString(),
+        sourceEngine: _sourceEngine,
+        resultType: resultType.value,
+      );
     }
   }
 
@@ -69,18 +88,16 @@ class _SearchScreenState extends State<SearchScreen> {
         height: 27,
         child: AnimatedContainer(
           duration: const Duration(seconds: 1),
-          curve: accelerateEasing,
+          curve: Easing.standardAccelerate,
           child: OutlinedButton(
             onPressed: () {
               setState(() {
                 _sourceEngine = sourceEngine;
-                if (_textEditingController.text.toString().isNotEmpty) {
-                  log("Search Engine ${sourceEngine.toString()}",
-                      name: "SearchScreen");
-                  context.read<FetchSearchResultsCubit>().search(
-                      _textEditingController.text.toString(),
-                      sourceEngine: sourceEngine);
-                }
+                context.read<FetchSearchResultsCubit>().checkAndRefreshSearch(
+                  query: _textEditingController.text.toString(),
+                  sE: sourceEngine,
+                  rT: resultType.value,
+                );
               });
             },
             style: OutlinedButton.styleFrom(
@@ -97,10 +114,10 @@ class _SearchScreenState extends State<SearchScreen> {
             child: Text(
               sourceEngine.value,
               style: TextStyle(
-                      color: _sourceEngine == sourceEngine
-                          ? Default_Theme.primaryColor2
-                          : Default_Theme.accentColor2,
-                      fontSize: 13)
+                  color: _sourceEngine == sourceEngine
+                      ? Default_Theme.primaryColor2
+                      : Default_Theme.accentColor2,
+                  fontSize: 13)
                   .merge(Default_Theme.secondoryTextStyleMedium),
             ),
           ),
@@ -111,180 +128,388 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      onVerticalDragEnd: (DragEndDetails details) =>
-          FocusManager.instance.primaryFocus?.unfocus(),
-      child: Scaffold(
-        appBar: AppBar(
-          shadowColor: Colors.black,
-          surfaceTintColor: Default_Theme.themeColor,
-          bottom: PreferredSize(
-            preferredSize: const Size(100, 20),
-            child: SizedBox(
-              height: 30,
-              width: MediaQuery.of(context).size.width,
+    return SafeArea(
+      child: GestureDetector(
+        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+        onVerticalDragEnd: (DragEndDetails details) =>
+            FocusManager.instance.primaryFocus?.unfocus(),
+        child: Scaffold(
+          appBar: AppBar(
+            shadowColor: Colors.black,
+            surfaceTintColor: Default_Theme.themeColor,
+            title: SizedBox(
+              height: 50.0,
               child: Padding(
                 padding: const EdgeInsets.only(
-                    left: 18, right: 18, top: 5, bottom: 5),
-                child: FutureBuilder(
-                  future: availableSourceEngines(),
-                  builder: (context, snapshot) {
-                    return snapshot.hasData || snapshot.data != null ? Row(
-                      children: snapshot.data!
-                        .map((e) => sourceEngineRadioButton(e))
-                        .toList(),
-                    ) : SizedBox();
-                  }
+                  top: 10,
+                ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () {
+                    showSearch(
+                        context: context,
+                        delegate: SearchPageDelegate(
+                            _sourceEngine, resultType.value),
+                        query: _textEditingController.text)
+                        .then((value) {
+                      if (value != null) {
+                        _textEditingController.text = value.toString();
+                      }
+                    });
+                  },
+                  child: TextField(
+                    controller: _textEditingController,
+                    enabled: false,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: Default_Theme.primaryColor1.withOpacity(0.55)),
+                    textInputAction: TextInputAction.search,
+                    decoration: InputDecoration(
+                        filled: true,
+                        suffixIcon: Icon(
+                          MingCute.search_2_fill,
+                          color: Default_Theme.primaryColor1.withOpacity(0.4),
+                        ),
+                        fillColor:
+                        Default_Theme.primaryColor2.withOpacity(0.07),
+                        contentPadding:
+                        const EdgeInsets.only(top: 20, left: 15, right: 5),
+                        hintText: "Find your next song obsession...",
+                        hintStyle: TextStyle(
+                          color: Default_Theme.primaryColor1.withOpacity(0.3),
+                          fontFamily: "Unageo",
+                          fontWeight: FontWeight.normal,
+                        ),
+                        disabledBorder: OutlineInputBorder(
+                            borderSide:
+                            const BorderSide(style: BorderStyle.none),
+                            borderRadius: BorderRadius.circular(50)),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Default_Theme.primaryColor1
+                                    .withOpacity(0.7)),
+                            borderRadius: BorderRadius.circular(50))),
+                  ),
                 ),
               ),
             ),
-          ),
-          title: SizedBox(
-            height: 50.0,
-            child: InkWell(
-              onTap: () {
-                showSearch(
-                        context: context,
-                        delegate: searchPageDelegate(_sourceEngine),
-                        query: _textEditingController.text)
-                    .then((value) {
-                  if ((value as String) != 'null') {
-                    _textEditingController.text = value.toString();
-                  }
-                });
-              },
-              child: TextField(
-                controller: _textEditingController,
-                enabled: false,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    color: Default_Theme.primaryColor1.withOpacity(0.55)),
-                textInputAction: TextInputAction.search,
-                decoration: InputDecoration(
-                    filled: true,
-                    suffixIcon: Icon(
-                      MingCute.search_2_fill,
-                      color: Default_Theme.primaryColor1.withOpacity(0.4),
-                    ),
-                    fillColor: Default_Theme.primaryColor2.withOpacity(0.07),
-                    contentPadding: const EdgeInsets.only(top: 20, left: 15, right: 5),
-                    hintText: "Find your next song obsession...",
-                    hintStyle: TextStyle(
-                      color: Default_Theme.primaryColor1.withOpacity(0.3),
-                      fontFamily: "Unageo",
-                      fontWeight: FontWeight.normal,
-                    ),
-                    disabledBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(style: BorderStyle.none),
-                        borderRadius: BorderRadius.circular(50)),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color:
-                                Default_Theme.primaryColor1.withOpacity(0.7)),
-                        borderRadius: BorderRadius.circular(50))),
-              ),
-            ),
+            backgroundColor: Default_Theme.themeColor,
           ),
           backgroundColor: Default_Theme.themeColor,
-        ),
-        backgroundColor: Default_Theme.themeColor,
-        body: BlocBuilder<ConnectivityCubit, ConnectivityState>(
-          builder: (context, state) {
-            return AnimatedSwitcher(
-                duration: const Duration(milliseconds: 600),
-                child: state == ConnectivityState.disconnected
-                    ? const SignBoardWidget(
-                  icon: MingCute.wifi_off_line,
-                  message: "No internet connection!",
-                )
-                    : BlocBuilder<FetchSearchResultsCubit,
-                    FetchSearchResultsState>(
-                  builder: (context, state) {
-                    if (state is FetchSearchResultsLoading) {
-                      return const Center(
-                        child: CircularProgressIndicator(
-                          color: Default_Theme.accentColor2,
-                        ),
-                      );
-                    } else if (state.loadingState ==
-                        LoadingState.loaded) {
-                      if (state.mediaItems.isNotEmpty) {
-                        log("Search Results: ${state.mediaItems.length}", name: "SearchScreen");
-                        return ListView.builder(
-                          controller: _scrollController,
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: state.hasReachedMax ? state.mediaItems.length : state.mediaItems.length + 1,
-                          itemBuilder: (context, index) {
-                            if (index == state.mediaItems.length) {
-                              return const Center(
-                                child: SizedBox(
-                                  height: 30,
-                                  width: 30,
-                                  child: CircularProgressIndicator(
-                                    color: Default_Theme.accentColor2,
-                                  ),
+          body: NestedScrollView(
+            headerSliverBuilder: (context, innerBoxIsScrolled) => [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      left: 18, right: 18, top: 5, bottom: 5),
+                  child: FutureBuilder(
+                      future: availableSourceEngines(),
+                      builder: (context, snapshot) {
+                        return snapshot.hasData || snapshot.data != null
+                            ? Wrap(
+                            direction: Axis.horizontal,
+                            runSpacing: 8,
+                            alignment: WrapAlignment.start,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 30,
+                                width: 100,
+                                child: Padding(
+                                  padding:
+                                  const EdgeInsets.only(right: 8),
+                                  child: ValueListenableBuilder(
+                                      valueListenable: resultType,
+                                      builder: (context, value, child) {
+                                        return DropdownButtonFormField(
+                                          key: UniqueKey(),
+                                          isExpanded: false,
+                                          isDense: true,
+                                          alignment: Alignment.center,
+                                          borderRadius:
+                                          BorderRadius.circular(20),
+                                          padding:
+                                          const EdgeInsets.all(0),
+                                          focusColor: Colors.transparent,
+                                          dropdownColor:
+                                          const Color.fromARGB(
+                                              255, 15, 15, 15),
+                                          decoration: InputDecoration(
+                                            filled: false,
+                                            fillColor: Default_Theme
+                                                .primaryColor2
+                                                .withOpacity(0.07),
+                                            contentPadding:
+                                            const EdgeInsets.all(0),
+                                            focusColor: Default_Theme
+                                                .accentColor2,
+                                            border: OutlineInputBorder(
+                                                borderSide:
+                                                const BorderSide(
+                                                    style: BorderStyle
+                                                        .none),
+                                                borderRadius:
+                                                BorderRadius.circular(
+                                                    20)),
+                                            enabledBorder:
+                                            OutlineInputBorder(
+                                                borderSide:
+                                                const BorderSide(
+                                                    style:
+                                                    BorderStyle
+                                                        .none),
+                                                borderRadius:
+                                                BorderRadius
+                                                    .circular(
+                                                    20)),
+                                            focusedBorder:
+                                            OutlineInputBorder(
+                                                borderSide:
+                                                const BorderSide(
+                                                    style:
+                                                    BorderStyle
+                                                        .none),
+                                                borderRadius:
+                                                BorderRadius
+                                                    .circular(
+                                                    20)),
+                                            disabledBorder:
+                                            OutlineInputBorder(
+                                                borderSide:
+                                                const BorderSide(
+                                                    style:
+                                                    BorderStyle
+                                                        .none),
+                                                borderRadius:
+                                                BorderRadius
+                                                    .circular(
+                                                    20)),
+                                            isDense: true,
+                                          ),
+                                          value: resultType.value.index,
+                                          items: ResultTypes.values
+                                              .map(
+                                                  (e) => DropdownMenuItem(
+                                                value: e.index,
+                                                child: SizedBox(
+                                                  height: 32,
+                                                  child: Padding(
+                                                    padding:
+                                                    const EdgeInsets
+                                                        .only(
+                                                      left: 8,
+                                                      top: 2,
+                                                      bottom: 4,
+                                                    ),
+                                                    child: Text(
+                                                      e.val,
+                                                      style: Default_Theme
+                                                          .secondoryTextStyleMedium
+                                                          .merge(
+                                                          const TextStyle(
+                                                            color: Default_Theme
+                                                                .primaryColor1,
+                                                            fontSize:
+                                                            13.5,
+                                                          )),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ))
+                                              .toList(),
+                                          onChanged: (value) {
+                                            resultType.value = ResultTypes
+                                                .values[value!];
+                                            context
+                                                .read<
+                                                FetchSearchResultsCubit>()
+                                                .checkAndRefreshSearch(
+                                              query:
+                                              _textEditingController
+                                                  .text
+                                                  .toString(),
+                                              sE: _sourceEngine,
+                                              rT: resultType.value,
+                                            );
+                                          },
+                                        );
+                                      }),
                                 ),
-                              );
-                            }
-                            return Padding(
-                              padding: const EdgeInsets.only(left: 4),
-                              child: SongCardWidget(
-                                song: state.mediaItems[index],
-                                onTap: () {
-                                  if (!listEquals(
-                                      context
+                              ),
+                              for (var sourceEngine in availSourceEngines)
+                                sourceEngineRadioButton(sourceEngine)
+                            ])
+                            : const SizedBox();
+                      }),
+                ),
+              ),
+            ],
+            body: BlocBuilder<ConnectivityCubit, ConnectivityState>(
+              builder: (context, state) {
+                return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 600),
+                    child: state == ConnectivityState.disconnected
+                        ? const SignBoardWidget(
+                      icon: MingCute.wifi_off_line,
+                      message: "No internet connection!",
+                    )
+                        : BlocConsumer<FetchSearchResultsCubit,
+                        FetchSearchResultsState>(
+                      builder: (context, state) {
+                        if (state is FetchSearchResultsLoading) {
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              color: Default_Theme.accentColor2,
+                            ),
+                          );
+                        } else if (state.loadingState ==
+                            LoadingState.loaded) {
+                          if (state.resultType == ResultTypes.songs &&
+                              state.mediaItems.isNotEmpty) {
+                            log("Search Results: ${state.mediaItems.length}",
+                                name: "SearchScreen");
+                            return ListView.builder(
+                              controller: _scrollController,
+                              itemCount: state.hasReachedMax
+                                  ? state.mediaItems.length
+                                  : state.mediaItems.length + 1,
+                              itemBuilder: (context, index) {
+                                if (index == state.mediaItems.length) {
+                                  return const Center(
+                                    child: SizedBox(
+                                      height: 30,
+                                      width: 30,
+                                      child: CircularProgressIndicator(
+                                        color: Default_Theme.accentColor2,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return Padding(
+                                  padding: const EdgeInsets.only(left: 4),
+                                  child: SongCardWidget(
+                                    song: state.mediaItems[index],
+                                    onTap: () {
+                                      if (!listEquals(
+                                          context
+                                              .read<FyrestreamPlayerCubit>()
+                                              .fyrestreamPlayer
+                                              .queue
+                                              .value,
+                                          state.mediaItems)) {
+                                        context
+                                            .read<FyrestreamPlayerCubit>()
+                                            .fyrestreamPlayer
+                                            .loadPlaylist(
+                                            MediaPlaylist(
+                                                playlistName:
+                                                "Search",
+                                                mediaItems:
+                                                state.mediaItems),
+                                            idx: index,
+                                            doPlay: true);
+                                      } else if (context
                                           .read<FyrestreamPlayerCubit>()
                                           .fyrestreamPlayer
-                                          .queue
-                                          .value,
-                                      state.mediaItems)) {
-                                    context
-                                        .read<FyrestreamPlayerCubit>()
-                                        .fyrestreamPlayer
-                                        .loadPlaylist(
-                                        MediaPlaylist(
-                                            playlistName:
-                                            state.albumName,
-                                            mediaItems:
-                                            state.mediaItems),
-                                        idx: index,
-                                        doPlay: true);
-                                  } else if (context
-                                      .read<FyrestreamPlayerCubit>()
-                                      .fyrestreamPlayer
-                                      .currentMedia !=
-                                      state.mediaItems[index]) {
-                                    context
-                                        .read<FyrestreamPlayerCubit>()
-                                        .fyrestreamPlayer
-                                        .prepare4play(
-                                        idx: index, doPlay: true);
-                                  }
+                                          .currentMedia !=
+                                          state.mediaItems[index]) {
+                                        context
+                                            .read<FyrestreamPlayerCubit>()
+                                            .fyrestreamPlayer
+                                            .prepare4play(
+                                            idx: index, doPlay: true);
+                                      }
 
-                                  context.push('/MusicPlayer');
-                                },
-                                onOptionsTap: () => showMoreBottomSheet(
-                                    context, state.mediaItems[index]),
+                                      context.push('/MusicPlayer');
+                                    },
+                                    onOptionsTap: () =>
+                                        showMoreBottomSheet(context,
+                                            state.mediaItems[index]),
+                                  ),
+                                );
+                              },
+                            );
+                          } else if (state.resultType ==
+                              ResultTypes.albums &&
+                              state.albumItems.isNotEmpty) {
+                            return Align(
+                              alignment: Alignment.topCenter,
+                              child: SingleChildScrollView(
+                                physics: const BouncingScrollPhysics(),
+                                child: Wrap(
+                                  alignment: WrapAlignment.center,
+                                  runSpacing: 10,
+                                  children: [
+                                    for (var album in state.albumItems)
+                                      AlbumCard(album: album)
+                                  ],
+                                ),
                               ),
                             );
-                          },
-                        );
-                      } else {
-                        return const SignBoardWidget(
-                            message:
-                            "No results found!\nTry another keyword or source engine!",
-                            icon: MingCute.sweats_line);
-                      }
-                    } else {
-                      return const SignBoardWidget(
-                          message:
-                          "Search for your favorite songs\nand discover new ones!",
-                          icon: MingCute.search_2_line);
-                    }
-                  },
-                ));
-          },
+                          } else if (state.resultType ==
+                              ResultTypes.artists &&
+                              state.artistItems.isNotEmpty) {
+                            return Align(
+                              alignment: Alignment.topCenter,
+                              child: SingleChildScrollView(
+                                physics: const BouncingScrollPhysics(),
+                                child: Wrap(
+                                  alignment: WrapAlignment.center,
+                                  runSpacing: 10,
+                                  children: [
+                                    for (var artist in state.artistItems)
+                                      ArtistCard(artist: artist)
+                                  ],
+                                ),
+                              ),
+                            );
+                          } else if (state.resultType ==
+                              ResultTypes.playlists &&
+                              state.playlistItems.isNotEmpty) {
+                            return Align(
+                              alignment: Alignment.topCenter,
+                              child: SingleChildScrollView(
+                                physics: const BouncingScrollPhysics(),
+                                child: Wrap(
+                                  alignment: WrapAlignment.center,
+                                  runSpacing: 10,
+                                  children: [
+                                    for (var playlist
+                                    in state.playlistItems)
+                                      PlaylistCard(
+                                        playlist: playlist,
+                                        sourceEngine: _sourceEngine,
+                                      )
+                                  ],
+                                ),
+                              ),
+                            );
+                          } else {
+                            return const SignBoardWidget(
+                                message:
+                                "No results found!\nTry another keyword or source engine!",
+                                icon: MingCute.sweats_line);
+                          }
+                        } else {
+                          return const SignBoardWidget(
+                              message:
+                              "Search for your favorite songs\nand discover new ones!",
+                              icon: MingCute.search_2_line);
+                        }
+                      },
+                      listener: (BuildContext context,
+                          FetchSearchResultsState state) {
+                        resultType.value = state.resultType;
+                        if (state is! FetchSearchResultsLoaded &&
+                            state is! FetchSearchResultsInitial) {
+                          _sourceEngine =
+                              state.sourceEngine ?? _sourceEngine;
+                        }
+                      },
+                    ));
+              },
+            ),
+          ),
         ),
       ),
     );

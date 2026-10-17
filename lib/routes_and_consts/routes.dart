@@ -2,7 +2,7 @@ import 'package:fyrestream/screens/widgets/global_footer.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fyrestream/routes_and_consts/global_str_consts.dart';
-import 'package:fyrestream/screens/screen/add_to_playlist_screen.dart';
+import 'package:fyrestream/screens/screen/common_views/add_to_playlist_screen.dart';
 import 'package:fyrestream/screens/screen/player_screen.dart';
 import 'package:fyrestream/screens/screen/explore_screen.dart';
 import 'package:fyrestream/screens/screen/library_screen.dart';
@@ -52,14 +52,14 @@ class GlobalRoutes {
         // parentNavigatorKey: globalRouterKey,
         path: '/PlaylistView',
         builder: (context, state) {
-          return PlaylistView();
+          return const PlaylistView();
         },
       ),
       GoRoute(
         path: '/AddToPlaylist',
         parentNavigatorKey: globalRouterKey,
         name: GlobalStrConsts.addToPlaylistScreen,
-        builder: (context, state) => AddToPlaylistScreen(),
+        builder: (context, state) => const AddToPlaylistScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
@@ -97,7 +97,7 @@ class GlobalRoutes {
               GoRoute(
                 name: GlobalStrConsts.libraryScreen,
                 path: '/Library',
-                builder: (context, state) => LibraryScreen(),
+                builder: (context, state) => const LibraryScreen(),
                 routes: [
                   GoRoute(
                     path: "ImportMediaFromPlatforms",
@@ -121,7 +121,7 @@ class GlobalRoutes {
                       searchQuery: state.uri.queryParameters['query']!.toString(),
                     );
                   } else {
-                    return SearchScreen();
+                    return const SearchScreen();
                   }
                 },
               ),
